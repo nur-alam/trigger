@@ -1,5 +1,5 @@
-=== Platform ===
-Contributor: Themeum
+=== Trigger ===
+Contributor: Nur
 Tags: subscriptions, subscription, subscription plan, license
 Requires at least: 5.3
 Tested up to: 6.3

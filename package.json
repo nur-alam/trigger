@@ -1,0 +1,43 @@
+{
+	"name": "trigger",
+	"version": "1.0.0",
+	"description": "learning app",
+	"main": "index.js",
+	"scripts": {
+		"dev": "npx mix",
+		"watch": "npx mix watch",
+		"prod": "npx mix --production",
+		"make-pot": "wp i18n make-pot --exclude='node_modules, vendor' . languages/trigger.pot",
+		"bundle": "wp dist-archive . . --filename-format=trigger-1.0.0",
+		"build": "composer i --no-dev && npm run make-pot && npm run prod && npm run bundle"
+	},
+	"author": "nur",
+	"license": "ISC",
+	"dependencies": {
+		"@hookform/resolvers": "^3.9.0",
+		"@tanstack/react-query": "^5.55.4",
+		"axios": "^1.7.7",
+		"framer-motion": "^11.3.31",
+		"lucide-react": "^0.439.0",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1",
+		"react-hook-form": "^7.53.0",
+		"react-hot-toast": "^2.4.1",
+		"react-quill": "^2.0.0",
+		"swr": "^2.2.5",
+		"tailwindcss": "^3.4.10",
+		"yup": "^1.4.0"
+	},
+	"devDependencies": {
+		"@babel/preset-react": "^7.24.7",
+		"laravel-mix": "^6.0.49",
+		"laravel-mix-tailwind": "^0.1.2",
+		"path": "^0.12.7",
+		"postcss-custom-properties": "^14.0.1",
+		"resolve-url-loader": "^5.0.0",
+		"sass": "^1.77.8",
+		"sass-loader": "^12.6.0",
+		"ts-loader": "^9.5.1",
+		"typescript": "^5.5.4"
+	}
+}

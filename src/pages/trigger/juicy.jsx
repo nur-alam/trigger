@@ -1,18 +1,12 @@
 import { css } from '@emotion/react';
-import Juicy from './juicy';
 
 const color = 'white';
 
-function Trigger() {
-	return (
-		<>
-			<div css={styles.wrapper}>Hover to change color.</div>
-			<Juicy />
-		</>
-	);
+function Juicy() {
+	return <div css={styles.wrapper}>Juicy</div>;
 }
 
-export default Trigger;
+export default Juicy;
 
 const styles = {
 	wrapper: css`

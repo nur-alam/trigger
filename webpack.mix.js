@@ -1,9 +1,15 @@
 let mix = require('laravel-mix');
 const path = require('path');
 const tailwind = require('laravel-mix-tailwind');
+const webpack = require('webpack');
 
 mix.webpackConfig({
 	cache: false,
+	plugins: [
+		new webpack.ProvidePlugin({
+			React: 'react',
+		}),
+	],
 });
 
 mix.setPublicPath('./assets/dist');

@@ -73,7 +73,7 @@ class Enqueue {
 	 *
 	 * @return void
 	 */
-	public static function load_front_end_scripts() {
+	public static function load_front_end_scripts(): void {
 		$plugin_data             = Trigger::plugin_data();
 		$trigger_frontend_bundle = Trigger::plugin_data()['plugin_url'] . 'assets/dist/js/trigger-frontend.min.js';
 		wp_enqueue_script(

@@ -4,12 +4,8 @@
 	"description": "learning app",
 	"main": "index.js",
 	"scripts": {
-		"dev": "npx mix",
-		"watch": "npx mix watch",
-		"prod": "npx mix --production",
-		"make-pot": "wp i18n make-pot --exclude='node_modules, vendor' . languages/trigger.pot",
-		"bundle": "wp dist-archive . . --filename-format=trigger-1.0.0",
-		"build": "composer i --no-dev && npm run make-pot && npm run prod && npm run bundle"
+		"build": "webpack --mode production",
+		"dev": "webpack --mode development --watch"
 	},
 	"author": "nur",
 	"license": "ISC",
@@ -32,19 +28,31 @@
 		"yup": "^1.4.0"
 	},
 	"devDependencies": {
-		"@emotion/babel-preset-css-prop": "^11.12.0",
+		"@babel/core": "^7.26.7",
 		"@babel/preset-env": "^7.26.7",
 		"@babel/preset-react": "^7.26.3",
+		"@babel/preset-typescript": "^7.26.0",
 		"@emotion/babel-plugin": "^11.13.5",
+		"@emotion/babel-preset-css-prop": "^11.12.0",
+		"@types/react": "^19.0.8",
+		"@types/react-dom": "^19.0.3",
+		"babel-loader": "^9.2.1",
+		"css-loader": "^7.1.2",
+		"html-webpack-plugin": "^5.6.3",
 		"laravel-mix": "^6.0.49",
 		"laravel-mix-tailwind": "^0.1.2",
+		"mini-css-extract-plugin": "^2.9.2",
 		"path": "^0.12.7",
 		"postcss-custom-properties": "^14.0.1",
 		"resolve-url-loader": "^5.0.0",
 		"sass": "^1.77.8",
 		"sass-loader": "^12.6.0",
-		"ts-loader": "^9.5.1",
-		"typescript": "^5.5.4",
-		"webpack": "^5.97.1"
+		"style-loader": "^4.0.0",
+		"terser-webpack-plugin": "^5.3.10",
+		"ts-loader": "^9.5.2",
+		"typescript": "^5.7.3",
+		"webpack": "^5.97.1",
+		"webpack-bundle-analyzer": "^4.10.2",
+		"webpack-cli": "^6.0.1"
 	}
 }

@@ -8,4 +8,4 @@
  */
 
 ?>
-<div id="word-root" class="text-2xl"></div>
+<div id="settings-root" class="text-2xl"></div>

@@ -3,7 +3,7 @@
         "target": "ES6",
         "module": "ESNext",
         "moduleResolution": "node",
-        "lib": ["ESNext", "DOM"],
+        "lib": ["dom", "dom.iterable", "esnext", "es5", "es6"],
         "jsx": "react-jsx",
         "isolatedModules": true,
         "strict": true,

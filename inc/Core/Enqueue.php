@@ -54,7 +54,7 @@ class Enqueue {
 		wp_enqueue_script(
 			'trigger-admin',
 			$trigger_admin_bundle,
-			array(),
+			array( 'wp-i18n' ),
 			'1.0.0',
 			// filemtime( $$plugin_data['plugin_path'] . 'assets/dist/js/backend-bundle.min.js' ),
 			true

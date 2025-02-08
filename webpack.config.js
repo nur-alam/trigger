@@ -25,7 +25,7 @@ module.exports = (env, options) => {
 					use: ['style-loader', 'css-loader'],
 				},
 				{
-					test: /\.(js|ts|tsx)$/,
+					test: /\.(js|jsx|ts|tsx)$/,
 					exclude: /node_modules/,
 					use: 'babel-loader',
 				},
@@ -49,9 +49,9 @@ module.exports = (env, options) => {
 		},
 		plugins: [new webpack.ProvidePlugin({ React: 'react' })],
 		externals: {
-			// react: 'React',
-			// 'react-dom': 'ReactDOM',
-			// '@wordpress/i18n': 'wp.i18n',
+			react: 'React',
+			'react-dom': 'ReactDOM',
+			'@wordpress/i18n': 'wp.i18n',
 		},
 		devtool: 'source-map',
 	};
@@ -60,7 +60,7 @@ module.exports = (env, options) => {
 		{
 			dest_path: './assets/dist/js',
 			src_files: {
-				'backend-bundle.min': './src/index.tsx',
+				'backend-bundle.min': './src/index.jsx',
 			},
 		},
 	];

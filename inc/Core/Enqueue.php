@@ -39,10 +39,15 @@ class Enqueue {
 	 *
 	 * @return void
 	 */
-	public static function load_admin_scripts(): void {
+	public static function load_admin_scripts( $page ): void {
 		$plugin_data          = Trigger::plugin_data();
 		$trigger_style_bundle = $plugin_data['plugin_url'] . 'assets/dist/css/style.min.css';
 		$trigger_admin_bundle = $plugin_data['plugin_url'] . 'assets/dist/js/backend-bundle.min.js';
+
+		if ( 'toplevel_page_trigger' !== $page ) {
+			return;
+		}
+
 		wp_enqueue_style(
 			'trigger-style',
 			$trigger_style_bundle,
@@ -54,7 +59,7 @@ class Enqueue {
 		wp_enqueue_script(
 			'trigger-admin',
 			$trigger_admin_bundle,
-			array( 'wp-i18n' ),
+			array( 'wp-element', 'wp-i18n' ),
 			'1.0.0',
 			// filemtime( $$plugin_data['plugin_path'] . 'assets/dist/js/backend-bundle.min.js' ),
 			true

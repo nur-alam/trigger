@@ -64,6 +64,7 @@ module.exports = (env, options) => {
 				new TerserPlugin({
 					parallel: true,
 					terserOptions: {
+						compress: { drop_console: true },
 						output: {
 							comments: false,
 							ecma: 6,

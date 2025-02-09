@@ -37,6 +37,8 @@ class Enqueue {
 	 *
 	 * @since 1.0.0
 	 *
+	 * @param string $page The current admin page.
+	 *
 	 * @return void
 	 */
 	public static function load_admin_scripts( $page ): void {

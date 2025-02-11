@@ -19,6 +19,7 @@ use Trigger\Database\Migration;
 use Trigger\Init;
 use Trigger\Frontend\Pages\PageManager;
 
+
 if ( ! class_exists( 'Trigger' ) ) {
 
 	/**
@@ -61,6 +62,9 @@ if ( ! class_exists( 'Trigger' ) ) {
 		 * @return void
 		 */
 		public function __construct() {
+
+			require_once 'constants.php';
+
 			if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 				include_once __DIR__ . '/vendor/autoload.php';
 			}

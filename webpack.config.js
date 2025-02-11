@@ -112,6 +112,9 @@ module.exports = (env, options) => {
 					},
 					alias: {
 						'@components': path.resolve(__dirname, './src/components'),
+						'@lib': path.resolve(__dirname, './src/lib'),
+						'@utils': path.resolve(__dirname, './src/lib/utils'),
+						'@hooks': path.resolve(__dirname, './src/hooks'),
 					},
 				},
 			})

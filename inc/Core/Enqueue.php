@@ -54,16 +54,14 @@ class Enqueue {
 			'trigger-style',
 			$trigger_style_bundle,
 			array(),
-			'1.0.0',
-			// filemtime( $$plugin_data['plugin_path'] . 'assets/dist/css/style.min.css' ),
-			false
+			TRIGGER_VERSION,
+			'all'
 		);
 		wp_enqueue_script(
 			'trigger-admin',
 			$trigger_admin_bundle,
 			array( 'wp-element', 'wp-i18n' ),
-			'1.0.0',
-			// filemtime( $$plugin_data['plugin_path'] . 'assets/dist/js/backend-bundle.min.js' ),
+			TRIGGER_VERSION,
 			true
 		);
 		wp_add_inline_script(
@@ -87,8 +85,7 @@ class Enqueue {
 			'trigger-frontend',
 			$trigger_frontend_bundle,
 			array(),
-			'1.0.0',
-			// filemtime( Trigger::plugin_data()['plugin_path'] . 'assets/dist/js/trigger-frontend.min.js' ),
+			TRIGGER_VERSION,
 			true
 		);
 		wp_add_inline_script(

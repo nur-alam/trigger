@@ -1,6 +1,7 @@
 const path = require('node:path');
 const fs = require('fs');
 const TerserPlugin = require('terser-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const webpack = require('webpack');
 
@@ -23,6 +24,10 @@ module.exports = (env, options) => {
 				{
 					test: /\.css$/i,
 					use: ['style-loader', 'css-loader'],
+				},
+				{
+					test: /\.scss$/i,
+					use: ['css-loader', 'sass-loader'],
 				},
 				{
 					test: /\.(js|jsx|ts|tsx)$/,
@@ -105,9 +110,13 @@ module.exports = (env, options) => {
 						path: false,
 						os: false,
 					},
+					alias: {
+						'@components': path.resolve(__dirname, './src/components'),
+					},
 				},
 			})
 		);
 	}
+
 	return [...configEditors];
 };

@@ -1,1 +1,1 @@
-console.log('trigger');
+console.log('concurrently trigger');

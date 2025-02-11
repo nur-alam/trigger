@@ -15,9 +15,10 @@
         "paths": {
             "@components/*": ["./src/components/*"],
             "@lib/*": ["./src/lib/*"],
-            "@utils": ["./src/lib/utils"],
             "@hooks": ["./src/hooks"],
             "@*": ["./src/*"],
+            "@utils": ["./src/utils"],
+            "@config": ["./src/config"],
         }
     },
     "include": ["src/**/*.ts", "src/**/*.tsx"],

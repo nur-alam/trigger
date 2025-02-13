@@ -1,4 +1,4 @@
-import config from '@config';
+import { config } from '@config';
 import { router } from '@utils/router'
 import { getSlugFromUrl } from '@utils/utils';
 import React, { use, useEffect, useState } from 'react'
@@ -29,7 +29,7 @@ const App = () => {
 				if (closestLinkTag) {
 					const url = config.admin_url + closestLinkTag.getAttribute('href');
 					const newSlug = getSlugFromUrl(url);
-					// console.log('newSlug', newSlug);
+					console.log('config ', config.trigger.nonce);
 
 					if (newSlug) {
 						setSlug(newSlug);

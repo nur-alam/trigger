@@ -1,7 +1,5 @@
-// const triggerObject = {}; // Define triggerObject
+const _triggerObject = (window as any).triggerObject;
 
-const config = {
-	...window.triggerObject,
+export const config = {
+	..._triggerObject,
 };
-
-export default config;

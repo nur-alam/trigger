@@ -51,17 +51,89 @@ const Canvas = () => {
 
 		items.forEach((item, i) => {
 			if (i !== index) {
-				const isHorizontallyAligned = Math.abs(draggedItem.position.y - item.position.y) <= 5; // Snap threshold
-				const isVerticallyAligned = Math.abs(draggedItem.position.x - item.position.x) <= 5; // Snap threshold
-
+				/**
+				 * Horizontal alignment
+				 * Top of dragItem & Other Items
+				 * while dragging top to bottom or bottom to top
+				 */
+				const isHorizontallyAligned = Math.abs(draggedItem.position.y - item.position.y) <= 2; // Snap threshold
 				if (isHorizontallyAligned) {
 					horizontalGuide = item.position.y;
 					draggedItem.position.y = item.position.y; // Snap to horizontal
 				}
+				/** ✅
+				 * Horizontal alignment
+				 * Top of dragItem & bottom other items
+				 */
+				const isDragItemTopItemBottomAlignment =
+					Math.abs(draggedItem.position.y - (item.position.y + item.size.height)) <= 1;
+				if (isDragItemTopItemBottomAlignment) {
+					horizontalGuide = draggedItem.position.y;
+					draggedItem.position.y = item.position.y + item.size.height; // Snap to horizontal
+				}
+				/** ✅
+				 * #Horizontal line
+				 * Bottom of dragItem & top of other items
+				 */
+				const isDragItemTopItemBottomAlignmentEnd =
+					Math.abs(draggedItem.position.y + draggedItem.size.height - item.position.y) <= 1;
+				if (isDragItemTopItemBottomAlignmentEnd) {
+					horizontalGuide = item.position.y;
+					draggedItem.position.y = item.position.y - draggedItem.size.height; // Snap to vertical
+				}
 
+				/**
+				 * Horizontal line
+				 * Bottom of dragItem & bottom of other items
+				 */
+				const isDragItemBottomOtherItemsBottomAlignment =
+					Math.abs(draggedItem.position.y + draggedItem.size.height - (item.position.y + item.size.height)) <=
+					1;
+				if (isDragItemBottomOtherItemsBottomAlignment) {
+					horizontalGuide = item.position.y + item.size.height;
+					draggedItem.position.y = item.position.y + item.size.height;
+				}
+
+				/** ✅
+				 * Vertical alignment
+				 * Left of dragItem & Other items
+				 * while dragging right to left or left to right
+				 */
+				const isVerticallyAligned = Math.abs(draggedItem.position.x - item.position.x) <= 2; // Snap threshold
 				if (isVerticallyAligned) {
 					verticalGuide = item.position.x;
 					draggedItem.position.x = item.position.x; // Snap to vertical
+				}
+				/** ✅
+				 * Vertical alignment
+				 * left of dragItem & right of other items
+				 */
+				const isDragItemLeftItemRightAlignment =
+					Math.abs(draggedItem.position.x - (item.position.x + item.size.width)) <= 1;
+				if (isDragItemLeftItemRightAlignment) {
+					verticalGuide = item.position.x + item.size.width;
+					draggedItem.position.x = item.position.x + item.size.width;
+				}
+				/** ✅
+				 * Vertical alignment
+				 * dragItem right & other items left
+				 */
+				const isDragItemRightItemLeftAlignment =
+					Math.abs(draggedItem.position.x + draggedItem.size.width - item.position.x) <= 1;
+				if (isDragItemRightItemLeftAlignment) {
+					verticalGuide = item.position.x;
+					draggedItem.position.x = item.position.x - draggedItem.size.width;
+				}
+				/** ✅
+				 * Vertical alignment
+				 * dragItem right & other items right
+				 */
+				const isDragItemRightOtherItemsRightAlignment =
+					Math.abs(draggedItem.position.x + draggedItem.size.width - (item.position.x + item.size.width)) <=
+					1;
+				if (isDragItemRightOtherItemsRightAlignment) {
+					verticalGuide = item.position.x + item.size.width;
+					draggedItem.position.x = item.position.x + item.size.width - draggedItem.size.width;
 				}
 			}
 		});

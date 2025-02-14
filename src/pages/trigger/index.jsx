@@ -1,13 +1,13 @@
 import { css } from '@emotion/react';
 import Juicy from './juicy';
+import Builder from '../../builder/index';
 
 const color = 'white';
 
 function Trigger() {
 	return (
 		<>
-			<div css={styles.wrapper}>Hover to change color.</div>
-			<Juicy />
+			<Builder />
 		</>
 	);
 }

@@ -91,7 +91,7 @@ const Canvas = () => {
 					1;
 				if (isDragItemBottomOtherItemsBottomAlignment) {
 					horizontalGuide = item.position.y + item.size.height;
-					draggedItem.position.y = item.position.y + item.size.height;
+					draggedItem.position.y = item.position.y + item.size.height - draggedItem.size.height;
 				}
 
 				/** ✅

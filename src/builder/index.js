@@ -6,13 +6,12 @@ import Canvas from './canvas';
 function Builder() {
 	return (
 		<>
-			<div className='app'>
+			<div className='builder'>
 				<Toolbar />
 				<div className='main'>
 					<Sidebar />
 					<Canvas />
 				</div>
-				builder
 			</div>
 		</>
 	);

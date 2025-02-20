@@ -1,73 +1,31 @@
 import React from 'react';
 
-const TEXT = {
-	label: 'Text',
-	content: '<p>Hello Text</p>',
-	position: {
-		top: 20,
-		left: 80,
-	},
-	size: {
-		width: 240,
-		height: 50,
-	},
-	style: {
-		typography: {
-			family: 'Lexend',
-			type: 'sans-serif',
-			height: 1.4,
-			weight: 400,
-			spacing: 0,
-			size: 35,
-			fontFamily: 'Lexend',
-		},
-		color: {
-			textColor: '#000',
-		},
-	},
-};
-const HEADING = {
-	label: 'Heading',
-	content: '<h2>Heading</h2>',
-	position: {
-		top: 20,
-		left: 80,
-	},
-	size: {
-		width: 240,
-		height: 50,
-	},
-	style: {
-		typography: {
-			family: 'Lexend',
-			type: 'sans-serif',
-			height: 1.4,
-			weight: 400,
-			spacing: 0,
-			size: 35,
-			fontFamily: 'Lexend',
-		},
-		color: {
-			textColor: '#000',
-		},
-	},
-};
+import elements from './elements';
 
 const Sidebar = ({ onDragStart }) => {
-	const elements = [TEXT, HEADING];
-
 	return (
-		<div className='sidebar'>
-			{elements.map((el, index) => (
+		<div
+			className='sidebar'
+			style={{
+				background: '#f5f5f5',
+				margin: '10px 0px',
+				display: 'flex',
+				gap: '20px',
+				padding: '8px 0px 8px 10px',
+				border: '2px solid rgb(221, 221, 221)',
+				width: '90%',
+			}}
+		>
+			{Object.keys(elements).map((key, index) => (
 				<div
 					key={index}
-					className='draggable-item'
+					className={`draggable-item`}
 					draggable
 					onDragStart={(e) => {
-						e.dataTransfer.setData('application/json', JSON.stringify(el));
+						e.dataTransfer.setData('application/json', JSON.stringify(elements[key]));
 					}}
 				>
-					{el.label}
+					{elements[key].label}
 				</div>
 			))}
 		</div>

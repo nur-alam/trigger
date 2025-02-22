@@ -1,11 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Rnd } from 'react-rnd';
-import { resizeHandleCss } from '@utils/builder';
+import { getSnapLines, resizeHandleCss } from '@utils/builder';
 
 const Canvas = () => {
 	const [canvasElements, setCanvasElements] = useState([]); // List of draggable items indices
 	const [selectedElements, setSelectedElements] = useState([]); // List of selected items indices
 	const [selectionBox, setSelectionBox] = useState(null);
+	const [snapLines, setSnapLines] = useState([]);
+	const snapThreshold = 1; // Distance to snap
 	const canvasRef = useRef(null);
 	const initialDragPosition = useRef(null);
 
@@ -55,7 +57,13 @@ const Canvas = () => {
 	 * @param {object} data  - data to be applied to the element
 	 */
 	const handleDrag = (index, data) => {
-		updateElement(index, { position: { x: data.x, y: data.y } });
+		const draggedElement = canvasElements[index];
+		const newPosition = { x: data.x, y: data.y };
+		const canvasWidth = canvasRef.current ? canvasRef.current.offsetWidth : 0;
+		const snapLines = getSnapLines(canvasElements, draggedElement, index, newPosition, snapThreshold, canvasWidth);
+		updateElement(index, { position: newPosition });
+		setSnapLines(snapLines);
+		console.log('snapLines', snapLines);
 	};
 
 	/**
@@ -64,6 +72,7 @@ const Canvas = () => {
 	 * @param {object} data  - data to be applied to the element
 	 */
 	const handleDragStop = (index, data) => {
+		setSnapLines([]);
 		updateElement(index, { position: { x: data.x, y: data.y } });
 	};
 
@@ -147,6 +156,10 @@ const Canvas = () => {
 		setSelectionBox(null);
 	};
 
+	/**
+	 * Gets the bounding rectangle for the selected elements
+	 * @returns {object} - bounding rectangle
+	 */
 	const getBoundingClientRect = () => {
 		if (selectedElements.length === 0) return null;
 		const elementsInBoundingRect = selectedElements.map((index) => canvasElements[index]);
@@ -164,6 +177,11 @@ const Canvas = () => {
 
 	const boundingRect = getBoundingClientRect();
 
+	/**
+	 * Handles dragging multiple selected elements simultaneously
+	 * @param {number} deltaX - The change in x position from drag movement
+	 * @param {number} deltaY - The change in y position from drag movement
+	 */
 	const handleDragSelected = (deltaX, deltaY) => {
 		setCanvasElements((prev) =>
 			prev.map((item, index) =>
@@ -206,7 +224,7 @@ const Canvas = () => {
 					padding: '8px 0px 8px 10px',
 				}}
 			>
-				{boundingRect && (
+				{boundingRect && selectedElements.length > 1 && (
 					<Rnd
 						size={{ width: boundingRect.width, height: boundingRect.height }}
 						position={{ x: boundingRect.x, y: boundingRect.y }}
@@ -237,6 +255,20 @@ const Canvas = () => {
 					/>
 				)}
 
+				{(snapLines || []).map((line, index) => (
+					<div
+						key={index}
+						style={{
+							position: 'absolute',
+							top: line.y !== undefined ? line.y : 0,
+							left: line.x !== undefined ? line.x : 0,
+							width: line.x !== undefined ? '1px' : '100%',
+							height: line.y !== undefined ? '1px' : '100%',
+							backgroundColor: 'red',
+						}}
+					/>
+				))}
+
 				{canvasElements.map((canvasElement, index) => (
 					<Rnd
 						key={index}
@@ -255,6 +287,7 @@ const Canvas = () => {
 						}}
 						enableResizing={selectedElements.length === 1 && selectedElements[0] === index}
 						resizeHandleStyles={resizeHandleCss()}
+						dragGrid={[1, 1]}
 						style={{
 							border: selectedElements.includes(index) ? '2px solid blue' : '2px solid transparent',
 							backgroundColor: '#fff',

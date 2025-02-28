@@ -1,44 +1,46 @@
 export const getSnapLines = (canvasElements, draggedElement, index, newPosition, snapThreshold, canvasWidth) => {
 	const newSnapLines = [];
+	const updatedPosition = { ...newPosition }; // Create a copy of newPosition
 	canvasElements.forEach((item, i) => {
 		if (i !== index) {
 			// Check horizontal snap lines
-			if (Math.abs(newPosition.x - item.position.x) < snapThreshold) {
-				newPosition.x = item.position.x;
+			if (Math.abs(updatedPosition.x - item.position.x) < snapThreshold) {
+				updatedPosition.x = item.position.x;
 				newSnapLines.push({ x: item.position.x, y1: 0, y2: '100%' });
 			}
 			if (
-				Math.abs(newPosition.x + draggedElement.size.width - (item.position.x + item.size.width)) <
+				Math.abs(updatedPosition.x + draggedElement.size.width - (item.position.x + item.size.width)) <
 				snapThreshold
 			) {
-				newPosition.x = item.position.x + item.size.width - draggedElement.size.width;
+				updatedPosition.x = item.position.x + item.size.width - draggedElement.size.width;
 				newSnapLines.push({ x: item.position.x + item.size.width, y1: 0, y2: '100%' });
 			}
 			if (
-				Math.abs(newPosition.x + draggedElement.size.width / 2 - (item.position.x + item.size.width / 2)) <
+				Math.abs(updatedPosition.x + draggedElement.size.width / 2 - (item.position.x + item.size.width / 2)) <
 				snapThreshold
 			) {
-				newPosition.x = item.position.x + item.size.width / 2 - draggedElement.size.width / 2;
+				updatedPosition.x = item.position.x + item.size.width / 2 - draggedElement.size.width / 2;
 				newSnapLines.push({ x: item.position.x + item.size.width / 2, y1: 0, y2: '100%' });
 			}
 
 			// Check vertical snap lines
-			if (Math.abs(newPosition.y - item.position.y) < snapThreshold) {
-				newPosition.y = item.position.y;
+			if (Math.abs(updatedPosition.y - item.position.y) < snapThreshold) {
+				updatedPosition.y = item.position.y;
 				newSnapLines.push({ y: item.position.y, x1: 0, x2: '100%' });
 			}
 			if (
-				Math.abs(newPosition.y + draggedElement.size.height - (item.position.y + item.size.height)) <
+				Math.abs(updatedPosition.y + draggedElement.size.height - (item.position.y + item.size.height)) <
 				snapThreshold
 			) {
-				newPosition.y = item.position.y + item.size.height - draggedElement.size.height;
+				updatedPosition.y = item.position.y + item.size.height - draggedElement.size.height;
 				newSnapLines.push({ y: item.position.y + item.size.height, x1: 0, x2: '100%' });
 			}
 			if (
-				Math.abs(newPosition.y + draggedElement.size.height / 2 - (item.position.y + item.size.height / 2)) <
-				snapThreshold
+				Math.abs(
+					updatedPosition.y + draggedElement.size.height / 2 - (item.position.y + item.size.height / 2)
+				) < snapThreshold
 			) {
-				newPosition.y = item.position.y + item.size.height / 2 - draggedElement.size.height / 2;
+				updatedPosition.y = item.position.y + item.size.height / 2 - draggedElement.size.height / 2;
 				newSnapLines.push({ y: item.position.y + item.size.height / 2, x1: 0, x2: '100%' });
 			}
 
@@ -61,17 +63,17 @@ export const getSnapLines = (canvasElements, draggedElement, index, newPosition,
 			// 	draggedItem.position.x = item.position.x; // Snap to vertical
 			// }
 			// if (
-			// 	Math.abs(newPosition.x + draggedElement.size.width / 2 - (item.position.x + item.size.width / 2)) <
+			// 	Math.abs(updatedPosition.x + draggedElement.size.width / 2 - (item.position.x + item.size.width / 2)) <
 			// 		snapThreshold &&
-			// 	Math.abs(newPosition.y + draggedElement.size.height / 2 - (item.position.y + item.size.height / 2)) <
+			// 	Math.abs(updatedPosition.y + draggedElement.size.height / 2 - (item.position.y + item.size.height / 2)) <
 			// 		snapThreshold &&
-			// 	Math.abs(newPosition.x + draggedElement.size.width / 2 - (item.position.x + item.size.width / 2)) <
+			// 	Math.abs(updatedPosition.x + draggedElement.size.width / 2 - (item.position.x + item.size.width / 2)) <
 			// 		snapThreshold &&
-			// 	Math.abs(newPosition.y + draggedElement.size.height / 2 - (item.position.y + item.size.height / 2)) <
+			// 	Math.abs(updatedPosition.y + draggedElement.size.height / 2 - (item.position.y + item.size.height / 2)) <
 			// 		snapThreshold
 			// ) {
-			// 	newPosition.x = item.position.x + item.size.width / 2 - draggedElement.size.width / 2;
-			// 	newPosition.y = item.position.y + item.size.height / 2 - draggedElement.size.height / 2;
+			// 	updatedPosition.x = item.position.x + item.size.width / 2 - draggedElement.size.width / 2;
+			// 	updatedPosition.y = item.position.y + item.size.height / 2 - draggedElement.size.height / 2;
 			// 	newSnapLines.push({ y: item.position.y + item.size.height / 2, x1: 0, x2: '100%' });
 			// 	newSnapLines.push({ x: item.position.x + item.size.width / 2, y1: 0, y2: '100%' });
 			// }
@@ -85,7 +87,7 @@ export const resizeHandleCss = () => {
 	return {
 		top: {
 			width: 26,
-			height: 6,
+			height: 3,
 			background: '#fff',
 			border: '2px solid #6180E4',
 			borderRadius: '32px',
@@ -96,7 +98,7 @@ export const resizeHandleCss = () => {
 		},
 		bottom: {
 			width: 26,
-			height: 6,
+			height: 3,
 			background: '#fff',
 			border: '2px solid #6180E4',
 			borderRadius: '32px',
@@ -106,30 +108,30 @@ export const resizeHandleCss = () => {
 			zIndex: 99,
 		},
 		left: {
-			width: 26,
-			height: 6,
+			width: 16,
+			height: 3,
 			background: '#fff',
 			border: '2px solid #6180E4',
 			borderRadius: '32px',
 			top: '50%',
-			left: '-14px',
+			left: '-11px',
 			transform: 'translate(0px, -50%) rotate(90deg)',
 			zIndex: 99,
 		},
 		right: {
-			width: 26,
-			height: 6,
+			width: 16,
+			height: 3,
 			background: '#fff',
 			border: '2px solid #6180E4',
 			borderRadius: '32px',
 			top: '50%',
-			left: 'calc(100% + 1px)',
-			transform: 'translate(-50%, 0px) rotate(90deg)',
+			right: '-10px',
+			transform: 'translate(0, -50%) rotate(90deg)',
 			zIndex: 99,
 		},
 		bottomRight: {
-			width: 16,
-			height: 16,
+			width: 10,
+			height: 10,
 			right: '-10px',
 			bottom: '-10px',
 			zIndex: 99,
@@ -138,8 +140,8 @@ export const resizeHandleCss = () => {
 			borderRadius: '50%',
 		},
 		bottomLeft: {
-			width: 16,
-			height: 16,
+			width: 10,
+			height: 10,
 			left: '-10px',
 			bottom: '-10px',
 			zIndex: 99,
@@ -148,8 +150,8 @@ export const resizeHandleCss = () => {
 			borderRadius: '50%',
 		},
 		topLeft: {
-			width: 16,
-			height: 16,
+			width: 10,
+			height: 10,
 			left: '-10px',
 			top: '-10px',
 			zIndex: 99,
@@ -158,8 +160,8 @@ export const resizeHandleCss = () => {
 			borderRadius: '50%',
 		},
 		topRight: {
-			width: 16,
-			height: 16,
+			width: 10,
+			height: 10,
 			right: '-10px',
 			top: '-10px',
 			zIndex: 99,

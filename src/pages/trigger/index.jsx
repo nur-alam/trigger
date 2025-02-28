@@ -1,8 +1,4 @@
-import { css } from '@emotion/react';
-import Juicy from './juicy';
-import Builder from '../../builder/index';
-
-const color = 'white';
+import Builder from '../../dnd';
 
 function Trigger() {
 	return (
@@ -13,15 +9,3 @@ function Trigger() {
 }
 
 export default Trigger;
-
-const styles = {
-	wrapper: css`
-		padding: 32px;
-		background-color: hotpink;
-		font-size: 24px;
-		border-radius: 4px;
-		&:hover {
-			color: ${color};
-		}
-	`,
-};

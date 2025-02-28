@@ -63,7 +63,6 @@ const Canvas = () => {
 		const snapLines = getSnapLines(canvasElements, draggedElement, index, newPosition, snapThreshold, canvasWidth);
 		updateElement(index, { position: newPosition });
 		setSnapLines(snapLines);
-		console.log('snapLines', snapLines);
 	};
 
 	/**
@@ -283,7 +282,7 @@ const Canvas = () => {
 						onDrag={(e, data) => handleDrag(index, data)}
 						onDragStop={(e, data) => handleDragStop(index, data)}
 						onResizeStop={(e, direction, ref, delta, position) => {
-							handleResizeStop(index, ref, delta, position);
+							handleResizeStop(index, direction, ref, delta, position);
 						}}
 						enableResizing={selectedElements.length === 1 && selectedElements[0] === index}
 						resizeHandleStyles={resizeHandleCss()}

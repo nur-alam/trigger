@@ -1,6 +1,8 @@
 import Text from './Text';
+import { v4 as uuidv4 } from 'uuid';
 
 export const TEXT = {
+	id: uuidv4(),
 	type: 'TEXT',
 	label: 'Text',
 	content: '<p>Hello Text</p>',

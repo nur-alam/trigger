@@ -13,8 +13,7 @@ const Canvas = () => {
 	// const { canvasElements, setCanvasElements, addElement, updateElement } = useContext(CanvasContext);
 	const dispatch = useDispatch();
 	const canvasElements = useSelector((state) => state.canvas.elements);
-
-	const [selectedElements, setSelectedElements] = useState([]);
+	const selectedElements = useSelector((state) => state.canvas.selectedElements) || [];
 	const { setNodeRef, isOver } = useDroppable({
 		id: 'canvas',
 	});
@@ -23,6 +22,8 @@ const Canvas = () => {
 	const initialDragPosition = useRef(null);
 	const snapThreshold = 1; // Distance to snap
 	const [snapLines, setSnapLines] = useState([]);
+
+	console.log('process.env.NODE_ENV', process.env.NODE_ENV);
 
 	useDndMonitor({
 		onDragEnd: (event) => {
@@ -39,8 +40,7 @@ const Canvas = () => {
 				},
 			};
 			dispatch(addElement(newElement));
-			// setCanvasElements((prevElements) => [...prevElements, newElement]);
-			setSelectedElements([canvasElements.length]); // adding new element means last element of the canvas elements
+			dispatch(updateSelectedElement([canvasElements.length]));
 		},
 	});
 
@@ -61,7 +61,7 @@ const Canvas = () => {
 			width: 0,
 			height: 0,
 		});
-		setSelectedElements([]);
+		dispatch(updateSelectedElement([]));
 	};
 
 	/**
@@ -106,7 +106,7 @@ const Canvas = () => {
 				return isWithinSelection ? index : null;
 			})
 			.filter((index) => index !== null);
-		setSelectedElements(selected);
+		dispatch(updateSelectedElement(selected));
 		setSelectionBox(null);
 	};
 
@@ -119,7 +119,6 @@ const Canvas = () => {
 		let draggedElement = canvasElements[index];
 		let newPosition = { x: data.x, y: data.y };
 		const updatedObj = { position: newPosition };
-		updateElement(index, updatedObj);
 		dispatch(updateElement({ index, updatedObj }));
 		let canvasWidth = canvasDom ? canvasDom.offsetWidth : 0;
 		const snapLines = getSnapLines(canvasElements, draggedElement, index, newPosition, snapThreshold, canvasWidth);
@@ -156,7 +155,7 @@ const Canvas = () => {
 	 * @returns {object} - bounding rectangle
 	 */
 	const getBoundingClientRect = () => {
-		if (selectedElements === 0) return null;
+		if (selectedElements.length < 2) return null;
 		const elementsInBoundingRect = selectedElements.map((index) => canvasElements[index]);
 		const minX = Math.min(...elementsInBoundingRect.map((element) => element.position.x));
 		const minY = Math.min(...elementsInBoundingRect.map((element) => element.position.y));
@@ -273,8 +272,7 @@ const Canvas = () => {
 						onMouseDown={(e) => {
 							e.stopPropagation();
 							if (!selectedElements.includes(index)) {
-								setSelectedElements([index]);
-								dispatch(updateSelectedElement(canvasElements[index]));
+								dispatch(updateSelectedElement([index]));
 							}
 						}}
 						onDrag={(e, data) => handleDrag(index, data)}

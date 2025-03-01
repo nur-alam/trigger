@@ -6,7 +6,7 @@ const canvasSlice = createSlice({
 	initialState: {
 		elements: [],
 		// elements: [HEADING, TEXT],
-		selectedElement: {},
+		selectedElements: [],
 		undoStack: [],
 		redoStack: [],
 	},
@@ -14,7 +14,7 @@ const canvasSlice = createSlice({
 		addElement: (state, action) => {
 			// state.undoStack.push([...state.elements]);
 			// state.redoStack = [];
-			state.selectedElement = action.payload;
+			// state.selectedElement = action.payload;
 			state.elements.push(action.payload);
 		},
 		updateElement: (state, action) => {
@@ -29,7 +29,7 @@ const canvasSlice = createSlice({
 			state.elements.splice(action.payload, 1);
 		},
 		updateSelectedElement: (state, action) => {
-			state.selectedElement = { ...action.payload };
+			state.selectedElements = action.payload;
 		},
 		undo: (state) => {
 			if (state.undoStack.length > 0) {

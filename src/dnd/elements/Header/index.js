@@ -1,6 +1,8 @@
 import Heading from './Heading';
+import { v4 as uuidv4 } from 'uuid';
 
 export const HEADING = {
+	id: uuidv4(),
 	type: 'HEADING',
 	label: 'Heading',
 	content: '<h2>Heading</h2>',

@@ -23,8 +23,6 @@ const Canvas = () => {
 	const snapThreshold = 1; // Distance to snap
 	const [snapLines, setSnapLines] = useState([]);
 
-	console.log('process.env.NODE_ENV', process.env.NODE_ENV);
-
 	useDndMonitor({
 		onDragEnd: (event) => {
 			const { active, over, isOver } = event;
@@ -61,6 +59,7 @@ const Canvas = () => {
 			width: 0,
 			height: 0,
 		});
+		console.log('handle mouse down');
 		dispatch(updateSelectedElement([]));
 	};
 
@@ -217,6 +216,9 @@ const Canvas = () => {
 				onMouseDown={handleMouseDown}
 				onMouseUp={handleMouseUp}
 				onMouseMove={handleMouseMove}
+				onPointerDown={() => {
+					dispatch(updateSelectedElement([]));
+				}}
 				// onDrop={handleDrop}
 			>
 				{boundingRect && selectedElements.length > 1 && (

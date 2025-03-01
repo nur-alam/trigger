@@ -1,5 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit';
 import canvasReducer from './canvasSlice';
+import { loadState, saveState } from './utility';
+
+const preloadedState = loadState();
 
 const store = configureStore({
 	reducer: {
@@ -7,6 +10,11 @@ const store = configureStore({
 	},
 	// devTools: process.env.NODE_ENV !== 'production',
 	devTools: true,
+	preloadedState,
+});
+
+store.subscribe(() => {
+	saveState(store.getState());
 });
 
 export default store;

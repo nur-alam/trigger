@@ -7,6 +7,7 @@ import Sidebar from './sidebar';
 import Canvas from './canvas';
 import { CanvasProvider } from './Context';
 import Settings from './settings';
+import StylePanel from './settings';
 
 function Builder() {
 	return (
@@ -25,7 +26,8 @@ function Builder() {
 						<Provider store={store}>
 							<Sidebar />
 							<Canvas />
-							<Settings />
+							{/* <Settings /> */}
+							<StylePanel />
 						</Provider>
 					</DndContext>
 				</div>

@@ -13,7 +13,14 @@ export const loadState = () => {
 		if (serializedState === null) {
 			return undefined;
 		}
-		return JSON.parse(serializedState);
+		const state = JSON.parse(serializedState);
+		return {
+			...state,
+			canvas: {
+				...state.canvas,
+				selectedElements: [],
+			},
+		};
 	} catch (err) {
 		console.error('Could not load state', err);
 		return undefined;

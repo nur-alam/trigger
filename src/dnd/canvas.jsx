@@ -8,16 +8,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addElement, updateElement, updateSelectedElement } from './store/canvasSlice';
 
 let mousePosition;
+let canvasDom;
 
 const Canvas = () => {
 	// const { canvasElements, setCanvasElements, addElement, updateElement } = useContext(CanvasContext);
 	const dispatch = useDispatch();
 	const canvasElements = useSelector((state) => state.canvas.elements);
 	const selectedElements = useSelector((state) => state.canvas.selectedElements) || [];
-	const { setNodeRef, isOver } = useDroppable({
+	const { setNodeRef, isOver, node, rect, active, over } = useDroppable({
 		id: 'canvas',
 	});
-	const canvasDom = document.getElementById('canvas');
+
 	const [selectionBox, setSelectionBox] = useState(null);
 	const initialDragPosition = useRef(null);
 	const snapThreshold = 1; // Distance to snap
@@ -59,7 +60,7 @@ const Canvas = () => {
 			width: 0,
 			height: 0,
 		});
-		console.log('handle mouse down');
+
 		dispatch(updateSelectedElement([]));
 	};
 
@@ -86,6 +87,7 @@ const Canvas = () => {
 	 * @returns {void} - void
 	 */
 	const handleMouseUp = () => {
+		console.log('handle mouse up');
 		if (!selectionBox) return;
 		const selected = canvasElements
 			.map((element, index) => {
@@ -190,6 +192,8 @@ const Canvas = () => {
 	};
 
 	useEffect(() => {
+		canvasDom = document.getElementById('canvas');
+
 		const handleMouseMove = (e) => {
 			mousePosition = e;
 		};
@@ -216,9 +220,10 @@ const Canvas = () => {
 				onMouseDown={handleMouseDown}
 				onMouseUp={handleMouseUp}
 				onMouseMove={handleMouseMove}
-				onPointerDown={() => {
-					dispatch(updateSelectedElement([]));
-				}}
+				// onPointerDown={() => {
+				// 	console.log('canvas clicked');
+				// 	dispatch(updateSelectedElement([]));
+				// }}
 				// onDrop={handleDrop}
 			>
 				{boundingRect && selectedElements.length > 1 && (

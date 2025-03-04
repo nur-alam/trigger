@@ -1,0 +1,80 @@
+.style-panel {
+	padding-right: 5px;
+}
+
+.font-options {
+	height: 200px;
+	overflow: scroll;
+	padding: 10px 0px;
+}
+
+.font-picker {
+	display: flex;
+	background: #1e1e1e;
+	color: white;
+	padding: 10px;
+	border-radius: 8px;
+	flex-direction: column;
+}
+
+.font-list {
+	width: 200px;
+	padding-right: 10px;
+	border-right: 1px solid #333;
+}
+
+.search-bar {
+	width: 100%;
+	padding: 8px;
+	background: #2a2a2a;
+	border: none;
+	border-radius: 4px;
+	color: white;
+}
+
+.font-options {
+	margin-top: 10px;
+	max-height: 200px;
+	overflow-y: auto;
+}
+
+.font-item {
+	padding: 8px;
+	cursor: pointer;
+	transition: background 0.3s;
+}
+
+.font-item:hover,
+.font-item.active {
+	background: #3a3a3a;
+	border-radius: 4px;
+}
+
+.font-controls {
+	flex: 1;
+	padding-left: 10px;
+}
+
+.control-group {
+	margin-bottom: 10px;
+}
+
+label {
+	display: block;
+	font-size: 14px;
+	margin-bottom: 4px;
+}
+
+select,
+input {
+	width: 100%;
+	padding: 6px;
+	background: #2a2a2a;
+	border: none;
+	border-radius: 4px;
+	color: white;
+}
+
+input[type="range"] {
+	width: 100%;
+}

@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import elements from './elements';
 import { useDraggable } from '@dnd-kit/core';
 import { CanvasContext } from './Context';
+import { useSelector } from 'react-redux';
 
 const DraggableItem = ({ label, element }) => {
 	const { attributes, setNodeRef, listeners, transform } = useDraggable({ id: label, data: element });
@@ -11,6 +12,7 @@ const DraggableItem = ({ label, element }) => {
 				transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
 		  }
 		: {};
+
 	return (
 		<>
 			<div

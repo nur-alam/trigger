@@ -20,11 +20,11 @@ export const TEXT = {
 		typography: {
 			family: 'Lexend',
 			type: 'sans-serif',
+			fontUrl: '',
 			height: 1.4,
 			weight: 400,
 			spacing: 0,
 			size: 35,
-			fontFamily: 'Lexend',
 		},
 		color: {
 			textColor: '#000',

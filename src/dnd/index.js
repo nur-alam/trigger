@@ -1,17 +1,23 @@
 import React, { useState } from 'react';
 import { DndContext } from '@dnd-kit/core';
-import { Provider } from 'react-redux';
-import store from './store';
+import { Provider, useSelector } from 'react-redux';
 import Toolbar from './toolbar';
 import Sidebar from './sidebar';
 import Canvas from './canvas';
-import { CanvasProvider } from './Context';
-import Settings from './settings';
-import StylePanel from './settings';
+import StylePanel from './stylepanel/stylepanel';
 
 function Builder() {
+	const fonts = useSelector((state) => state.canvas.fonts);
+
+	const generateFontUrlString = (fonts) => {
+		return Object.values(fonts)?.join(' ');
+	};
+
+	console.log('generateFontUrlString', Object.values(fonts).join(' '));
+
 	return (
 		<>
+			<style>{generateFontUrlString(fonts)}</style>
 			<div className='builder'>
 				<Toolbar />
 				<div
@@ -19,26 +25,15 @@ function Builder() {
 					style={{
 						display: 'grid',
 						gridTemplateColumns: '200px 1fr 300px',
-						gap: '20px',
+						// gap: '20px',
 					}}
 				>
 					<DndContext>
-						<Provider store={store}>
-							<Sidebar />
-							<Canvas />
-							{/* <Settings /> */}
-							<StylePanel />
-						</Provider>
+						<Sidebar />
+						<Canvas />
+						<StylePanel />
 					</DndContext>
 				</div>
-				{/* <div className='main'>
-					<DndContext>
-						<CanvasProvider>
-							<Sidebar />
-							<Canvas />
-						</CanvasProvider>
-					</DndContext>
-				</div> */}
 			</div>
 		</>
 	);

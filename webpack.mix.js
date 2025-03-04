@@ -21,6 +21,7 @@ mix.js('assets/src/script/frontend/frontend.js', 'assets/dist/js/trigger-fronten
 mix.sass('assets/src/scss/index.scss', 'assets/dist/css/style.min.css').tailwind();
 
 mix.alias({
+	'@src': path.resolve(__dirname, './src/'),
 	'@components': path.resolve(__dirname, './src/components/'),
 	'@config': path.resolve(__dirname, './src/config/'),
 	'@hooks': path.resolve(__dirname, './src/hooks/'),

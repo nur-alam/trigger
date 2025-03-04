@@ -7,6 +7,9 @@ const canvasSlice = createSlice({
 		elements: [],
 		// elements: [HEADING, TEXT],
 		selectedElements: [],
+		fonts: {
+			// ABeeZee: '@import url(https://fonts.googleapis.com/css2?family=ABeeZee:ital@0;1&display=swap);',
+		},
 		undoStack: [],
 		redoStack: [],
 	},
@@ -19,6 +22,7 @@ const canvasSlice = createSlice({
 		},
 		updateElement: (state, action) => {
 			const { index, updatedObj } = action.payload;
+			// console.log('index, updatedObj', index, updatedObj);
 			// state.undoStack.push([...state.elements]);
 			// state.redoStack = [];
 			state.elements[index] = { ...state.elements[index], ...updatedObj };
@@ -30,6 +34,14 @@ const canvasSlice = createSlice({
 		},
 		updateSelectedElement: (state, action) => {
 			state.selectedElements = action.payload;
+		},
+		updateFonts: (state, action) => {
+			const { family, fontUrl } = action.payload;
+			// if (!state.fonts[family]) {
+			// 	state.fonts[family] = fontUrl;
+			// 	return;
+			// }
+			state.fonts[family] = fontUrl;
 		},
 		undo: (state) => {
 			if (state.undoStack.length > 0) {
@@ -47,7 +59,8 @@ const canvasSlice = createSlice({
 		},
 	},
 });
-export const { addElement, updateElement, deleteElement, updateSelectedElement, undo, redo } = canvasSlice.actions;
+export const { addElement, updateElement, deleteElement, updateSelectedElement, updateFonts, undo, redo } =
+	canvasSlice.actions;
 export default canvasSlice.reducer;
 // module.exports = canvasSlice.reducer;
 // module.exports.canvasActions = canvasSlice.actions;

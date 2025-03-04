@@ -1,0 +1,70 @@
+export default {
+	kind: 'webfonts#webfontList',
+	items: [
+		{
+			family: 'ABeeZee',
+			variants: ['regular', 'italic'],
+			subsets: ['latin'],
+			version: 'v14',
+			lastModified: '2020-09-02',
+			files: {
+				regular: 'http://fonts.gstatic.com/s/abeezee/v14/esDR31xSG-6AGleN6tKukbcHCpE.ttf',
+				italic: 'http://fonts.gstatic.com/s/abeezee/v14/esDT31xSG-6AGleN2tCklZUCGpG-GQ.ttf',
+			},
+			category: 'sans-serif',
+			kind: 'webfonts#webfont',
+		},
+		{
+			family: 'Abel',
+			variants: ['regular'],
+			subsets: ['latin'],
+			version: 'v12',
+			lastModified: '2020-09-10',
+			files: {
+				regular: 'http://fonts.gstatic.com/s/abel/v12/MwQ5bhbm2POE6VhLPJp6qGI.ttf',
+			},
+			category: 'sans-serif',
+			kind: 'webfonts#webfont',
+		},
+		{
+			family: 'Abhaya Libre',
+			variants: ['regular', '500', '600', '700', '800'],
+			subsets: ['latin', 'latin-ext', 'sinhala'],
+			version: 'v6',
+			lastModified: '2020-09-02',
+			files: {
+				regular: 'http://fonts.gstatic.com/s/abhayalibre/v6/e3tmeuGtX-Co5MNzeAOqinEge0PWovdU4w.ttf',
+				500: 'http://fonts.gstatic.com/s/abhayalibre/v6/e3t5euGtX-Co5MNzeAOqinEYj2ryqtxI6oYtBA.ttf',
+				600: 'http://fonts.gstatic.com/s/abhayalibre/v6/e3t5euGtX-Co5MNzeAOqinEYo23yqtxI6oYtBA.ttf',
+				700: 'http://fonts.gstatic.com/s/abhayalibre/v6/e3t5euGtX-Co5MNzeAOqinEYx2zyqtxI6oYtBA.ttf',
+				800: 'http://fonts.gstatic.com/s/abhayalibre/v6/e3t5euGtX-Co5MNzeAOqinEY22_yqtxI6oYtBA.ttf',
+			},
+			category: 'serif',
+			kind: 'webfonts#webfont',
+		},
+		{
+			family: 'Abril Fatface',
+			variants: ['regular'],
+			subsets: ['latin', 'latin-ext'],
+			version: 'v12',
+			lastModified: '2020-09-02',
+			files: {
+				regular: 'http://fonts.gstatic.com/s/abrilfatface/v12/zOL64pLDlL1D99S8g8PtiKchm-BsjOLhZBY.ttf',
+			},
+			category: 'display',
+			kind: 'webfonts#webfont',
+		},
+		{
+			family: 'Aclonica',
+			variants: ['regular'],
+			subsets: ['latin'],
+			version: 'v11',
+			lastModified: '2020-09-02',
+			files: {
+				regular: 'http://fonts.gstatic.com/s/aclonica/v11/K2FyfZJVlfNNSEBXGb7TCI6oBjLz.ttf',
+			},
+			category: 'sans-serif',
+			kind: 'webfonts#webfont',
+		},
+	],
+};

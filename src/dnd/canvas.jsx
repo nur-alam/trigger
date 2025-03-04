@@ -87,7 +87,6 @@ const Canvas = () => {
 	 * @returns {void} - void
 	 */
 	const handleMouseUp = () => {
-		console.log('handle mouse up');
 		if (!selectionBox) return;
 		const selected = canvasElements
 			.map((element, index) => {

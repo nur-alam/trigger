@@ -11,7 +11,7 @@ export const HEADING = {
 		y: 80,
 	},
 	size: {
-		width: 120,
+		width: 210,
 		height: 50,
 	},
 	style: {

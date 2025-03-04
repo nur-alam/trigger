@@ -1,17 +1,44 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import elements from './elements';
-import { useDraggable } from '@dnd-kit/core';
+import { DragOverlay, useDndMonitor, useDraggable } from '@dnd-kit/core';
 import { CanvasContext } from './Context';
 import { useSelector } from 'react-redux';
 
-const DraggableItem = ({ label, element }) => {
-	const { attributes, setNodeRef, listeners, transform } = useDraggable({ id: label, data: element });
+const DraggableItem = ({ index, elementsKey, label, element }) => {
+	const { attributes, setNodeRef, listeners, transform, isDragging } = useDraggable({
+		id: label,
+		data: {
+			element: element,
+			index: index, // index of elements list of redux store
+			key: elementsKey, // key of elements object from elements list in elements/index.js
+		},
+	});
 
 	const style = transform
 		? {
 				transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
 		  }
 		: {};
+
+	if (isDragging)
+		return (
+			<div
+				style={{
+					width: 'max-content',
+					height: 'max-content',
+					padding: '10px',
+					backgroundColor: 'lightblue',
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+					cursor: 'grab',
+					zIndex: 10,
+					position: 'relative',
+				}}
+			>
+				{label}
+			</div>
+		);
 
 	return (
 		<>
@@ -40,10 +67,14 @@ const DraggableItem = ({ label, element }) => {
 };
 
 const Sidebar = () => {
-	// const { canvasElements, addElement } = useContext(CanvasContext);
-	// const handleClick = (element) => {
-	// 	addElement(element);
-	// };
+	const [activeItem, setActiveItem] = useState(null);
+
+	useDndMonitor({
+		onDragStart: (event) => {
+			setActiveItem(event.active.data.current);
+		},
+	});
+
 	return (
 		<div
 			className='sidebar'
@@ -62,9 +93,34 @@ const Sidebar = () => {
 					className={`draggable-item`}
 					// onPointerDown={() => handleClick(elements[key])}
 				>
-					<DraggableItem label={elements[key].label} element={elements[key]} />
+					<DraggableItem
+						elementsKey={key}
+						index={index}
+						label={elements[key].label}
+						element={elements[key]}
+					/>
 				</div>
 			))}
+			{activeItem && (
+				<DragOverlay>
+					<div
+						style={{
+							width: 'max-content',
+							height: 'max-content',
+							padding: '10px',
+							backgroundColor: 'lightblue',
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
+							cursor: 'grab',
+							zIndex: 10,
+							position: 'relative',
+						}}
+					>
+						{activeItem.element.label}
+					</div>
+				</DragOverlay>
+			)}
 		</div>
 	);
 };

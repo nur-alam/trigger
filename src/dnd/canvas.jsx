@@ -32,10 +32,10 @@ const Canvas = () => {
 			const canvasRect = document.getElementById('canvas')?.getBoundingClientRect();
 			if (!canvasRect) return;
 			const newElement = {
-				...active.data.current,
+				...active.data.current.element,
 				position: {
-					x: mousePosition.clientX - canvasRect.left - active.data.current.size.width / 2,
-					y: mousePosition.clientY - canvasRect.top - active.data.current.size.height / 2,
+					x: mousePosition.clientX - canvasRect.left - active.data.current.element.size.width / 2,
+					y: mousePosition.clientY - canvasRect.top - active.data.current.element.size.height / 2,
 				},
 			};
 			dispatch(addElement(newElement));

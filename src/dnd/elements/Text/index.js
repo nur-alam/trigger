@@ -7,8 +7,6 @@ export const TEXT = {
 	label: 'Text',
 	content: '<p>Hello Text</p>',
 	position: {
-		left: 80,
-		top: 20,
 		x: 80,
 		y: 20,
 	},

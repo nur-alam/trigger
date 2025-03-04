@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DndContext } from '@dnd-kit/core';
+import { DndContext, DragOverlay } from '@dnd-kit/core';
 import { Provider, useSelector } from 'react-redux';
 import Toolbar from './toolbar';
 import Sidebar from './sidebar';
@@ -13,7 +13,9 @@ function Builder() {
 		return Object.values(fonts)?.join(' ');
 	};
 
-	console.log('generateFontUrlString', Object.values(fonts).join(' '));
+	// const handleDragEnd = (event) => {
+	// 	console.log('handle drag end! root', event);
+	// };
 
 	return (
 		<>

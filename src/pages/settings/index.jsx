@@ -1,5 +1,11 @@
+import DrawingCanvas from './draw';
+
 function Settings() {
-	return <div>Settings Page</div>;
+	return (
+		<div>
+			<DrawingCanvas />
+		</div>
+	);
 }
 
 export default Settings;

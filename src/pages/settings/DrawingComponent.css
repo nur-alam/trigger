@@ -1,0 +1,22 @@
+.drawing-container {
+	display: flex;
+	height: 100vh;
+}
+
+.sidebar {
+	width: 100px;
+	background-color: #f4f4f4;
+	padding: 10px;
+}
+
+.sidebar button {
+	display: block;
+	margin-bottom: 10px;
+}
+
+.canvas {
+	flex: 1;
+	position: relative;
+	background-color: white;
+	border: 1px solid #ccc;
+}

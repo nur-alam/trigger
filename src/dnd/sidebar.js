@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import { createPortal } from 'react-dom';
 import elements from './elements';
 import { DragOverlay, useDndMonitor, useDraggable } from '@dnd-kit/core';
 import { CanvasContext } from './Context';
@@ -27,12 +28,13 @@ const DraggableItem = ({ index, elementsKey, label, element }) => {
 					width: 'max-content',
 					height: 'max-content',
 					padding: '10px',
-					backgroundColor: 'lightblue',
+					backgroundColor: 'blue',
 					display: 'flex',
 					alignItems: 'center',
 					justifyContent: 'center',
 					cursor: 'grab',
 					zIndex: 10,
+					color: 'white',
 					position: 'relative',
 				}}
 			>
@@ -68,7 +70,6 @@ const DraggableItem = ({ index, elementsKey, label, element }) => {
 
 const Sidebar = () => {
 	const [activeItem, setActiveItem] = useState(null);
-
 	useDndMonitor({
 		onDragStart: (event) => {
 			setActiveItem(event.active.data.current);
@@ -101,26 +102,18 @@ const Sidebar = () => {
 					/>
 				</div>
 			))}
-			{activeItem && (
-				<DragOverlay>
-					<div
-						style={{
-							width: 'max-content',
-							height: 'max-content',
-							padding: '10px',
-							backgroundColor: 'lightblue',
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'center',
-							cursor: 'grab',
-							zIndex: 10,
-							position: 'relative',
-						}}
-					>
-						{activeItem.element.label}
-					</div>
-				</DragOverlay>
-			)}
+			{activeItem &&
+				createPortal(
+					<DragOverlay dropAnimation={null}>
+						<DraggableItem
+							elementsKey={activeItem.key}
+							index={activeItem.index}
+							label={elements[activeItem.key].label}
+							element={elements[activeItem.key]}
+						/>
+					</DragOverlay>,
+					document.body
+				)}
 		</div>
 	);
 };

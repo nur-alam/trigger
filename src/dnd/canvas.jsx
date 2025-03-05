@@ -49,7 +49,6 @@ const Canvas = () => {
 	 * @returns {void} - void
 	 */
 	const handleMouseDown = (e) => {
-		if (e.target !== canvasDom) return;
 		initialDragPosition.current = {
 			x: e.clientX - canvasDom.getBoundingClientRect().left,
 			y: e.clientY - canvasDom.getBoundingClientRect().top,
@@ -60,7 +59,6 @@ const Canvas = () => {
 			width: 0,
 			height: 0,
 		});
-
 		dispatch(updateSelectedElement([]));
 	};
 
@@ -109,6 +107,20 @@ const Canvas = () => {
 		dispatch(updateSelectedElement(selected));
 		setSelectionBox(null);
 	};
+
+	useEffect(() => {
+		canvasDom = document.getElementById('canvas');
+
+		const handleMouseMove = (e) => {
+			mousePosition = e;
+		};
+
+		document.addEventListener('mousemove', handleMouseMove);
+
+		return () => {
+			document.removeEventListener('mousemove', handleMouseMove);
+		};
+	}, []);
 
 	/**
 	 * Handles the drag event for an element
@@ -189,20 +201,6 @@ const Canvas = () => {
 			}
 		});
 	};
-
-	useEffect(() => {
-		canvasDom = document.getElementById('canvas');
-
-		const handleMouseMove = (e) => {
-			mousePosition = e;
-		};
-
-		document.addEventListener('mousemove', handleMouseMove);
-
-		return () => {
-			document.removeEventListener('mousemove', handleMouseMove);
-		};
-	}, []);
 
 	return (
 		<>

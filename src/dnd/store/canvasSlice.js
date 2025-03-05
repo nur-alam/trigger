@@ -35,6 +35,9 @@ const canvasSlice = createSlice({
 		updateSelectedElement: (state, action) => {
 			state.selectedElements = action.payload;
 		},
+		deSelectElement: (state, action) => {
+			state.selectedElements = [];
+		},
 		updateFonts: (state, action) => {
 			const { family, fontUrl } = action.payload;
 			// if (!state.fonts[family]) {
@@ -59,8 +62,16 @@ const canvasSlice = createSlice({
 		},
 	},
 });
-export const { addElement, updateElement, deleteElement, updateSelectedElement, updateFonts, undo, redo } =
-	canvasSlice.actions;
+export const {
+	addElement,
+	updateElement,
+	deleteElement,
+	updateSelectedElement,
+	deSelectElement,
+	updateFonts,
+	undo,
+	redo,
+} = canvasSlice.actions;
 export default canvasSlice.reducer;
 // module.exports = canvasSlice.reducer;
 // module.exports.canvasActions = canvasSlice.actions;

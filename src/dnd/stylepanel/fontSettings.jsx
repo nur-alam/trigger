@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import fonts from './fonts/webfonts.js';
+import React, { useCallback, useState } from 'react';
+import fonts from './fonts/googleWebfonts.js';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateElement, updateFonts } from '../../dnd/store/canvasSlice.js';
+import { Virtuoso } from 'react-virtuoso';
 
 function hasNumber(myString) {
 	return new RegExp(/\d/, 'g').test(myString);
@@ -40,17 +41,37 @@ export function createURLFromVariant(data) {
 	}&display=swap`;
 }
 
-const FontSettings = () => {
+const FontSettings = ({ selectedElement }) => {
 	const dispatch = useDispatch();
 	const selectedElements = useSelector((state) => state.canvas.selectedElements);
 	const elements = useSelector((state) => state.canvas.elements);
-	const [selectedFont, setSelectedFont] = useState('Lexend');
+
+	const [searchTerm, setSearchTerm] = useState('');
+
+	const [selectedFont, setSelectedFont] = useState(selectedElement.style.typography.family);
 	const [fontWeight, setFontWeight] = useState('Regular');
 	const [fontSize, setFontSize] = useState(35);
 	const [typeSpacing, setTypeSpacing] = useState(0);
 	const [lineHeight, setLineHeight] = useState(1.4);
 
-	const selectedElement = elements[selectedElements[0]];
+	const getFilteredFonts = useCallback(() => {
+		// console.log('fonts', fonts);
+		return fonts.items.filter((font) => {
+			return font.family.toLowerCase().includes(searchTerm.toLowerCase());
+		});
+	}, [searchTerm]);
+
+	const filteredFonts = getFilteredFonts();
+
+	// const filteredFonts = fonts.items.filter((font) => {
+	// 	return font.family.toLowerCase().includes(searchTerm.toLowerCase());
+	// });
+
+	const handleSearch = (e) => {
+		setTimeout(() => {
+			setSearchTerm(e.target.value);
+		}, 500);
+	};
 
 	const handleClick = (font) => {
 		if (!selectedElement) return null;
@@ -77,12 +98,29 @@ const FontSettings = () => {
 		<div className='font-picker'>
 			{/* Font List */}
 			<div className='font-list'>
-				<input type='text' placeholder='Search font' className='search-bar' />
+				<input type='text' placeholder='Search font' className='search-bar' onKeyUp={(e) => handleSearch(e)} />
 				<div>
 					<strong>{selectedFont}</strong>
 				</div>
 				<div className='font-options'>
-					{fonts?.items?.map((font, index) => (
+					<Virtuoso
+						data={filteredFonts}
+						style={{ height: '300px' }}
+						data={filteredFonts}
+						totalCount={filteredFonts?.length}
+						itemContent={(index, font) => {
+							return (
+								<div
+									key={index}
+									className={`font-item ${selectedFont === font.family ? 'active' : ''}`}
+									onClick={() => handleClick(font)}
+								>
+									{font.family}
+								</div>
+							);
+						}}
+					/>
+					{/* {fonts?.items?.map((font, index) => (
 						<div
 							key={index}
 							className={`font-item ${selectedFont === font ? 'active' : ''}`}
@@ -90,54 +128,7 @@ const FontSettings = () => {
 						>
 							{font?.family}
 						</div>
-					))}
-				</div>
-			</div>
-
-			{/* Font Controls */}
-			<div className='font-controls'>
-				<div className='control-group'>
-					<label>Font Weight</label>
-					<select value={fontWeight} onChange={(e) => setFontWeight(e.target.value)}>
-						<option>Regular</option>
-						<option>Bold</option>
-						<option>Light</option>
-					</select>
-				</div>
-
-				<div className='control-group'>
-					<label>Font Size</label>
-					<select value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))}>
-						{[10, 15, 20, 25, 30, 35, 40].map((size) => (
-							<option key={size} value={size}>
-								{size}
-							</option>
-						))}
-					</select>
-				</div>
-
-				<div className='control-group'>
-					<label>Type Spacing</label>
-					<input
-						type='range'
-						min='0'
-						max='10'
-						value={typeSpacing}
-						onChange={(e) => setTypeSpacing(e.target.value)}
-					/>
-				</div>
-
-				<div className='control-group'>
-					<label>Line Height</label>
-					<input
-						type='range'
-						min='1'
-						max='2'
-						step='0.1'
-						value={lineHeight}
-						onChange={(e) => setLineHeight(e.target.value)}
-					/>
-					<span>{lineHeight}</span>
+					))} */}
 				</div>
 			</div>
 		</div>

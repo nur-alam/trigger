@@ -7,15 +7,22 @@ import './font.css';
 const StylePanel = () => {
 	const dispatch = useDispatch();
 	const selectedElements = useSelector((state) => state.canvas.selectedElements);
+
 	const elements = useSelector((state) => state.canvas.elements);
 
-	// Only show panel when a single element is selected
-	if (selectedElements.length !== 1) return null;
-
-	const selectedElement = elements[selectedElements[0]];
-	if (!selectedElement) return null;
+	const selectedElement = elements[selectedElements[0]] ?? {};
+	if (selectedElements.length !== 1)
+		return (
+			<>
+				<div className='style-panel'>
+					<h3>Style Settings</h3>
+				</div>
+			</>
+		);
 
 	const handleStyleUpdate = (category, property, value) => {
+		console.log('handleStyleUpdate', category, property, value);
+
 		const updatedStyle = {
 			...selectedElement.style,
 			[category]: {
@@ -40,7 +47,7 @@ const StylePanel = () => {
 				<h4>Typography</h4>
 				<div className='control-group'>
 					<label>Font Family</label>
-					<FontSettings />
+					<FontSettings selectedElement={selectedElement} />
 					<br />
 					{/* <select
 						value={selectedElement.style.typography.family}
@@ -108,7 +115,7 @@ const StylePanel = () => {
 			</div>
 
 			{/* Border Section */}
-			<div className='style-section'>
+			{/* <div className='style-section'>
 				<h4>Border</h4>
 				<div className='control-group'>
 					<label>Border Color</label>
@@ -150,7 +157,7 @@ const StylePanel = () => {
 						<option value='dotted'>Dotted</option>
 					</select>
 				</div>
-			</div>
+			</div> */}
 		</div>
 	);
 };

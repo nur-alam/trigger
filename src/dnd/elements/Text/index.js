@@ -25,7 +25,13 @@ export const TEXT = {
 			size: 35,
 		},
 		color: {
-			textColor: '#000',
+			textColor: '#000000',
+		},
+		border: {
+			borderColor: '#000000',
+			borderWidth: 0,
+			borderRadius: 0,
+			borderStyle: 'solid',
 		},
 	},
 };

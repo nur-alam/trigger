@@ -81,10 +81,11 @@ const Canvas = () => {
 	};
 
 	/**
-	 * Handles the mouse up event for the canvas
+	 * Handles the logic for mouse up event,
+	 * selecting elements within the selection box.
 	 * @returns {void} - void
 	 */
-	const handleMouseUp = () => {
+	const mouseUpLogic = () => {
 		if (!selectionBox) return;
 		const selected = canvasElements
 			.map((element, index) => {
@@ -108,6 +109,15 @@ const Canvas = () => {
 
 	/**
 	 * Handles the mouse up event for the canvas
+	 * @returns {void} - void
+	 */
+	const handleMouseUp = () => {
+		console.log('canvas mouseup');
+		mouseUpLogic();
+	};
+
+	/**
+	 * Handles the mouse up event for the canvas
 	 * @param {MouseEvent} e - event object
 	 * @returns {void} - void
 	 */
@@ -117,13 +127,18 @@ const Canvas = () => {
 		const handleMouseMove = (e) => {
 			mousePosition = e;
 		};
-
 		document.addEventListener('mousemove', handleMouseMove);
+
+		const documentMouseUp = (e) => {
+			mouseUpLogic();
+		};
+		document.addEventListener('mouseup', documentMouseUp);
 
 		return () => {
 			document.removeEventListener('mousemove', handleMouseMove);
+			document.removeEventListener('mouseup', documentMouseUp);
 		};
-	}, []);
+	}, [selectionBox]);
 
 	/**
 	 * Handles the drag event for an element

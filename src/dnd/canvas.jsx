@@ -112,7 +112,6 @@ const Canvas = () => {
 	 * @returns {void} - void
 	 */
 	const handleMouseUp = () => {
-		console.log('canvas mouseup');
 		mouseUpLogic();
 	};
 

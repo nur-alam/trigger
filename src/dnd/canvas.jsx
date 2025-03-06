@@ -11,7 +11,6 @@ let mousePosition;
 let canvasDom;
 
 const Canvas = () => {
-	// const { canvasElements, setCanvasElements, addElement, updateElement } = useContext(CanvasContext);
 	const dispatch = useDispatch();
 	const canvasElements = useSelector((state) => state.canvas.elements);
 	const selectedElements = useSelector((state) => state.canvas.selectedElements) || [];
@@ -49,6 +48,7 @@ const Canvas = () => {
 	 * @returns {void} - void
 	 */
 	const handleMouseDown = (e) => {
+		if (e.target !== canvasDom) return;
 		initialDragPosition.current = {
 			x: e.clientX - canvasDom.getBoundingClientRect().left,
 			y: e.clientY - canvasDom.getBoundingClientRect().top,
@@ -94,13 +94,11 @@ const Canvas = () => {
 					width: element.size.width,
 					height: element.size.height,
 				};
-
 				const isWithinSelection =
 					itemRect.x < selectionBox.x + selectionBox.width &&
 					itemRect.x + itemRect.width > selectionBox.x &&
 					itemRect.y < selectionBox.y + selectionBox.height &&
 					itemRect.y + itemRect.height > selectionBox.y;
-
 				return isWithinSelection ? index : null;
 			})
 			.filter((index) => index !== null);
@@ -108,6 +106,11 @@ const Canvas = () => {
 		setSelectionBox(null);
 	};
 
+	/**
+	 * Handles the mouse up event for the canvas
+	 * @param {MouseEvent} e - event object
+	 * @returns {void} - void
+	 */
 	useEffect(() => {
 		canvasDom = document.getElementById('canvas');
 
@@ -218,7 +221,6 @@ const Canvas = () => {
 				onMouseUp={handleMouseUp}
 				onMouseMove={handleMouseMove}
 				// onPointerDown={() => {
-				// 	console.log('canvas clicked');
 				// 	dispatch(updateSelectedElement([]));
 				// }}
 				// onDrop={handleDrop}
@@ -294,7 +296,6 @@ const Canvas = () => {
 						bounds='parent'
 					>
 						<Element {...element} />
-						{/* <div dangerouslySetInnerHTML={{ __html: element.content }}></div> */}
 					</Rnd>
 				))}
 			</div>

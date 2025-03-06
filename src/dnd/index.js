@@ -19,11 +19,11 @@ function Builder() {
 
 	useEffect(() => {
 		const handleCanvasOutsideClick = (e) => {
-			if (e.target.closest('.builder') === null) {
+			if (e.target.closest('#canvas') === null && e.target.closest('.style-panel') === null) {
 				dispatch(deSelectElement());
 			}
 		};
-		document.addEventListener('click', handleCanvasOutsideClick);
+		document.addEventListener('mousedown', handleCanvasOutsideClick);
 		return () => {
 			document.removeEventListener('click', handleCanvasOutsideClick);
 		};

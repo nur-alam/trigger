@@ -1,12 +1,9 @@
 const { createContext, useState } = require('react');
 
-// const [canvasElements, setCanvasElements] = useState([]);
-
 export const CanvasContext = createContext(null);
 
 export const CanvasProvider = ({ children }) => {
 	const [canvasElements, setCanvasElements] = useState([]);
-	console.log('CanvasProvider', canvasElements);
 	const addElement = (element) => {
 		setCanvasElements((prev) => [...prev, element]);
 	};

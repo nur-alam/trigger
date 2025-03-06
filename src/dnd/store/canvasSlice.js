@@ -7,9 +7,7 @@ const canvasSlice = createSlice({
 		elements: [],
 		// elements: [HEADING, TEXT],
 		selectedElements: [],
-		fonts: {
-			// ABeeZee: '@import url(https://fonts.googleapis.com/css2?family=ABeeZee:ital@0;1&display=swap);',
-		},
+		fonts: {},
 		undoStack: [],
 		redoStack: [],
 	},
@@ -22,7 +20,6 @@ const canvasSlice = createSlice({
 		},
 		updateElement: (state, action) => {
 			const { index, updatedObj } = action.payload;
-			// console.log('index, updatedObj', index, updatedObj);
 			// state.undoStack.push([...state.elements]);
 			// state.redoStack = [];
 			state.elements[index] = { ...state.elements[index], ...updatedObj };
@@ -73,5 +70,3 @@ export const {
 	redo,
 } = canvasSlice.actions;
 export default canvasSlice.reducer;
-// module.exports = canvasSlice.reducer;
-// module.exports.canvasActions = canvasSlice.actions;

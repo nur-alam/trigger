@@ -8,8 +8,7 @@ const store = configureStore({
 	reducer: {
 		canvas: canvasReducer,
 	},
-	// devTools: process.env.NODE_ENV !== 'production',
-	devTools: true,
+	devTools: process.env.NODE_ENV !== 'production',
 	preloadedState,
 });
 

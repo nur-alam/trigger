@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import fonts from './fonts/googleWebfonts.js';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateElement, updateFonts } from '../../dnd/store/canvasSlice.js';
@@ -43,29 +43,19 @@ export function createURLFromVariant(data) {
 
 const FontSettings = ({ selectedElement }) => {
 	const dispatch = useDispatch();
-	const selectedElements = useSelector((state) => state.canvas.selectedElements);
-	const elements = useSelector((state) => state.canvas.elements);
 
+	const [filteredFonts, setFilteredFonts] = useState([]);
 	const [searchTerm, setSearchTerm] = useState('');
+	const [selectedFont, setSelectedFont] = useState('');
 
-	const [selectedFont, setSelectedFont] = useState(selectedElement.style.typography.family);
-	const [fontWeight, setFontWeight] = useState('Regular');
-	const [fontSize, setFontSize] = useState(35);
-	const [typeSpacing, setTypeSpacing] = useState(0);
-	const [lineHeight, setLineHeight] = useState(1.4);
-
-	const getFilteredFonts = useCallback(() => {
-		// console.log('fonts', fonts);
-		return fonts.items.filter((font) => {
-			return font.family.toLowerCase().includes(searchTerm.toLowerCase());
-		});
-	}, [searchTerm]);
-
-	const filteredFonts = getFilteredFonts();
-
-	// const filteredFonts = fonts.items.filter((font) => {
-	// 	return font.family.toLowerCase().includes(searchTerm.toLowerCase());
-	// });
+	useEffect(() => {
+		setSelectedFont(selectedElement.style.typography.family);
+		setFilteredFonts(
+			fonts.items.filter((font) => {
+				return font.family.toLowerCase().includes(searchTerm.toLowerCase());
+			})
+		);
+	}, [searchTerm, selectedElement]);
 
 	const handleSearch = (e) => {
 		setTimeout(() => {
@@ -84,7 +74,7 @@ const FontSettings = ({ selectedElement }) => {
 		};
 		dispatch(
 			updateElement({
-				index: selectedElements[0],
+				index: selectedElement,
 				updatedObj: { style: updatedStyle },
 			})
 		);
@@ -104,7 +94,6 @@ const FontSettings = ({ selectedElement }) => {
 				</div>
 				<div className='font-options'>
 					<Virtuoso
-						data={filteredFonts}
 						style={{ height: '300px' }}
 						data={filteredFonts}
 						totalCount={filteredFonts?.length}
@@ -120,15 +109,6 @@ const FontSettings = ({ selectedElement }) => {
 							);
 						}}
 					/>
-					{/* {fonts?.items?.map((font, index) => (
-						<div
-							key={index}
-							className={`font-item ${selectedFont === font ? 'active' : ''}`}
-							onClick={() => handleClick(font)}
-						>
-							{font?.family}
-						</div>
-					))} */}
 				</div>
 			</div>
 		</div>

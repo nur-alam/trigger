@@ -18,15 +18,15 @@ function Builder() {
 	};
 
 	useEffect(() => {
-		// const handleCanvasOutsideClick = (e) => {
-		// 	if (e.target.closest('.builder') === null) {
-		// 		dispatch(deSelectElement());
-		// 	}
-		// };
-		// document.addEventListener('click', handleCanvasOutsideClick);
-		// return () => {
-		// 	document.removeEventListener('click', handleCanvasOutsideClick);
-		// };
+		const handleCanvasOutsideClick = (e) => {
+			if (e.target.closest('.builder') === null) {
+				dispatch(deSelectElement());
+			}
+		};
+		document.addEventListener('click', handleCanvasOutsideClick);
+		return () => {
+			document.removeEventListener('click', handleCanvasOutsideClick);
+		};
 	}, []);
 
 	return (

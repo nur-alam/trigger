@@ -21,8 +21,6 @@ const StylePanel = () => {
 		);
 
 	const handleStyleUpdate = (category, property, value) => {
-		console.log('handleStyleUpdate', category, property, value);
-
 		const updatedStyle = {
 			...selectedElement.style,
 			[category]: {

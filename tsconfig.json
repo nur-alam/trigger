@@ -17,7 +17,7 @@
             "@lib/*": ["./src/lib/*"],
             "@utils": ["./src/lib/utils"],
             "@hooks": ["./src/hooks"],
-            "@*": ["./src/*"],
+            "@src": ["./src/*"],
         }
     },
     "include": ["src/**/*.ts", "src/**/*.tsx"],

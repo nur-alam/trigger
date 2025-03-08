@@ -66,7 +66,7 @@ class Enqueue {
 		);
 		wp_add_inline_script(
 			'trigger-admin',
-			'const triggerObject = ' . wp_json_encode( self::scripts_data() ) . ';window.triggerObject=triggerObject',
+			'const _triggerObject = ' . wp_json_encode( self::scripts_data() ) . ';window._triggerObject=_triggerObject',
 			'before'
 		);
 	}
@@ -90,7 +90,7 @@ class Enqueue {
 		);
 		wp_add_inline_script(
 			'trigger-frontend',
-			'const triggerObject = ' . wp_json_encode( self::scripts_data() ) . ';window.triggerObject=triggerObject',
+			'const _triggerObject = ' . wp_json_encode( self::scripts_data() ) . ';window._triggerObject=_triggerObject',
 			'before'
 		);
 	}

@@ -1,5 +1,5 @@
 {
-    "baseUrl": ".",
+    "baseUrl": "./src/",
     "compilerOptions": {
         "target": "ES6",
         "module": "ESNext",
@@ -12,12 +12,15 @@
         "skipLibCheck": true,
         "resolveJsonModule": true,
         "forceConsistentCasingInFileNames": true,
+        "typeRoots": ["./node_modules/@types/", "./assets/react/@types"],
         "paths": {
+            "@/*": ["./src/*"],
+            "@config/*": ["./src/config/*"],
             "@components/*": ["./src/components/*"],
             "@lib/*": ["./src/lib/*"],
-            "@utils": ["./src/lib/utils"],
+            "@utils/*": ["./src/utils/*"],
             "@hooks": ["./src/hooks"],
-            "@src": ["./src/*"],
+            "@pages/*": ["./src/pages/*"],
         }
     },
     "include": ["src/**/*.ts", "src/**/*.tsx"],

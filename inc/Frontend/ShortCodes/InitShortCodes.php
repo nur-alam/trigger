@@ -2,8 +2,8 @@
 /**
  * Init Short codes
  *
- * @package Trigger\Core
- * @subpackage Trigger\Core\EmailConfiguration
+ * @package Trigger\Frontend
+ * @subpackage Trigger\Frontend\ShortCodes
  * @author  Trigger<trigger@gmail.com>
  * @since 1.0.0
  */

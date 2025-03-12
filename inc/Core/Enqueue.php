@@ -46,29 +46,27 @@ class Enqueue {
 		$trigger_style_bundle = $plugin_data['plugin_url'] . 'assets/dist/css/style.min.css';
 		$trigger_admin_bundle = $plugin_data['plugin_url'] . 'assets/dist/js/backend-bundle.min.js';
 
-		if ( 'toplevel_page_trigger' !== $page ) {
-			return;
+		if ( 'toplevel_page_trigger' !== $page || 'trigger_page_trigger-settings' !== $page ) {
+			wp_enqueue_style(
+				'trigger-style',
+				$trigger_style_bundle,
+				array(),
+				TRIGGER_VERSION,
+				'all'
+			);
+			wp_enqueue_script(
+				'trigger-admin',
+				$trigger_admin_bundle,
+				array( 'wp-element', 'wp-i18n' ),
+				TRIGGER_VERSION,
+				true
+			);
+			wp_add_inline_script(
+				'trigger-admin',
+				'const _triggerObject = ' . wp_json_encode( self::scripts_data() ) . ';window._triggerObject=_triggerObject',
+				'before'
+			);
 		}
-
-		wp_enqueue_style(
-			'trigger-style',
-			$trigger_style_bundle,
-			array(),
-			TRIGGER_VERSION,
-			'all'
-		);
-		wp_enqueue_script(
-			'trigger-admin',
-			$trigger_admin_bundle,
-			array( 'wp-element', 'wp-i18n' ),
-			TRIGGER_VERSION,
-			true
-		);
-		wp_add_inline_script(
-			'trigger-admin',
-			'const _triggerObject = ' . wp_json_encode( self::scripts_data() ) . ';window._triggerObject=_triggerObject',
-			'before'
-		);
 	}
 
 	/**

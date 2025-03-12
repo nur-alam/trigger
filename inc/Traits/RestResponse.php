@@ -4,8 +4,8 @@
  *
  * Wrapper class of rest_ensure_response
  *
- * @package Trigger\Core
- * @subpackage Trigger\Core\EmailConfiguration
+ * @package Trigger\Traits
+ * @subpackage Trigger\Traits\RestResponse
  * @author  Trigger<trigger@gmail.com>
  * @since 1.0.0
  */

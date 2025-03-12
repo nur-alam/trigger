@@ -3,7 +3,7 @@
  * The Migration class creates and drops tables of products
  *
  * @package Trigger\Core
- * @subpackage Trigger\Core\EmailConfiguration
+ * @subpackage Trigger\Core\Migration
  * @author  Trigger<trigger@gmail.com>
  * @since 1.0.0
  */

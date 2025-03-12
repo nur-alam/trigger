@@ -3,7 +3,7 @@
  * Initialize the plugin
  *
  * @package Trigger\Core
- * @subpackage Trigger\Core\EmailConfiguration
+ * @subpackage Trigger\Init
  * @author  Trigger<trigger@gmail.com>
  * @since 1.0.0
  */
@@ -15,6 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Trigger\Admin\Init as AdminInit;
+use Trigger\Controllers\SmtpConfig;
 use Trigger\Core\Enqueue;
 use Trigger\Core\EmailConfiguration;
 use Trigger\Frontend\CustomTemplate;
@@ -38,5 +39,6 @@ class Init {
 		new Routes();
 		new CustomTemplate();
 		new EmailConfiguration();
+		new SmtpConfig();
 	}
 }

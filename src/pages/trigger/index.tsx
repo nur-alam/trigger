@@ -1,8 +1,15 @@
-import React from 'react'
+// import { TableProvider } from './TableContext'
+import DataTable from './DataTable'
+import { Button } from '@/components/ui/button'
 
 const Trigger = () => {
 	return (
-		<div>Trigger</div>
+		// <TableProvider>
+		<div className='m-20'>
+			<Button />
+			<DataTable />
+		</div>
+		// </TableProvider>
 	)
 }
 

@@ -26,7 +26,7 @@ class EmailConfiguration {
 	 */
 	public function __construct() {
 		add_action( 'phpmailer_init', array( $this, 'configure_smtp' ) );
-		add_action( 'wp_ajax_platform_send_test_mail', array( $this, 'send_test_mail' ) );
+		add_action( 'wp_ajax_trigger_send_test_mail', array( $this, 'send_test_mail' ) );
 	}
 
 	/**

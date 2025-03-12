@@ -4,8 +4,8 @@
  * operations
  * Initialize the plugin
  *
- * @package Trigger\Core
- * @subpackage Trigger\Core\EmailConfiguration
+ * @package Trigger\Helpers
+ * @subpackage Trigger\Helpers\QueryHelper
  * @author  Trigger<trigger@gmail.com>
  * @since 1.0.0
  */

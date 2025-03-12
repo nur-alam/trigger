@@ -111,6 +111,7 @@ module.exports = (env, options) => {
 						os: false,
 					},
 					alias: {
+						'@': path.resolve(__dirname, 'src'),
 						'@components': path.resolve(__dirname, './src/components'),
 						'@config': path.resolve(__dirname, './src/config'),
 						'@lib': path.resolve(__dirname, './src/lib'),

@@ -3,8 +3,8 @@
  * The CustomerTable class defines a database table schema
  * for storing customer information.
  *
- * @package Trigger\Core
- * @subpackage Trigger\Core\EmailConfiguration
+ * @package Trigger\Database
+ * @subpackage Trigger\Database\WordTable
  * @author  Trigger<trigger@gmail.com>
  * @since 1.0.0
  */

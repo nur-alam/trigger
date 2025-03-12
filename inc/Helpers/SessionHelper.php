@@ -3,8 +3,8 @@
  * Session Management Helper Class.
  * Initialize the plugin
  *
- * @package Trigger\Core
- * @subpackage Trigger\Core\EmailConfiguration
+ * @package Trigger\Helpers
+ * @subpackage Trigger\Helpers\SessionHelper
  * @author  Trigger<trigger@gmail.com>
  * @since 1.0.0
  */

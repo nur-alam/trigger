@@ -2,8 +2,8 @@
 /**
  * Enqueue Assets, styles & scripts
  *
- * @package Trigger\Core
- * @subpackage Trigger\Core\EmailConfiguration
+ * @package Trigger\Models
+ * @subpackage Trigger\Models\WordsModel
  * @author  Trigger<trigger@gmail.com>
  * @since 1.0.0
  */

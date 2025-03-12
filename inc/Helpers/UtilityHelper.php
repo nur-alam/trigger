@@ -3,8 +3,8 @@
  * Contains Plugin's utilities functions
  * Initialize the plugin
  *
- * @package Trigger\Core
- * @subpackage Trigger\Core\EmailConfiguration
+ * @package Trigger\Helpers
+ * @subpackage Trigger\Helpers\UtilityHelper
  * @author  Trigger<trigger@gmail.com>
  * @since 1.0.0
  */
@@ -94,6 +94,50 @@ class UtilityHelper {
 	public static function verify_nonce() {
 		$plugin_data = Trigger::plugin_data();
 		return isset( $_POST[ $plugin_data['nonce_key'] ] ) && wp_verify_nonce( $_POST[ $plugin_data['nonce_key'] ], $plugin_data['nonce_action'] ); //phpcs:ignore
+	}
+
+	/**
+	 * Sanitize array, single or multi dimensional array
+	 * Explicitly setup how should a value sanitize by the
+	 * sanitize function.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @see available sanitize func
+	 * https://developer.wordpress.org/themes/theme-security/data-sanitization-escaping/
+	 *
+	 * @param array $input array to sanitize.
+	 * @param array $sanitize_mapping single dimensional map key value
+	 * pair to set up sanitization process. Key name should by inside
+	 * input array and the value will be callable func.
+	 * For ex: [key1 => sanitize_email, key2 => wp_kses_post ]
+	 *
+	 * If key not passed then default sanitize_text_field will be used.
+	 *
+	 * @return array
+	 */
+	public static function sanitize_array( array $input, array $sanitize_mapping = array() ): array {
+		$array = array();
+
+		if ( is_array( $input ) && count( $input ) ) {
+			foreach ( $input as $key => $value ) {
+				if ( is_array( $value ) ) {
+					$array[ $key ] = self::sanitize_array( $value, $sanitize_mapping );
+				} else {
+					$key = sanitize_text_field( $key );
+
+					// If mapping exists then use callback.
+					if ( isset( $sanitize_mapping[ $key ] ) ) {
+						$callback = $sanitize_mapping[ $key ];
+						$value    = call_user_func( $callback, wp_unslash( $value ) );
+					} else {
+						$value = sanitize_text_field( wp_unslash( $value ) );
+					}
+					$array[ $key ] = $value;
+				}
+			}
+		}
+		return is_array( $array ) && count( $array ) ? $array : array();
 	}
 
 	/**

@@ -2,8 +2,8 @@
 /**
  * WordsController logics
  *
- * @package Trigger\Core
- * @subpackage Trigger\Core\EmailConfiguration
+ * @package Trigger\Controllers
+ * @subpackage Trigger\Controllers\WordsController
  * @author  Trigger<trigger@gmail.com>
  * @since 1.0.0
  */

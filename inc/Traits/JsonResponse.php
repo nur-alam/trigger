@@ -2,8 +2,8 @@
 /**
  * Manage json response
  *
- * @package Trigger\Core
- * @subpackage Trigger\Core\EmailConfiguration
+ * @package Trigger\Traits
+ * @subpackage Trigger\Traits\JsonResponse
  * @author  Trigger<trigger@gmail.com>
  * @since 1.0.0
  */
@@ -66,7 +66,7 @@ trait JsonResponse {
 	 *
 	 * @return void
 	 */
-	public function response_fail( $message, $status_code = 200 ) {
+	public function response_fail( $message, $status_code = 400 ) {
 		wp_send_json(
 			array(
 				'success' => false,

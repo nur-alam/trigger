@@ -9,6 +9,6 @@ export const pageUrls = {
 };
 
 export const router = {
-	[pageUrls.TRIGGER]: { pageTitle: 'trigger', pageContent: <Trigger /> },
+	[pageUrls.TRIGGER]: { pageTitle: 'Email Logs', pageContent: <Trigger /> },
 	[pageUrls.SETTINGS]: { pageTitle: 'Settings', pageContent: <Settings /> },
 };

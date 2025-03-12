@@ -2,8 +2,8 @@
 /**
  * Register Routes
  *
- * @package Trigger\Core
- * @subpackage Trigger\Core\EmailConfiguration
+ * @package Trigger\RestAPI
+ * @subpackage Trigger\RestAPI\Routes
  * @author  Trigger<trigger@gmail.com>
  * @since 1.0.0
  */

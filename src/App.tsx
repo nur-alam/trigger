@@ -3,6 +3,7 @@ import { getSlugFromUrl } from '@utils/utils';
 import { router } from '@utils/router';
 import Page from '@pages/page';
 import config from '@config/index';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
 	const [slug, setSlug] = useState(getSlugFromUrl(window.location.href));
@@ -32,6 +33,7 @@ function App() {
 	return (
 		<>
 			<Page>{renderPageContent(slug)}</Page>
+			<Toaster position='bottom-right' />
 		</>
 	);
 }

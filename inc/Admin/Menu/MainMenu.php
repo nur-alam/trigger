@@ -134,7 +134,7 @@ class MainMenu {
 		// Register main menu.
 		add_submenu_page(
 			$this->slug(),
-			$this->menu_title(),
+			'Email Logs',
 			$this->capability(),
 			$this->slug(),
 			$this->capability(),

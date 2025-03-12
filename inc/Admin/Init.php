@@ -2,8 +2,8 @@
 /**
  * Admin module loader
  *
- * @package Trigger\Core
- * @subpackage Trigger\Core\EmailConfiguration
+ * @package Trigger\Admin
+ * @subpackage Trigger\Admin\Init
  * @author  Trigger<trigger@gmail.com>
  * @since 1.0.0
  */

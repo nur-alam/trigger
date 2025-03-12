@@ -2,8 +2,8 @@
 /**
  * Helper class for handling cookies.
  *
- * @package Trigger\Core
- * @subpackage Trigger\Core\EmailConfiguration
+ * @package Trigger\Helpers
+ * @subpackage Trigger\Helpers\CookieHelper
  * @author  Trigger<trigger@gmail.com>
  * @since 1.0.0
  */

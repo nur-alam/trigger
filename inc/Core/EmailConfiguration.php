@@ -26,7 +26,6 @@ class EmailConfiguration {
 	 */
 	public function __construct() {
 		add_action( 'phpmailer_init', array( $this, 'configure_smtp' ) );
-		add_action( 'wp_ajax_trigger_send_test_mail', array( $this, 'send_test_mail' ) );
 	}
 
 	/**
@@ -37,24 +36,25 @@ class EmailConfiguration {
 	 * @return void
 	 */
 	public function configure_smtp( $phpmailer ) {
+
+		$smtp_settings = get_option( TRIGGER_SMTP_CONFIG, array() );
+
 		// Enable SMTP
+		// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 		$phpmailer->isSMTP();
-		$phpmailer->Host = '';
-		$phpmailer->Port = 587;
+		$phpmailer->Host = $smtp_settings['smtp_host'] ?? '';
+		$phpmailer->Port = $smtp_settings['smtp_port'] ?? '587';
 
 		// Set the encryption type (ssl or tls).
-		$phpmailer->SMTPSecure = 'TLS';
+		$phpmailer->SMTPSecure = $smtp_settings['smtp_security'] ?? 'TLS';
 		$phpmailer->SMTPAuth   = true;
 
-		$phpmailer->Username = ( '' );
-		$phpmailer->Password = ( '' );
+		$phpmailer->Username = $smtp_settings['smtp_username'] ?? '';
+		$phpmailer->Password = $smtp_settings['smtp_password'] ?? '';
 
-		/**
-		 * For debug
-		 * $phpmailer->SMTPDebug = 2;
-		 */
 		// Override the 'From' email address (optional).
-		$phpmailer->FromName = ( '' );
-		$phpmailer->From     = ( '' );
+		$phpmailer->FromName = $smtp_settings['from_name'] ?? '';
+		$phpmailer->From     = $smtp_settings['from_email'] ?? '';
+		// phpcs:enable
 	}
 }

@@ -30,8 +30,8 @@ class SmtpConfig {
 	 */
 	public function __construct() {
 		add_action( 'wp_ajax_update_smtp_config', array( $this, 'update_smtp_config' ) );
-		// add_action( 'wp_ajax_trigger_fetch_smtp_settings', array( $this, 'trigger_fetch_smtp_settings' ) );
-		// add_action( 'wp_ajax_trigger_send_test_email', array( $this, 'trigger_send_test_email' ) );
+		add_action( 'wp_ajax_trigger_fetch_smtp_config', array( $this, 'trigger_fetch_smtp_config' ) );
+		add_action( 'wp_ajax_trigger_send_test_email', array( $this, 'trigger_send_test_email' ) );
 	}
 
 	/**
@@ -40,15 +40,14 @@ class SmtpConfig {
 	 * @return  array
 	 */
 	public function update_smtp_config() {
-		sleep( 1 );
-		$is_auth = is_user_logged_in();
-		if ( ! $is_auth ) {
-			$this->response_fail( 'Access denied! Plz login to access this feature.' );
-			// $this->send_json_response( 400, '', 'Access denied! Plz login to access this feature.' );
+		// Verify authentication and nonce
+		$verify = trigger_verify_request();
+		if ( ! $verify['success'] ) {
+			return $this->json_response( $verify['message'], null, $verify['code'] );
 		}
-		$params = UtilityHelper::sanitize_array( $_POST ); //phpcs:ignore
 
-		$rules = array(
+		$params = $verify['data'];
+		$rules  = array(
 			'action'        => 'required|string',
 			'trigger_nonce' => 'required|string',
 			'smtpHost'      => 'required|string',
@@ -57,32 +56,94 @@ class SmtpConfig {
 			'smtpUsername'  => 'required|string',
 			'smtpPassword'  => 'required|string',
 			'fromName'      => 'required|string',
-			'fromEmail'     => 'required|string|email',
+			'fromEmail'     => 'required|email',
 		);
 
 		$validator = ValidationHelper::validate( $rules, $params );
 		if ( ! $validator->success ) {
-			return $this->json_response( 'Validation failed!', array( 'errors', $validator->errors ), 400 );
+			return $this->json_response( 'Validation failed!', array( 'errors' => $validator->errors ), 400 );
 		}
 
-		$plugin_info = Trigger::plugin_data();
-		if ( ! isset( $_POST['trigger_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['trigger_nonce'] ) ), $plugin_info['nonce_action'] ) ) {
-			return $this->json_response( 'Nonce verification failed!', null, 400 );
-		}
 		try {
-			$this->update( $params );
-			$this->json_response( 'Email settings saved!' );
+			// Save SMTP settings.
+			$smtp_settings = array(
+				'smtp_host'     => $params['smtpHost'],
+				'smtp_port'     => $params['smtpPort'],
+				'smtp_security' => $params['smtpSecurity'],
+				'smtp_username' => $params['smtpUsername'],
+				'smtp_password' => $params['smtpPassword'],
+				'from_name'     => $params['fromName'],
+				'from_email'    => $params['fromEmail'],
+			);
+
+			// Update WordPress options.
+			update_option( TRIGGER_SMTP_CONFIG, $smtp_settings );
+
+			return $this->json_response( 'SMTP settings saved successfully!', null, 200 );
 		} catch ( \Throwable $th ) {
-			return $this->json_response( $th->getMessage(), null, 400 );
+			return $this->json_response( $th->getMessage(), null, 500 );
 		}
 	}
 
 	/**
-	 * Update settings
+	 * Get SMTP settings.
 	 *
-	 * @param  array $data  settings data.
+	 * @return array
 	 */
-	public function update( $data ) {
-		return update_option( TRIGGER_SMTP_CONFIG, $data );
+	public function trigger_fetch_smtp_config() {
+		// Verify authentication and nonce
+		$verify = trigger_verify_request();
+		if ( ! $verify['success'] ) {
+			return $this->json_response( $verify['message'], null, $verify['code'] );
+		}
+
+		try {
+			$smtp_settings = get_option( TRIGGER_SMTP_CONFIG, array() );
+			return $this->json_response( 'SMTP settings retrieved successfully!', $smtp_settings, 200 );
+		} catch ( \Throwable $th ) {
+			return $this->json_response( $th->getMessage(), null, 500 );
+		}
+	}
+
+	/**
+	 * Send test email.
+	 *
+	 * @return array
+	 */
+	public function trigger_send_test_email() {
+		// Verify authentication and nonce
+		$verify = trigger_verify_request();
+		if ( ! $verify['success'] ) {
+			return $this->json_response( $verify['message'], null, $verify['code'] );
+		}
+
+		$params = $verify['data'];
+		$rules  = array(
+			'action'        => 'required|string',
+			'trigger_nonce' => 'required|string',
+			'to_email'      => 'required|email',
+		);
+
+		$validator = ValidationHelper::validate( $rules, $params );
+		if ( ! $validator->success ) {
+			return $this->json_response( 'Validation failed!', array( 'errors' => $validator->errors ), 400 );
+		}
+
+		try {
+			$to      = $params['to_email'];
+			$subject = 'Trigger Test Email';
+			$message = 'This is a test email from your WordPress site using SMTP configuration.';
+			$headers = array( 'Content-Type: text/html; charset=UTF-8' );
+
+			$sent = \wp_mail( $to, $subject, $message, $headers );
+
+			if ( $sent ) {
+				return $this->json_response( 'Test email sent successfully!', null, 200 );
+			} else {
+				return $this->json_response( 'Failed to send test email.', null, 400 );
+			}
+		} catch ( \Throwable $th ) {
+			return $this->json_response( $th->getMessage(), null, 500 );
+		}
 	}
 }

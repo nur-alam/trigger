@@ -58,6 +58,8 @@ class EmailLogController {
 	public function __construct() {
 		$this->email_log_model = new EmailLogModel();
 		add_filter( 'wp_mail', array( $this, 'create_email_log' ) );
+		add_action( 'wp_ajax_trigger_fetch_email_logs', array( $this, 'get_email_logs' ) );
+		add_action( 'wp_ajax_trigger_delete_email_log', array( $this, 'delete_email_log' ) );
 	}
 
 	/**
@@ -69,10 +71,10 @@ class EmailLogController {
 	public function create_email_log( $mail_data ) {
 		try {
 			$email_log_model = new \Trigger\Models\EmailLogModel();
-
-			$log_data = array(
+			$smtp_settings   = get_option( TRIGGER_SMTP_CONFIG, array() );
+			$log_data        = array(
 				'mail_to'     => $mail_data['to'] ?? '',
-				'mail_from'   => $mail_data['from'] ?? '',
+				'mail_from'   => $smtp_settings['from_email'] ?? '',
 				'subject'     => $mail_data['subject'] ?? '',
 				'message'     => $mail_data['message'] ?? '',
 				'headers'     => $mail_data['headers'] ?? '',
@@ -90,11 +92,54 @@ class EmailLogController {
 		return true;
 	}
 
-	// /**
-	// * This function hold logics of getting words.
-	// *
-	// * @param WP_REST_Request $request object.
-	// *
+	/**
+	 * Get email logs
+	 *
+	 * @return mixed array|WP_Error
+	 */
+	public function get_email_logs() {
+		$verify = trigger_verify_request();
+		if ( ! $verify['success'] ) {
+			return $this->json_response( $verify['message'], null, $verify['code'] );
+		}
+
+		$params = $verify['data'];
+		$data   = array(
+			'order'  => ! empty( $params['order'] ) ? $params['order'] : 'DESC',
+			'limit'  => $params['limit'] ?? 5,
+			'offset' => $params['offset'] ?? 0,
+			'search' => $params['search'] ?? '',
+		);
+
+		$result = $this->email_log_model->get_all_email_logs( $data );
+		return $this->json_response( 'Email logs fetched successfully', $result['data'], 200 );
+	}
+
+	/**
+	 * Delete email log
+	 *
+	 * @return mixed array|WP_Error
+	 */
+	public function delete_email_log() {
+		$verify = trigger_verify_request();
+		if ( ! $verify['success'] ) {
+			return $this->json_response( $verify['message'], null, $verify['code'] );
+		}
+
+		$params = $verify['data'];
+		$id     = $params['id'];
+
+		try {
+			$result = $this->email_log_model->delete_email_log( $id );
+			if ( ! $result ) {
+				return $this->json_response( 'Failed to delete email log', null, 400 );
+			}
+		} catch ( \Throwable $th ) {
+			return $this->json_response( 'Error deleting email log: ' . $th->getMessage(), null, 500 );
+		}
+
+		return $this->json_response( 'Email log deleted successfully', $result, 200 );
+	}
 	// * @return  mixed WP_REST_Response|WP_Error
 	// */
 	// public function get_email_logs( WP_REST_Request $request ) {

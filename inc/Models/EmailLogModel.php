@@ -140,19 +140,19 @@ class EmailLogModel {
 	/**
 	 * Delete_email_log in email_logs table.
 	 *
-	 * @param array $email_log field as per database table.
+	 * @param integer $email_id field as per database table.
 	 *
 	 * @return integer
 	 */
-	public function delete_email_log( $email_log ) {
+	public function delete_email_log( $email_id ) {
 		global $wpdb;
 		try {
 			$deleted = $wpdb->delete(
 				$this->table_name,
-				array( 'id' => $email_log['id'] )
+				array( 'id' => $email_id )
 			);
 		} catch ( \Throwable $th ) {
-			return wp_send_json_error( $th );
+			return false;
 		}
 
 		return $deleted;
@@ -172,33 +172,20 @@ class EmailLogModel {
 	public function get_all_email_logs() {
 		global $wpdb;
 
-		try {
-			$results = $wpdb->get_results(
-				$wpdb->prepare(
-					'SELECT * FROM `' . esc_sql( $this->table_name ) . '` ORDER BY created_at DESC'
-				)
-			);
+		$email_logs = $wpdb->get_results(
+			$wpdb->prepare(
+				'SELECT * FROM `' . esc_sql( $this->table_name ) . '` ORDER BY created_at DESC'
+			)
+		);
 
-			if ( null === $results ) {
-				return array(
-					'success' => false,
-					'message' => 'Failed to fetch email logs',
-					'data'    => array(),
-				);
-			}
-
+		if ( null === $email_logs ) {
 			return array(
-				'success' => true,
-				'message' => 'Email logs fetched successfully',
-				'data'    => $results,
-			);
-
-		} catch ( \Throwable $th ) {
-			return array(
-				'success' => false,
-				'message' => $th->getMessage(),
-				'data'    => array(),
+				'data' => array(),
 			);
 		}
+
+		return array(
+			'data' => $email_logs,
+		);
 	}
 }

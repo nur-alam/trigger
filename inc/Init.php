@@ -18,8 +18,8 @@ use Trigger\Admin\Init as AdminInit;
 use Trigger\Controllers\SmtpConfig;
 use Trigger\Core\Enqueue;
 use Trigger\Core\EmailConfiguration;
+use Trigger\Controllers\EmailLogController;
 use Trigger\Frontend\CustomTemplate;
-use Trigger\Frontend\RewriteRule;
 use Trigger\RestAPI\Routes;
 
 /**
@@ -40,5 +40,6 @@ class Init {
 		new CustomTemplate();
 		new EmailConfiguration();
 		new SmtpConfig();
+		new EmailLogController();
 	}
 }

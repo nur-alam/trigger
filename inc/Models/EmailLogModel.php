@@ -41,65 +41,78 @@ class EmailLogModel {
 	}
 
 	/**
-	 * Get_words from word table.
-	 *
-	 * @param array $data field as per database table.
-	 *
-	 * @return array
-	 */
-	public function get_email_logs( $data ) {
-		global $wpdb;
-		$order           = $data['order'];
-		$query           = $wpdb->prepare( "SELECT COUNT(*) FROM $this->table_name" );
-		$email_log_count = $wpdb->get_var( $query ); //phpcs:ignore
-		if ( ! $data['search'] ) {
-			$query  = $wpdb->prepare(
-				"SELECT * FROM $this->table_name 
-					ORDER BY id $order LIMIT %d OFFSET %d",
-				$data['limit'],
-				$data['offset']
-			);
-			$result = $wpdb->get_results( $query ); //phpcs:ignore
-		} else {
-			$like   = '%' . $data['search'] . '%';
-			$query  = $wpdb->prepare(
-				"SELECT * FROM $this->table_name 
-					WHERE email_log LIKE %s LIMIT %d OFFSET %d",
-				$like,
-				$data['limit'],
-				$data['offset']
-			);
-			$result = $wpdb->get_results( $query ); //phpcs:ignore
-			return array(
-				'count'   => (int) count( $result ),
-				'results' => $result,
-			);
-		}
-		return array(
-			'count'   => (int) $email_log_count,
-			'results' => $result,
-		);
-	}
-
-	/**
 	 * Create_email_log in email_logs table.
 	 *
-	 * @param array $data field as per database table.
+	 * @param array $data {
+	 *     Email log data.
+	 *     @type string $mail_to      Recipient email address
+	 *     @type string $mail_from    Sender email address
+	 *     @type string $subject      Email subject
+	 *     @type string $message      Email body content
+	 *     @type string $headers      Email headers (optional)
+	 *     @type string $attachments  Email attachments (optional)
+	 * }
 	 *
-	 * @return integer
+	 * @return array {
+	 *     @type bool   $success Whether the log was created successfully
+	 *     @type string $message Response message
+	 *     @type int    $id      ID of the created log entry, or 0 if failed
+	 * }
 	 */
 	public function create_email_log( $data ) {
 		global $wpdb;
-		try {
-			$insert = $wpdb->insert(
-				$this->table_name,
-				$data
-			);
-		} catch ( \Throwable $th ) {
-			return wp_send_json_error( $th );
-		}
 
-		return $insert;
+		try {
+
+			// Sanitize and prepare data
+			$log_data = array(
+				'mail_to'     => sanitize_email( $data['mail_to'] ),
+				'mail_from'   => sanitize_email( $data['mail_from'] ),
+				'subject'     => sanitize_text_field( $data['subject'] ),
+				'message'     => wp_kses_post( $data['message'] ),
+				'headers'     => isset( $data['headers'] ) ? wp_json_encode( $data['headers'] ) : '',
+				'attachments' => isset( $data['attachments'] ) ? wp_json_encode( $data['attachments'] ) : '',
+				'created_at'  => current_time( 'mysql' ),
+				'updated_at'  => current_time( 'mysql' ),
+			);
+
+			// Insert the log entry
+			$inserted = $wpdb->insert(
+				$this->table_name,
+				$log_data,
+				array(
+					'%s', // mail_to
+					'%s', // mail_from
+					'%s', // subject
+					'%s', // message
+					'%s', // headers
+					'%s', // attachments
+					'%s', // created_at
+					'%s',  // updated_at
+				)
+			);
+
+			if ( false === $inserted ) {
+				return array(
+					'success' => false,
+					'message' => 'Failed to create email log: ' . $wpdb->last_error,
+					'id'      => 0,
+				);
+			}
+
+			return array(
+				'success' => true,
+				'message' => 'Email log created successfully',
+				'id'      => $wpdb->insert_id,
+			);
+
+		} catch ( \Throwable $th ) {
+			return array(
+				'success' => false,
+				'message' => 'Error creating email log: ' . $th->getMessage(),
+				'id'      => 0,
+			);
+		}
 	}
 
 	/**

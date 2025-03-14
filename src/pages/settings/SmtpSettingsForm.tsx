@@ -1,7 +1,6 @@
 import { __ } from "@wordpress/i18n";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -103,17 +102,17 @@ const SmtpSettingsForm = () => {
 			const responseData = await response.json() as SmtpSettingsResponse;
 
 			if (responseData.status_code === 200) {
-				toast.success('SMTP settings saved successfully!');
+				toast.success(__('SMTP configuration saved successfully!', 'trigger'));
 			} else {
 				if (responseData.data?.errors) {
 					const errors = responseData.data.errors;
 					toast((t) => <ErrorToast errors={errors} />, {});
 				} else {
-					toast.error(responseData.message || 'Failed to save SMTP settings');
+					toast.error(responseData.message || __('Failed to save SMTP configuration', 'trigger'));
 				}
 			}
 		} catch (error) {
-			toast.error('Failed to save SMTP settings');
+			toast.error(__('Failed to save SMTP configuration', 'trigger'));
 		} finally {
 			setIsSubmitting(false);
 		}
@@ -121,7 +120,7 @@ const SmtpSettingsForm = () => {
 
 	const handleTestEmail = async () => {
 		if (!toEmail) {
-			toast.error('Please enter a test email address');
+			toast.error(__('Please enter a test email address', 'trigger'));
 			return;
 		}
 
@@ -139,18 +138,18 @@ const SmtpSettingsForm = () => {
 
 			const responseData = await response.json() as SmtpSettingsResponse;
 			if (responseData.status_code === 200) {
-				toast.success('Test email sent successfully!');
+				toast.success(__('Test email sent successfully!', 'trigger'));
 				setOpen(false);
 			} else {
 				if (responseData.data?.errors) {
 					const errors = responseData.data.errors;
 					toast((t) => <ErrorToast errors={errors} />, {});
 				} else {
-					toast.error(responseData?.message || 'Failed to send test email');
+					toast.error(responseData?.message || __('Failed to send test email', 'trigger'));
 				}
 			}
 		} catch (error) {
-			toast.error('Failed to send test email');
+			toast.error(__('Failed to send test email', 'trigger'));
 		} finally {
 			setIsTestingEmail(false);
 		}

@@ -3,14 +3,14 @@
  * Enqueue Assets, styles & scripts
  *
  * @package Trigger\Models
- * @subpackage Trigger\Models\WordsModel
+ * @subpackage Trigger\Models\EmailLogModel
  * @author  Trigger<trigger@gmail.com>
  * @since 1.0.0
  */
 
 namespace Trigger\Models;
 
-use Trigger\Database\WordTable;
+use Trigger\Database\EmailLogTable;
 use Trigger\Helpers\QueryHelper;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Words database operation management
  */
-class WordsModel {
+class EmailLogModel {
 
 	/**
 	 * Table name
@@ -37,7 +37,7 @@ class WordsModel {
 	 * @since 1.0.0
 	 */
 	public function __construct() {
-		$this->table_name = ( new WordTable() )->get_table_name();
+		$this->table_name = ( new EmailLogTable() )->get_table_name();
 	}
 
 	/**

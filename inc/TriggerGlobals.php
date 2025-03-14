@@ -34,7 +34,7 @@ function trigger_verify_request( $nonce_key = 'trigger_nonce', $action = '', $ch
 	if ( $check_auth && ! is_user_logged_in() ) {
 		return array(
 			'success' => false,
-			'message' => 'Access denied! Please login to access this feature.',
+			'message' => __( 'Access denied! Please login to access this feature.', 'trigger' ),
 			'code'    => 403,
 		);
 	}
@@ -52,7 +52,7 @@ function trigger_verify_request( $nonce_key = 'trigger_nonce', $action = '', $ch
 	) ) {
 		return array(
 			'success' => false,
-			'message' => 'Invalid security token! Please refresh the page and try again.',
+			'message' => __( 'Invalid security token! Please refresh the page and try again.', 'trigger' ),
 			'code'    => 400,
 		);
 	}
@@ -60,7 +60,7 @@ function trigger_verify_request( $nonce_key = 'trigger_nonce', $action = '', $ch
 	// Return success with sanitized POST data
 	return array(
 		'success' => true,
-		'message' => 'Verification successful.',
+		'message' => __( 'Verification successful.', 'trigger' ),
 		'code'    => 200,
 		'data'    => UtilityHelper::sanitize_array( $_POST ),
 	);

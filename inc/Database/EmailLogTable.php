@@ -4,7 +4,7 @@
  * for storing customer information.
  *
  * @package Trigger\Database
- * @subpackage Trigger\Database\WordTable
+ * @subpackage Trigger\Database\EmailLogTable
  * @author  Trigger<trigger@gmail.com>
  * @since 1.0.0
  */
@@ -16,9 +16,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * WordTable class for creating & dropping table
+ * EmailLogTable class for creating & dropping table
  */
-class WordTable extends DatabaseAbstract {
+class EmailLogTable extends DatabaseAbstract {
 
 	/**
 	 * Table name without prefix
@@ -27,7 +27,7 @@ class WordTable extends DatabaseAbstract {
 	 *
 	 * @var string
 	 */
-	private $name = 'words';
+	private $name = 'email_logs';
 
 	/**
 	 * This function sets the name property of an object to the WordPress
@@ -62,16 +62,18 @@ class WordTable extends DatabaseAbstract {
 	 */
 	public function get_table_schema(): string {
 		$schema = "CREATE TABLE {$this->name} (
-                `id` BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-                `user_id` BIGINT UNSIGNED NOT NULL,
-				`read_count` INT DEFAULT 0,
-                `word` VARCHAR(45),
-                `description` TEXT,
-				`status` VARCHAR(20),
-                `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
-                `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-				-- INDEX idx_user_id (user_id)
-            ) ENGINE = INNODB ";
+			`id` BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+			`mail_to` VARCHAR(30),
+			`mail_from` VARCHAR(30),
+			`subject` VARCHAR(100),
+			`message` TEXT,
+			`headers` TEXT,
+			`attachments` TEXT,
+			`created_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			`updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+			// -- INDEX idx_user_id (user_id)
+		) ENGINE = INNODB ";
+
 		return $schema;
 	}
 
@@ -88,25 +90,5 @@ class WordTable extends DatabaseAbstract {
 		$sql             = $this->get_table_schema() . $charset_collate;
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 		dbDelta( $sql );
-
-		// global $wpdb;
-
-		// $charset_collate = $wpdb->get_charset_collate();
-
-		// $schema = "CREATE TABLE IF NOT EXISTS `{$wpdb->prefix}addresses` (
-		// `id` int unsigned NOT NULL AUTO_INCREMENT,
-		// `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-		// `address` varchar(255) DEFAULT NULL,
-		// `phone` varchar(30) DEFAULT NULL,
-		// `created_by` bigint unsigned NOT NULL,
-		// `created_at` datetime NOT NULL,
-		// PRIMARY KEY (`id`)
-		// ) $charset_collate";
-
-		// if ( ! file_exists( 'dbDelta' ) ) {
-		// require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-		// }
-
-		// dbDelta( $schema );
 	}
 }

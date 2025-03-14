@@ -1,9 +1,9 @@
 <?php
 /**
- * WordsController logics
+ * EmailLogController logics
  *
  * @package Trigger\Controllers
- * @subpackage Trigger\Controllers\WordsController
+ * @subpackage Trigger\Controllers\EmailLogController
  * @author  Trigger<trigger@gmail.com>
  * @since 1.0.0
  */
@@ -11,7 +11,7 @@
 namespace Trigger\Controllers;
 
 use Exception;
-use Trigger\Models\WordsModel;
+use Trigger\Models\EmailLogModel;
 use Trigger\Traits\JsonResponse;
 use Trigger\Traits\RestResponse;
 use WP_Error;
@@ -23,9 +23,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * WordsController logics
+ * EmailLogController logics
  */
-class WordsController {
+class EmailLogController {
 
 	use RestResponse;
 	use JsonResponse;
@@ -37,7 +37,7 @@ class WordsController {
 	 *
 	 * @var object
 	 */
-	private $words_model;
+	private $email_log_model;
 
 	/**
 	 * Get the model
@@ -47,7 +47,7 @@ class WordsController {
 	 * @return object
 	 */
 	public function get_model() {
-		return $this->words_model;
+		return $this->email_log_model;
 	}
 
 	/**
@@ -56,7 +56,7 @@ class WordsController {
 	 * @since 1.0.0
 	 */
 	public function __construct() {
-		$this->words_model = new WordsModel();
+		$this->email_log_model = new EmailLogModel();
 	}
 
 	/**
@@ -66,7 +66,7 @@ class WordsController {
 	 *
 	 * @return  mixed WP_REST_Response|WP_Error
 	 */
-	public function get_words( WP_REST_Request $request ) {
+	public function get_email_logs( WP_REST_Request $request ) {
 		$params = $request->get_params();
 		$data   = array(
 			'order'  => ! empty( $params['order'] ) ? $params['order'] : 'DESC',
@@ -75,8 +75,8 @@ class WordsController {
 			'search' => $params['search'] ?? '',
 		);
 		try {
-			$result = $this->words_model->get_words( $data );
-			return $this->response( 'Word updated successfully', $result );
+			$result = $this->email_log_model->get_email_logs( $data );
+			return $this->response( 'Email log updated successfully', $result );
 		} catch ( \Throwable $th ) {
 			return $this->response( 'Something went wrong!', '', $this->failed_code );
 		}
@@ -92,14 +92,14 @@ class WordsController {
 	 *
 	 * @return mixed WP_REST_Response|WP_Error
 	 */
-	public function create_word( WP_REST_Request $request ) {
+	public function create_email_log( WP_REST_Request $request ) {
 		$data = $request->get_params();
 		try {
-			$create_word = $this->words_model->create_word( $data );
-			if ( $create_word ) {
-				return $this->response( 'Word updated successfully', $create_word );
+			$create_email_log = $this->email_log_model->create_email_log( $data );
+			if ( $create_email_log ) {
+				return $this->response( 'Email log updated successfully', $create_email_log );
 			} else {
-				return $this->response( 'Word not updated!', $create_word );
+				return $this->response( 'Email log not updated!', $create_email_log );
 			}
 		} catch ( \Throwable $th ) {
 			return $this->response( 'Something went wrong!', '', $this->failed_code );
@@ -121,9 +121,9 @@ class WordsController {
 	public function create_bookmark( WP_REST_Request $request ) {
 		$data = $request->get_params();
 		try {
-			$create_bookmark = $this->words_model->create_bookmark( $data );
-			if ( $create_bookmark ) {
-				return $this->response( 'Bookmark Successfull!', $create_bookmark );
+			$create_email_log = $this->email_log_model->create_email_log( $data );
+			if ( $create_email_log ) {
+				return $this->response( 'Email log Successfull!', $create_email_log );
 			} else {
 				return $this->response( 'Something went wrong!!', '', $this->failed_code );
 			}
@@ -143,12 +143,10 @@ class WordsController {
 	 * @return mixed WP_REST_Response|WP_Error
 	 */
 	public function update_word( WP_REST_Request $request ) {
-		$data        = $request->get_params();
-		$update_word = $this->words_model->update_word( $data );
+		$data             = $request->get_params();
+		$update_email_log = $this->email_log_model->update_email_log( $data );
 
-		return $this->response( 'Word not updated!', $update_word );
-
-		return wp_send_json( $update_word );
+		return $this->response( 'Email log updated successfully', $update_email_log );
 	}
 
 	/**
@@ -161,15 +159,15 @@ class WordsController {
 	 *
 	 * @return mixed WP_REST_Response|WP_Error
 	 */
-	public function delete_word( WP_REST_Request $request ) {
-		$data        = $request->get_params();
-		$detete_word = $this->words_model->delete_word( $data );
+	public function delete_email_log( WP_REST_Request $request ) {
+		$data             = $request->get_params();
+		$delete_email_log = $this->email_log_model->delete_email_log( $data );
 
-		if ( ! $detete_word ) {
+		if ( ! $delete_email_log ) {
 			return wp_send_json_error( 'Something went wrong!' );
 		}
 
-		return wp_send_json( $detete_word );
+		return wp_send_json( $delete_email_log );
 	}
 
 	/**

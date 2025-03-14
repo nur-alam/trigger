@@ -15,8 +15,8 @@
  * @package trigger
  */
 
-use Trigger\Database\Migration;
 use Trigger\Init;
+use Trigger\Database\Migration;
 use Trigger\Frontend\Pages\PageManager;
 
 
@@ -126,7 +126,7 @@ if ( ! class_exists( 'Trigger' ) ) {
 			update_option( '_trigger_install_time', time() );
 
 			// Migrate DB.
-			// Migration::migrate();
+			Migration::migrate();
 
 			// Create dynamic pages .
 			// PageManager::create_dynamic_pages();

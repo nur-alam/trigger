@@ -47,11 +47,11 @@ class EmailLogModel {
 	 *
 	 * @return array
 	 */
-	public function get_words( $data ) {
+	public function get_email_logs( $data ) {
 		global $wpdb;
-		$order      = $data['order'];
-		$query      = $wpdb->prepare( "SELECT COUNT(*) FROM $this->table_name" );
-		$word_count = $wpdb->get_var( $query ); //phpcs:ignore
+		$order           = $data['order'];
+		$query           = $wpdb->prepare( "SELECT COUNT(*) FROM $this->table_name" );
+		$email_log_count = $wpdb->get_var( $query ); //phpcs:ignore
 		if ( ! $data['search'] ) {
 			$query  = $wpdb->prepare(
 				"SELECT * FROM $this->table_name 
@@ -64,7 +64,7 @@ class EmailLogModel {
 			$like   = '%' . $data['search'] . '%';
 			$query  = $wpdb->prepare(
 				"SELECT * FROM $this->table_name 
-					WHERE word LIKE %s LIMIT %d OFFSET %d",
+					WHERE email_log LIKE %s LIMIT %d OFFSET %d",
 				$like,
 				$data['limit'],
 				$data['offset']
@@ -76,19 +76,19 @@ class EmailLogModel {
 			);
 		}
 		return array(
-			'count'   => (int) $word_count,
+			'count'   => (int) $email_log_count,
 			'results' => $result,
 		);
 	}
 
 	/**
-	 * Create_word in words table.
+	 * Create_email_log in email_logs table.
 	 *
 	 * @param array $data field as per database table.
 	 *
 	 * @return integer
 	 */
-	public function create_word( $data ) {
+	public function create_email_log( $data ) {
 		global $wpdb;
 		try {
 			$insert = $wpdb->insert(
@@ -103,31 +103,13 @@ class EmailLogModel {
 	}
 
 	/**
-	 * Create_bookmark in words table.
+	 * Update_email_log in email_logs table.
 	 *
 	 * @param array $data field as per database table.
 	 *
 	 * @return integer
 	 */
-	public function create_bookmark( $data ) {
-		global $wpdb;
-
-		$insert = $wpdb->insert(
-			$this->table_name,
-			$data
-		);
-
-		return $insert;
-	}
-
-	/**
-	 * Update_word in words table.
-	 *
-	 * @param array $data field as per database table.
-	 *
-	 * @return integer
-	 */
-	public function update_word( $data ) {
+	public function update_email_log( $data ) {
 		global $wpdb;
 		try {
 			$update = $wpdb->update(
@@ -143,23 +125,67 @@ class EmailLogModel {
 	}
 
 	/**
-	 * Update_word in words table.
+	 * Delete_email_log in email_logs table.
 	 *
-	 * @param array $word field as per database table.
+	 * @param array $email_log field as per database table.
 	 *
 	 * @return integer
 	 */
-	public function delete_word( $word ) {
+	public function delete_email_log( $email_log ) {
 		global $wpdb;
 		try {
 			$deleted = $wpdb->delete(
 				$this->table_name,
-				array( 'id' => $word['id'] )
+				array( 'id' => $email_log['id'] )
 			);
 		} catch ( \Throwable $th ) {
 			return wp_send_json_error( $th );
 		}
 
 		return $deleted;
+	}
+
+	/**
+	 * Get all email logs from the database.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return array {
+	 *     @type bool   $success Whether the query was successful
+	 *     @type string $message Response message
+	 *     @type array  $data    Array of email logs
+	 * }
+	 */
+	public function get_all_email_logs() {
+		global $wpdb;
+
+		try {
+			$results = $wpdb->get_results(
+				$wpdb->prepare(
+					'SELECT * FROM `' . esc_sql( $this->table_name ) . '` ORDER BY created_at DESC'
+				)
+			);
+
+			if ( null === $results ) {
+				return array(
+					'success' => false,
+					'message' => 'Failed to fetch email logs',
+					'data'    => array(),
+				);
+			}
+
+			return array(
+				'success' => true,
+				'message' => 'Email logs fetched successfully',
+				'data'    => $results,
+			);
+
+		} catch ( \Throwable $th ) {
+			return array(
+				'success' => false,
+				'message' => $th->getMessage(),
+				'data'    => array(),
+			);
+		}
 	}
 }

@@ -60,6 +60,7 @@ class EmailLogController {
 		add_filter( 'wp_mail', array( $this, 'create_email_log' ) );
 		add_action( 'wp_ajax_trigger_fetch_email_logs', array( $this, 'get_email_logs' ) );
 		add_action( 'wp_ajax_trigger_delete_email_log', array( $this, 'delete_email_log' ) );
+		add_action( 'wp_ajax_trigger_bulk_delete_email_logs', array( $this, 'bulk_delete_email_logs' ) );
 	}
 
 	/**
@@ -104,15 +105,14 @@ class EmailLogController {
 		}
 
 		$params = $verify['data'];
-		$data   = array(
-			'order'  => ! empty( $params['order'] ) ? $params['order'] : 'DESC',
-			'limit'  => $params['limit'] ?? 5,
-			'offset' => $params['offset'] ?? 0,
-			'search' => $params['search'] ?? '',
+		$args   = array(
+			'page'     => isset( $params['page'] ) ? absint( $params['page'] ) : 1,
+			'per_page' => isset( $params['per_page'] ) ? absint( $params['per_page'] ) : 10,
+			'search'   => isset( $params['search'] ) ? sanitize_text_field( $params['search'] ) : '',
 		);
 
-		$result = $this->email_log_model->get_all_email_logs( $data );
-		return $this->json_response( 'Email logs fetched successfully', $result['data'], 200 );
+		$result = $this->email_log_model->get_all_email_logs( $args );
+		return $this->json_response( 'Email logs fetched successfully', $result, 200 );
 	}
 
 	/**
@@ -140,93 +140,30 @@ class EmailLogController {
 
 		return $this->json_response( 'Email log deleted successfully', $result, 200 );
 	}
-	// * @return  mixed WP_REST_Response|WP_Error
-	// */
-	// public function get_email_logs( WP_REST_Request $request ) {
-	// $params = $request->get_params();
-	// $data   = array(
-	// 'order'  => ! empty( $params['order'] ) ? $params['order'] : 'DESC',
-	// 'limit'  => $params['limit'] ?? 5,
-	// 'offset' => $params['offset'] ?? 0,
-	// 'search' => $params['search'] ?? '',
-	// );
-	// try {
-	// $result = $this->email_log_model->get_email_logs( $data );
-	// return $this->response( 'Email log updated successfully', $result );
-	// } catch ( \Throwable $th ) {
-	// return $this->response( 'Something went wrong!', '', $this->failed_code );
-	// }
-	// }
 
-	// /**
-	// * This function creates a Word in a PHP application after verifying the nonce,
-	// * user privileges, and sanitizing the request.
-	// *
-	// * @since 1.0.0
-	// *
-	// * @param WP_REST_Request $request request object.
-	// *
-	// * @return mixed WP_REST_Response|WP_Error
-	// */
-	// public function create_email_log( WP_REST_Request $request ) {
-	// $data = $request->get_params();
-	// try {
-	// $create_email_log = $this->email_log_model->create_email_log( $data );
-	// if ( $create_email_log ) {
-	// return $this->response( 'Email log updated successfully', $create_email_log );
-	// } else {
-	// return $this->response( 'Email log not updated!', $create_email_log );
-	// }
-	// } catch ( \Throwable $th ) {
-	// return $this->response( 'Something went wrong!', '', $this->failed_code );
-	// }
-	// return wp_send_json( $create_word );
-	// }
+	/**
+	 * Bulk delete email logs
+	 *
+	 * @return mixed array|WP_Error
+	 */
+	public function bulk_delete_email_logs() {
+		$verify = trigger_verify_request();
+		if ( ! $verify['success'] ) {
+			return $this->json_response( $verify['message'], null, $verify['code'] );
+		}
 
-	// /**
-	// * This function creates a plan in a PHP application after verifying the nonce,
-	// * user privileges, and sanitizing the request.
-	// *
-	// * @since 1.0.0
-	// *
-	// * @param WP_REST_Request $request request object.
-	// *
-	// * @return mixed WP_REST_Response|WP_Error
-	// */
-	// public function update_email_log( WP_REST_Request $request ) {
-	// $data             = $request->get_params();
-	// $update_email_log = $this->email_log_model->update_email_log( $data );
+		$params = $verify['data'];
+		$ids    = json_decode( $params['ids'], true );
 
-	// return $this->response( 'Email log updated successfully', $update_email_log );
-	// }
+		try {
+			$result = $this->email_log_model->bulk_delete_email_logs( $ids );
+			if ( ! $result ) {
+				return $this->json_response( 'Failed to delete email logs', null, 400 );
+			}
+		} catch ( \Throwable $th ) {
+			return $this->json_response( 'Error deleting email logs: ' . $th->getMessage(), null, 500 );
+		}
 
-	// /**
-	// * This function creates a plan in a PHP application after verifying the nonce,
-	// * user privileges, and sanitizing the request.
-	// *
-	// * @since 1.0.0
-	// *
-	// * @param WP_REST_Request $request request object.
-	// *
-	// * @return mixed WP_REST_Response|WP_Error
-	// */
-	// public function delete_email_log( WP_REST_Request $request ) {
-	// $data             = $request->get_params();
-	// $delete_email_log = $this->email_log_model->delete_email_log( $data );
-
-	// if ( ! $delete_email_log ) {
-	// return wp_send_json_error( 'Something went wrong!' );
-	// }
-
-	// return wp_send_json( $delete_email_log );
-	// }
-
-	// /**
-	// * Validate description.
-	// *
-	// * @return  [type]  [return description]
-	// */
-	// public function validate() {
-	// return true;
-	// }
+		return $this->json_response( 'Email logs deleted successfully', $result, 200 );
+	}
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback, useRef } from 'react'
 import {
 	Table,
 	TableBody,
@@ -14,9 +14,10 @@ import {
 	useReactTable,
 	getSortedRowModel,
 	SortingState,
-	getPaginationRowModel,
+	PaginationState,
 	ColumnFiltersState,
 	getFilteredRowModel,
+	RowSelectionState,
 } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -33,6 +34,17 @@ import { format } from 'date-fns'
 import { __ } from '@wordpress/i18n'
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog'
 import { Badge } from '@/components/ui/badge'
+import { Checkbox } from '@/components/ui/checkbox'
+import { debounce } from 'lodash'
+import {
+	Pagination,
+	PaginationContent,
+	PaginationEllipsis,
+	PaginationItem,
+	PaginationLink,
+	PaginationNext,
+	PaginationPrevious,
+} from "@/components/ui/pagination"
 
 interface EmailLog {
 	id: number
@@ -45,10 +57,20 @@ interface EmailLog {
 	attachments: string
 }
 
+interface PaginationMeta {
+	total: number
+	per_page: number
+	current_page: number
+	total_pages: number
+}
+
 interface EmailLogsResponse {
 	status_code: number
 	message?: string
-	data: EmailLog[]
+	data: {
+		email_logs: EmailLog[]
+		meta: PaginationMeta
+	}
 }
 
 const CollapsibleSection = ({
@@ -84,14 +106,56 @@ const CollapsibleSection = ({
 	);
 };
 
+const TableSkeleton = () => (
+	<TableBody>
+		{Array.from({ length: 5 }).map((_, i) => (
+			<TableRow key={i}>
+				{Array.from({ length: 7 }).map((_, j) => (
+					<TableCell key={j}>
+						<div className="h-6 w-full animate-pulse rounded bg-gray-200" />
+					</TableCell>
+				))}
+			</TableRow>
+		))}
+	</TableBody>
+)
+
 const EmailLogs = () => {
 	const [sorting, setSorting] = useState<SortingState>([])
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+	const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
+		pageIndex: 0,
+		pageSize: 5,
+	})
 	const [data, setData] = useState<EmailLog[]>([])
+	const [pageCount, setPageCount] = useState(0)
 	const [loading, setLoading] = useState(true)
 	const [viewEmail, setViewEmail] = useState<EmailLog | null>(null)
 	const [deleteEmail, setDeleteEmail] = useState<EmailLog | null>(null)
 	const [isDeleting, setIsDeleting] = useState(false)
+	const [isBulkDeleting, setIsBulkDeleting] = useState(false)
+	const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+	const lastSelectedRowRef = useRef<number | null>(null)
+	const [searchQuery, setSearchQuery] = useState('');
+	const debouncedSearch = useCallback(
+		debounce((value: string) => {
+			setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+			fetchEmailLogs({
+				page: 1,
+				per_page: pageSize,
+				search: value,
+			});
+		}, 500),
+		[pageSize]
+	);
+
+	const pagination = React.useMemo(
+		() => ({
+			pageIndex,
+			pageSize,
+		}),
+		[pageIndex, pageSize]
+	)
 
 	const handleView = (email: EmailLog) => {
 		setViewEmail(email)
@@ -128,7 +192,86 @@ const EmailLogs = () => {
 		}
 	}
 
+	const handleBulkDelete = async () => {
+		setIsBulkDeleting(true)
+		try {
+			const selectedRows = table.getSelectedRowModel().rows
+			const selectedIds = selectedRows.map(row => (row.original as EmailLog).id)
+
+			const formData = new FormData();
+			formData.append('action', 'trigger_bulk_delete_email_logs');
+			formData.append('trigger_nonce', config.nonce_value);
+			formData.append('ids', JSON.stringify(selectedIds));
+
+			const response = await fetch(config.ajax_url, {
+				method: 'POST',
+				body: formData,
+			});
+
+			const responseData = await response.json() as EmailLogsResponse;
+
+			if (responseData?.status_code === 200) {
+				setData(data.filter(email => !selectedIds.includes(email.id)))
+				setRowSelection({})
+				toast.success(__('Selected email logs deleted successfully', 'trigger'))
+			} else {
+				toast.error(responseData?.message || __('Failed to delete email logs', 'trigger'))
+			}
+		} catch (error) {
+			toast.error(__('Failed to delete email logs', 'trigger'))
+		} finally {
+			setIsBulkDeleting(false)
+		}
+	}
+
 	const columns: ColumnDef<EmailLog>[] = [
+		{
+			id: 'select',
+			header: ({ table }) => (
+				<Checkbox
+					checked={
+						table.getIsAllPageRowsSelected() ||
+						(table.getIsSomePageRowsSelected() && 'indeterminate')
+					}
+					onCheckedChange={(value: boolean | 'indeterminate') => table.toggleAllPageRowsSelected(!!value)}
+					aria-label={__('Select all', 'trigger')}
+				/>
+			),
+			cell: ({ row }) => {
+				const handleCheckboxClick = (e: React.MouseEvent) => {
+					if (e.shiftKey && lastSelectedRowRef.current !== null) {
+						const currentIndex = row.index
+						const lastIndex = lastSelectedRowRef.current
+						const start = Math.min(currentIndex, lastIndex)
+						const end = Math.max(currentIndex, lastIndex)
+
+						const newSelection = { ...rowSelection }
+						// Get all rows between start and end
+						const rows = table.getRowModel().rows
+						rows.forEach((tableRow) => {
+							if (tableRow.index >= start && tableRow.index <= end) {
+								newSelection[tableRow.id] = true
+							}
+						})
+						setRowSelection(newSelection)
+					} else {
+						row.toggleSelected()
+						lastSelectedRowRef.current = row.index
+					}
+				}
+
+				return (
+					<Checkbox
+						checked={row.getIsSelected()}
+						onClick={handleCheckboxClick}
+						onCheckedChange={(value: boolean) => row.toggleSelected(!!value)}
+						aria-label={__('Select row', 'trigger')}
+					/>
+				)
+			},
+			enableSorting: false,
+			enableHiding: false,
+		},
 		{
 			accessorKey: 'id',
 			header: __('ID', 'trigger'),
@@ -137,22 +280,22 @@ const EmailLogs = () => {
 			accessorKey: 'mail_to',
 			header: __('To', 'trigger'),
 		},
-		{
-			accessorKey: 'mail_from',
-			header: __('From', 'trigger'),
-		},
+		// {
+		// 	accessorKey: 'mail_from',
+		// 	header: __('From', 'trigger'),
+		// },
 		{
 			accessorKey: 'subject',
 			header: __('Subject', 'trigger'),
 		},
-		{
-			accessorKey: 'message',
-			header: __('Message', 'trigger'),
-			cell: ({ row }) => {
-				const message = row.getValue('message') as string
-				return <div className="max-w-[500px] truncate">{message}</div>
-			},
-		},
+		// {
+		// 	accessorKey: 'message',
+		// 	header: __('Message', 'trigger'),
+		// 	cell: ({ row }) => {
+		// 		const message = row.getValue('message') as string
+		// 		return <div className="max-w-[500px] truncate">{message}</div>
+		// 	},
+		// },
 		{
 			accessorKey: 'created_at',
 			header: __('Date', 'trigger'),
@@ -190,64 +333,173 @@ const EmailLogs = () => {
 		},
 	]
 
-	useEffect(() => {
-		const fetchEmailLogs = async () => {
-			try {
-				const formData = new FormData();
-				formData.append('action', 'trigger_fetch_email_logs');
-				formData.append('trigger_nonce', config.nonce_value);
-
-				const response = await fetch(config.ajax_url, {
-					method: 'POST',
-					body: formData,
-				});
-
-				const responseData = await response.json() as EmailLogsResponse;
-
-				if (responseData.status_code === 200) {
-					setData(responseData.data)
-				}
-			} catch (error) {
-				console.error('Error fetching email logs:', error)
-			} finally {
-				setLoading(false)
+	const fetchEmailLogs = async (params: { page: number; per_page: number; search?: string }) => {
+		setLoading(true);
+		try {
+			const formData = new FormData();
+			formData.append('action', 'trigger_fetch_email_logs');
+			formData.append('trigger_nonce', config.nonce_value);
+			formData.append('page', params.page.toString());
+			formData.append('per_page', params.per_page.toString());
+			if (params.search) {
+				formData.append('search', params.search);
 			}
-		}
 
-		fetchEmailLogs()
-	}, [])
+			const response = await fetch(config.ajax_url, {
+				method: 'POST',
+				body: formData,
+			});
+
+			const responseData = await response.json() as EmailLogsResponse;
+			if (responseData.status_code === 200) {
+				setData(responseData.data.email_logs)
+				setPageCount(responseData.data.meta.total_pages)
+			} else {
+				toast.error(responseData?.message || __('Failed to fetch email logs', 'trigger'))
+			}
+		} catch (error) {
+			toast.error(__('Failed to fetch email logs', 'trigger'))
+		} finally {
+			setLoading(false)
+		}
+	}
+
+	useEffect(() => {
+		fetchEmailLogs({
+			page: pageIndex + 1,
+			per_page: pageSize,
+			search: searchQuery,
+		});
+	}, [pageIndex, pageSize])
 
 	const table = useReactTable({
 		data,
 		columns,
-		getCoreRowModel: getCoreRowModel(),
-		onSortingChange: setSorting,
-		getSortedRowModel: getSortedRowModel(),
-		getPaginationRowModel: getPaginationRowModel(),
-		onColumnFiltersChange: setColumnFilters,
-		getFilteredRowModel: getFilteredRowModel(),
+		pageCount,
 		state: {
 			sorting,
+			pagination,
 			columnFilters,
+			rowSelection,
 		},
+		enableRowSelection: true,
+		onRowSelectionChange: setRowSelection,
+		onPaginationChange: setPagination,
+		onSortingChange: setSorting,
+		getSortedRowModel: getSortedRowModel(),
+		getCoreRowModel: getCoreRowModel(),
+		onColumnFiltersChange: setColumnFilters,
+		getFilteredRowModel: getFilteredRowModel(),
+		manualPagination: true,
 	})
 
 	if (loading) {
-		return <div>{__('Loading...', 'trigger')}</div>
+		return (
+			<div className="p-4 space-y-4">
+
+				<div className="flex items-center justify-between h-12">
+					<h2 className="text-2xl font-bold">{__('Email Logs', 'trigger')}</h2>
+					<div className="flex items-center gap-4">
+						{Object.keys(rowSelection).length > 0 ? (
+							<div className="flex items-center gap-4">
+								<span className="text-sm text-muted-foreground">
+									{table.getFilteredSelectedRowModel().rows.length} {__('selected', 'trigger')}
+								</span>
+								<Button
+									variant="destructive"
+									size="sm"
+									onClick={() => {
+										setDeleteEmail({ id: -1 } as EmailLog)
+									}}
+									disabled={isBulkDeleting}
+									className="flex items-center gap-2"
+								>
+									<Trash2 className="h-4 w-4" />
+									{__('Delete Selected', 'trigger')}
+								</Button>
+							</div>
+						) : (
+							<Input
+								placeholder={__('Search by subject or email...', 'trigger')}
+								value={searchQuery}
+								onChange={(event) => {
+									setSearchQuery(event.target.value);
+									debouncedSearch(event.target.value);
+								}}
+								className="w-[300px]"
+							/>
+						)}
+					</div>
+				</div>
+
+				<div className="rounded-md border">
+					<Table>
+						<TableHeader>
+							{table.getHeaderGroups().map((headerGroup) => (
+								<TableRow key={headerGroup.id}>
+									{headerGroup.headers.map((header) => (
+										<TableHead key={header.id}>
+											{header.isPlaceholder
+												? null
+												: flexRender(
+													header.column.columnDef.header,
+													header.getContext()
+												)}
+										</TableHead>
+									))}
+								</TableRow>
+							))}
+						</TableHeader>
+						<TableSkeleton />
+					</Table>
+				</div>
+
+				<div className="flex items-center justify-between space-x-2 py-4">
+					<div className="h-5 w-48 animate-pulse rounded bg-gray-200" />
+					<div className="flex items-center space-x-6 lg:space-x-8">
+						<div className="h-8 w-32 animate-pulse rounded bg-gray-200" />
+						<div className="h-8 w-32 animate-pulse rounded bg-gray-200" />
+						<div className="h-8 w-32 animate-pulse rounded bg-gray-200" />
+					</div>
+				</div>
+			</div>
+		)
 	}
 
 	return (
 		<div className="p-4 space-y-4">
-			<div className="flex items-center justify-between">
+			<div className="flex items-center justify-between h-12">
 				<h2 className="text-2xl font-bold">{__('Email Logs', 'trigger')}</h2>
-				<Input
-					placeholder={__('Filter subjects...', 'trigger')}
-					value={(table.getColumn('subject')?.getFilterValue() as string) ?? ''}
-					onChange={(event) =>
-						table.getColumn('subject')?.setFilterValue(event.target.value)
-					}
-					className="max-w-sm"
-				/>
+				<div className="flex items-center gap-4">
+					{Object.keys(rowSelection).length > 0 ? (
+						<div className="flex items-center gap-4">
+							<span className="text-sm text-muted-foreground">
+								{table.getFilteredSelectedRowModel().rows.length} {__('selected', 'trigger')}
+							</span>
+							<Button
+								variant="destructive"
+								size="sm"
+								onClick={() => setDeleteEmail({ id: -1 } as EmailLog)}
+								disabled={isBulkDeleting}
+								className="flex items-center gap-2"
+							>
+								<Trash2 className="h-4 w-4" />
+								{__('Delete Selected', 'trigger')}
+							</Button>
+						</div>
+					) : (
+						<Input
+							placeholder={__('Search by subject or email...', 'trigger')}
+							value={searchQuery}
+							onChange={(event) => {
+								const value = event.target.value;
+								setSearchQuery(value);
+								debouncedSearch(value);
+							}}
+							className="w-[300px]"
+						/>
+					)}
+				</div>
 			</div>
 
 			<div className="rounded-md border">
@@ -268,9 +520,11 @@ const EmailLogs = () => {
 							</TableRow>
 						))}
 					</TableHeader>
-					<TableBody>
-						{table.getRowModel().rows?.length ? (
-							table.getRowModel().rows.map((row) => (
+					{loading ? (
+						<TableSkeleton />
+					) : table.getRowModel().rows?.length ? (
+						<TableBody>
+							{table.getRowModel().rows.map((row) => (
 								<TableRow
 									key={row.id}
 									data-state={row.getIsSelected() && 'selected'}
@@ -284,8 +538,10 @@ const EmailLogs = () => {
 										</TableCell>
 									))}
 								</TableRow>
-							))
-						) : (
+							))}
+						</TableBody>
+					) : (
+						<TableBody>
 							<TableRow>
 								<TableCell
 									colSpan={columns.length}
@@ -294,28 +550,88 @@ const EmailLogs = () => {
 									{__('No email logs found.', 'trigger')}
 								</TableCell>
 							</TableRow>
-						)}
-					</TableBody>
+						</TableBody>
+					)}
 				</Table>
 			</div>
 
-			<div className="flex items-center justify-end space-x-2 py-4">
-				<Button
-					variant="outline"
-					size="sm"
-					onClick={() => table.previousPage()}
-					disabled={!table.getCanPreviousPage()}
-				>
-					{__('Previous', 'trigger')}
-				</Button>
-				<Button
-					variant="outline"
-					size="sm"
-					onClick={() => table.nextPage()}
-					disabled={!table.getCanNextPage()}
-				>
-					{__('Next', 'trigger')}
-				</Button>
+			<div className="flex flex-wrap items-center justify-between space-x-2 py-4">
+				<div className="flex-1 text-sm text-muted-foreground hidden lg:block">
+					{table.getFilteredSelectedRowModel().rows.length} of{' '}
+					{table.getFilteredRowModel().rows.length} row(s) selected.
+				</div>
+				<div className="flex-1 flex space-x-2 items-center justify-center">
+					<p className="text-sm font-medium">
+						{__('Rows per page', 'trigger')}
+					</p>
+					<select
+						value={table.getState().pagination.pageSize}
+						onChange={(e) => {
+							table.setPageSize(Number(e.target.value))
+						}}
+						className="h-8 w-[70px] rounded-md border border-input bg-transparent px-2 py-1 text-sm"
+					>
+						{[10, 20, 30, 40, 50].map((pageSize) => (
+							<option key={pageSize} value={pageSize}>
+								{pageSize}
+							</option>
+						))}
+					</select>
+				</div>
+				<Pagination className="flex-1 justify-end">
+					<PaginationContent className="gap-2">
+						<PaginationItem>
+							<PaginationPrevious
+								onClick={() => table.previousPage()}
+								disabled={!table.getCanPreviousPage() || loading}
+								aria-disabled={!table.getCanPreviousPage() || loading}
+								className="h-8 min-w-8 px-2"
+							/>
+						</PaginationItem>
+						{Array.from({ length: pageCount }, (_, i) => {
+							const pageNumber = i + 1;
+							const currentPage = table.getState().pagination.pageIndex + 1;
+
+							if (
+								pageNumber === 1 ||
+								pageNumber === pageCount ||
+								(pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
+							) {
+								return (
+									<PaginationItem key={i}>
+										<PaginationLink
+											onClick={() => table.setPageIndex(i)}
+											isActive={currentPage === pageNumber}
+											className="h-8 min-w-8 px-3"
+										>
+											{pageNumber}
+										</PaginationLink>
+									</PaginationItem>
+								);
+							} else if (
+								(pageNumber === 2 && currentPage > 3) ||
+								(pageNumber === pageCount - 1 && currentPage < pageCount - 2)
+							) {
+								return (
+									<PaginationItem key={i}>
+										<PaginationEllipsis className="h-8" />
+									</PaginationItem>
+								);
+							}
+							return null;
+						})}
+						<PaginationItem>
+							<PaginationNext
+								onClick={() => table.nextPage()}
+								disabled={!table.getCanNextPage() || loading}
+								aria-disabled={!table.getCanNextPage() || loading}
+								className="h-8 min-w-8 px-2"
+							/>
+						</PaginationItem>
+					</PaginationContent>
+				</Pagination>
+				{/* <div className="flex items-center space-x-6 lg:space-x-8">
+				</div> */}
 			</div>
 
 			{/* Updated View Email Dialog */}
@@ -426,21 +742,28 @@ const EmailLogs = () => {
 			<ConfirmationDialog
 				open={!!deleteEmail}
 				onOpenChange={(open) => !open && setDeleteEmail(null)}
-				title={__('Delete Email Log', 'trigger')}
-				description={__('Are you sure you want to delete this email log? This action cannot be undone.', 'trigger')}
+				title={deleteEmail?.id === -1 ? __('Delete Selected Email Logs', 'trigger') : __('Delete Email Log', 'trigger')}
+				description={deleteEmail?.id === -1
+					? __('Are you sure you want to delete all selected email logs? This action cannot be undone.', 'trigger')
+					: __('Are you sure you want to delete this email log? This action cannot be undone.', 'trigger')
+				}
 				icon={<AlertTriangle className="h-5 w-5 text-destructive" />}
 				variant="danger"
 				confirmText={__('Delete', 'trigger')}
 				cancelText={__('Cancel', 'trigger')}
 				onConfirm={async () => {
 					if (deleteEmail) {
-						await handleDelete(deleteEmail.id)
+						if (deleteEmail.id === -1) {
+							await handleBulkDelete()
+						} else {
+							await handleDelete(deleteEmail.id)
+						}
 					}
 				}}
-				loading={isDeleting}
+				loading={isDeleting || isBulkDeleting}
 				loadingText={__('Deleting...', 'trigger')}
 			>
-				{/* {deleteEmail && (
+				{deleteEmail && deleteEmail.id !== -1 && (
 					<div className="space-y-2 mt-4">
 						<div className="grid grid-cols-2 gap-2">
 							<div>
@@ -457,7 +780,14 @@ const EmailLogs = () => {
 							<p className="text-sm text-muted-foreground">{deleteEmail.subject}</p>
 						</div>
 					</div>
-				)} */}
+				)}
+				{deleteEmail?.id === -1 && (
+					<div className="mt-4">
+						<p className="text-sm text-muted-foreground">
+							{table.getSelectedRowModel().rows.length} {__('email logs will be deleted.', 'trigger')}
+						</p>
+					</div>
+				)}
 			</ConfirmationDialog>
 		</div>
 	)

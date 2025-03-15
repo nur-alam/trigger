@@ -159,33 +159,164 @@ class EmailLogModel {
 	}
 
 	/**
-	 * Get all email logs from the database.
+	 * Get total count of email logs.
 	 *
-	 * @since 1.0.0
-	 *
-	 * @return array {
-	 *     @type bool   $success Whether the query was successful
-	 *     @type string $message Response message
-	 *     @type array  $data    Array of email logs
-	 * }
+	 * @param string $search Optional search term for subject or mail_to.
+	 * @return int Total number of email logs.
 	 */
-	public function get_all_email_logs() {
+	private function get_total_count( $search = '' ) {
 		global $wpdb;
 
-		$email_logs = $wpdb->get_results(
-			$wpdb->prepare(
-				'SELECT * FROM `' . esc_sql( $this->table_name ) . '` ORDER BY created_at DESC'
-			)
-		);
-
-		if ( null === $email_logs ) {
-			return array(
-				'data' => array(),
+		if ( ! empty( $search ) ) {
+			return (int) $wpdb->get_var(
+				$wpdb->prepare(
+					'SELECT COUNT(*) FROM `' . esc_sql( $this->table_name ) . '` 
+					WHERE subject LIKE %s OR mail_to LIKE %s',
+					'%' . $wpdb->esc_like( $search ) . '%',
+					'%' . $wpdb->esc_like( $search ) . '%'
+				)
 			);
 		}
 
-		return array(
-			'data' => $email_logs,
+		return (int) $wpdb->get_var(
+			$wpdb->prepare(
+				'SELECT COUNT(*) FROM `' . esc_sql( $this->table_name ) . '`'
+			)
 		);
+	}
+
+	/**
+	 * Get all email logs from the database with pagination and filtering.
+	 *
+	 * @param array $args {
+	 *     Optional. Arguments to filter and paginate results.
+	 *     @type int    $page           Current page number. Default 1.
+	 *     @type int    $per_page       Items per page. Default 10.
+	 *     @type string $search         Search term for subject or mail_to.
+	 * }
+	 * @return array {
+	 *     @type array  $data    Array of email logs
+	 *     @type array  $meta    Pagination metadata
+	 * }
+	 */
+	public function get_all_email_logs( $args = array() ) {
+		global $wpdb;
+
+		// Set default arguments
+		$defaults = array(
+			'page'     => 1,
+			'per_page' => 10,
+			'search'   => '',
+		);
+		$args     = wp_parse_args( $args, $defaults );
+
+		// Ensure positive integers for pagination
+		$page     = max( 1, intval( $args['page'] ) );
+		$per_page = max( 1, intval( $args['per_page'] ) );
+		$offset   = ( $page - 1 ) * $per_page;
+
+		// Get total count for pagination
+		$total       = $this->get_total_count( $args['search'] );
+		$total_pages = ceil( $total / $per_page );
+
+		// Build and execute query
+		$email_logs = array();
+		if ( ! empty( $args['search'] ) ) {
+			$email_logs = $wpdb->get_results(
+				$wpdb->prepare(
+					'SELECT * FROM `' . esc_sql( $this->table_name ) . '` 
+					WHERE subject LIKE %s OR mail_to LIKE %s 
+					ORDER BY created_at DESC 
+					LIMIT %d OFFSET %d',
+					'%' . $wpdb->esc_like( $args['search'] ) . '%',
+					'%' . $wpdb->esc_like( $args['search'] ) . '%',
+					$per_page,
+					$offset
+				)
+			);
+		} else {
+			$email_logs = $wpdb->get_results(
+				$wpdb->prepare(
+					'SELECT * FROM `' . esc_sql( $this->table_name ) . '` 
+					ORDER BY created_at DESC 
+					LIMIT %d OFFSET %d',
+					$per_page,
+					$offset
+				)
+			);
+		}
+
+		if ( null === $email_logs ) {
+			$email_logs = array();
+		}
+
+		return array(
+			'email_logs' => $email_logs,
+			'meta'       => array(
+				'total'        => $total,
+				'per_page'     => $per_page,
+				'current_page' => $page,
+				'total_pages'  => $total_pages,
+			),
+		);
+	}
+
+	/**
+	 * Bulk delete email logs
+	 *
+	 * @param array $ids Array of email log IDs to delete.
+	 * @return bool True if logs were deleted, false otherwise.
+	 */
+	public function bulk_delete_email_logs( $ids ) {
+		global $wpdb;
+		try {
+			if ( empty( $ids ) ) {
+				return false;
+			}
+
+			// Handle if IDs come as a string
+			if ( is_string( $ids ) ) {
+				$ids = explode( ',', $ids );
+			}
+
+			// Ensure we have an array
+			if ( ! is_array( $ids ) ) {
+				return false;
+			}
+
+			// Clean the IDs
+			$ids = array_filter( array_map( 'absint', $ids ) );
+			if ( empty( $ids ) ) {
+				return false;
+			}
+
+			// Start transaction
+			$wpdb->query( 'START TRANSACTION' );
+
+			$success = true;
+			foreach ( $ids as $id ) {
+				$result = $wpdb->delete(
+					$this->table_name,
+					array( 'id' => $id ),
+					array( '%d' )
+				);
+				if ( false === $result ) {
+					$success = false;
+					break;
+				}
+			}
+
+			// Commit or rollback based on success
+			if ( $success ) {
+				$wpdb->query( 'COMMIT' );
+				return true;
+			} else {
+				$wpdb->query( 'ROLLBACK' );
+				return false;
+			}
+		} catch ( \Throwable $th ) {
+			$wpdb->query( 'ROLLBACK' );
+			return false;
+		}
 	}
 }

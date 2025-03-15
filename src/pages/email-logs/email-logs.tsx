@@ -1,10 +1,32 @@
-import React, { useEffect, useState } from 'react'
-import { ColumnDef, SortingState, PaginationState, ColumnFiltersState, RowSelectionState } from '@tanstack/react-table'
+import React, { useEffect, useState, useCallback, useRef } from 'react'
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from '@/components/ui/table'
+import {
+	ColumnDef,
+	flexRender,
+	getCoreRowModel,
+	useReactTable,
+	getSortedRowModel,
+	SortingState,
+	PaginationState,
+	ColumnFiltersState,
+	getFilteredRowModel,
+	RowSelectionState,
+} from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
-import { Eye, Trash2, AlertTriangle, ChevronUp, ChevronDown } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Eye, Trash2, AlertTriangle, ChevronDown, ChevronUp, X } from 'lucide-react'
 import {
 	Dialog,
 	DialogContent,
+	DialogHeader,
+	DialogTitle,
 } from "@/components/ui/dialog"
 import { toast } from 'sonner'
 import config from '@/config'
@@ -13,7 +35,16 @@ import { __ } from '@wordpress/i18n'
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
-import { DataTable } from '@/components/data-table'
+import { debounce } from 'lodash'
+import {
+	Pagination,
+	PaginationContent,
+	PaginationEllipsis,
+	PaginationItem,
+	PaginationLink,
+	PaginationNext,
+	PaginationPrevious,
+} from "@/components/ui/pagination"
 
 interface EmailLog {
 	id: number
@@ -75,12 +106,26 @@ const CollapsibleSection = ({
 	);
 };
 
+const TableSkeleton = () => (
+	<TableBody>
+		{Array.from({ length: 5 }).map((_, i) => (
+			<TableRow key={i}>
+				{Array.from({ length: 7 }).map((_, j) => (
+					<TableCell key={j}>
+						<div className="h-6 w-full animate-pulse rounded bg-gray-200" />
+					</TableCell>
+				))}
+			</TableRow>
+		))}
+	</TableBody>
+)
+
 const EmailLogs = () => {
 	const [sorting, setSorting] = useState<SortingState>([])
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
 		pageIndex: 0,
-		pageSize: 10,
+		pageSize: 5,
 	})
 	const [data, setData] = useState<EmailLog[]>([])
 	const [pageCount, setPageCount] = useState(0)
@@ -90,8 +135,27 @@ const EmailLogs = () => {
 	const [isDeleting, setIsDeleting] = useState(false)
 	const [isBulkDeleting, setIsBulkDeleting] = useState(false)
 	const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
-	const [searchQuery, setSearchQuery] = useState('')
-	const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(null)
+	const lastSelectedRowRef = useRef<number | null>(null)
+	const [searchQuery, setSearchQuery] = useState('');
+	const debouncedSearch = useCallback(
+		debounce((value: string) => {
+			setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+			fetchEmailLogs({
+				page: 1,
+				per_page: pageSize,
+				search: value,
+			});
+		}, 500),
+		[pageSize]
+	);
+
+	const pagination = React.useMemo(
+		() => ({
+			pageIndex,
+			pageSize,
+		}),
+		[pageIndex, pageSize]
+	)
 
 	const handleView = (email: EmailLog) => {
 		setViewEmail(email)
@@ -113,16 +177,14 @@ const EmailLogs = () => {
 			const responseData = await response.json() as EmailLogsResponse;
 
 			if (responseData?.status_code === 200) {
+				setData(data.filter(email => email.id !== id))
 				toast.success(responseData?.message || __('Email log deleted successfully', 'trigger'))
-				await fetchEmailLogs({
-					page: pageIndex + 1,
-					per_page: pageSize,
-					search: searchQuery,
-				});
+				console.log('delete response', responseData)
 			} else {
 				toast.error(responseData?.message || __('Failed to delete email log', 'trigger'))
 			}
 		} catch (error) {
+			console.error('Error deleting email log:', error)
 			toast.error(__('Failed to delete email log', 'trigger'))
 		} finally {
 			setIsDeleting(false)
@@ -131,13 +193,10 @@ const EmailLogs = () => {
 	}
 
 	const handleBulkDelete = async () => {
-		if (!deleteEmail) return;
-
 		setIsBulkDeleting(true)
 		try {
-			const selectedIds = Object.keys(rowSelection).map(key => {
-				return parseInt(key)
-			}).filter(Boolean) as number[]
+			const selectedRows = table.getSelectedRowModel().rows
+			const selectedIds = selectedRows.map(row => (row.original as EmailLog).id)
 
 			const formData = new FormData();
 			formData.append('action', 'trigger_bulk_delete_email_logs');
@@ -152,13 +211,9 @@ const EmailLogs = () => {
 			const responseData = await response.json() as EmailLogsResponse;
 
 			if (responseData?.status_code === 200) {
+				setData(data.filter(email => !selectedIds.includes(email.id)))
 				setRowSelection({})
 				toast.success(__('Selected email logs deleted successfully', 'trigger'))
-				await fetchEmailLogs({
-					page: pageIndex + 1,
-					per_page: pageSize,
-					search: searchQuery,
-				});
 			} else {
 				toast.error(responseData?.message || __('Failed to delete email logs', 'trigger'))
 			}
@@ -166,34 +221,8 @@ const EmailLogs = () => {
 			toast.error(__('Failed to delete email logs', 'trigger'))
 		} finally {
 			setIsBulkDeleting(false)
-			setDeleteEmail(null)
 		}
 	}
-
-	const handleRowSelection = (rowIndex: number, checked: boolean, shiftKey: boolean) => {
-		const row = data[rowIndex];
-		if (!row) return;
-
-		if (shiftKey && lastSelectedIndex !== null) {
-			const start = Math.min(rowIndex, lastSelectedIndex);
-			const end = Math.max(rowIndex, lastSelectedIndex);
-
-			const newSelection = { ...rowSelection };
-			for (let i = start; i <= end; i++) {
-				const currentRow = data[i];
-				if (currentRow) {
-					newSelection[currentRow.id] = checked;
-				}
-			}
-			setRowSelection(newSelection);
-		} else {
-			setRowSelection(prev => ({
-				...prev,
-				[row.id]: checked,
-			}));
-		}
-		setLastSelectedIndex(rowIndex);
-	};
 
 	const columns: ColumnDef<EmailLog>[] = [
 		{
@@ -208,18 +237,37 @@ const EmailLogs = () => {
 					aria-label={__('Select all', 'trigger')}
 				/>
 			),
-			cell: ({ row, table }) => {
-				const rowIndex = table.getRowModel().rows.findIndex(r => r.id === row.id);
+			cell: ({ row }) => {
+				const handleCheckboxClick = (e: React.MouseEvent) => {
+					if (e.shiftKey && lastSelectedRowRef.current !== null) {
+						const currentIndex = row.index
+						const lastIndex = lastSelectedRowRef.current
+						const start = Math.min(currentIndex, lastIndex)
+						const end = Math.max(currentIndex, lastIndex)
+
+						const newSelection = { ...rowSelection }
+						// Get all rows between start and end
+						const rows = table.getRowModel().rows
+						rows.forEach((tableRow) => {
+							if (tableRow.index >= start && tableRow.index <= end) {
+								newSelection[tableRow.id] = true
+							}
+						})
+						setRowSelection(newSelection)
+					} else {
+						row.toggleSelected()
+						lastSelectedRowRef.current = row.index
+					}
+				}
+
 				return (
 					<Checkbox
 						checked={row.getIsSelected()}
-						onCheckedChange={(checked: boolean) => {
-							const event = window.event as MouseEvent | undefined;
-							handleRowSelection(rowIndex, checked, event?.shiftKey ?? false);
-						}}
+						onClick={handleCheckboxClick}
+						onCheckedChange={(value: boolean) => row.toggleSelected(!!value)}
 						aria-label={__('Select row', 'trigger')}
 					/>
-				);
+				)
 			},
 			enableSorting: false,
 			enableHiding: false,
@@ -232,10 +280,22 @@ const EmailLogs = () => {
 			accessorKey: 'mail_to',
 			header: __('To', 'trigger'),
 		},
+		// {
+		// 	accessorKey: 'mail_from',
+		// 	header: __('From', 'trigger'),
+		// },
 		{
 			accessorKey: 'subject',
 			header: __('Subject', 'trigger'),
 		},
+		// {
+		// 	accessorKey: 'message',
+		// 	header: __('Message', 'trigger'),
+		// 	cell: ({ row }) => {
+		// 		const message = row.getValue('message') as string
+		// 		return <div className="max-w-[500px] truncate">{message}</div>
+		// 	},
+		// },
 		{
 			accessorKey: 'created_at',
 			header: __('Date', 'trigger'),
@@ -312,48 +372,279 @@ const EmailLogs = () => {
 		});
 	}, [pageIndex, pageSize])
 
-	const handleSearch = (value: string) => {
-		setSearchQuery(value)
-		setPagination(prev => ({ ...prev, pageIndex: 0 }))
-		fetchEmailLogs({
-			page: 1,
-			per_page: pageSize,
-			search: value,
-		})
+	const table = useReactTable({
+		data,
+		columns,
+		pageCount,
+		state: {
+			sorting,
+			pagination,
+			columnFilters,
+			rowSelection,
+		},
+		enableRowSelection: true,
+		onRowSelectionChange: setRowSelection,
+		onPaginationChange: setPagination,
+		onSortingChange: setSorting,
+		getSortedRowModel: getSortedRowModel(),
+		getCoreRowModel: getCoreRowModel(),
+		onColumnFiltersChange: setColumnFilters,
+		getFilteredRowModel: getFilteredRowModel(),
+		manualPagination: true,
+	})
+
+	if (loading) {
+		return (
+			<div className="p-4 space-y-4">
+
+				<div className="flex items-center justify-between h-12">
+					<h2 className="text-2xl font-bold">{__('Email Logs', 'trigger')}</h2>
+					<div className="flex items-center gap-4">
+						{Object.keys(rowSelection).length > 0 ? (
+							<div className="flex items-center gap-4">
+								<span className="text-sm text-muted-foreground">
+									{table.getFilteredSelectedRowModel().rows.length} {__('selected', 'trigger')}
+								</span>
+								<Button
+									variant="destructive"
+									size="sm"
+									onClick={() => {
+										setDeleteEmail({ id: -1 } as EmailLog)
+									}}
+									disabled={isBulkDeleting}
+									className="flex items-center gap-2"
+								>
+									<Trash2 className="h-4 w-4" />
+									{__('Delete Selected', 'trigger')}
+								</Button>
+							</div>
+						) : (
+							<Input
+								placeholder={__('Search by subject or email...', 'trigger')}
+								value={searchQuery}
+								onChange={(event) => {
+									setSearchQuery(event.target.value);
+									debouncedSearch(event.target.value);
+								}}
+								className="w-[300px]"
+							/>
+						)}
+					</div>
+				</div>
+
+				<div className="rounded-md border">
+					<Table>
+						<TableHeader>
+							{table.getHeaderGroups().map((headerGroup) => (
+								<TableRow key={headerGroup.id}>
+									{headerGroup.headers.map((header) => (
+										<TableHead key={header.id}>
+											{header.isPlaceholder
+												? null
+												: flexRender(
+													header.column.columnDef.header,
+													header.getContext()
+												)}
+										</TableHead>
+									))}
+								</TableRow>
+							))}
+						</TableHeader>
+						<TableSkeleton />
+					</Table>
+				</div>
+
+				<div className="flex items-center justify-between space-x-2 py-4">
+					<div className="h-5 w-48 animate-pulse rounded bg-gray-200" />
+					<div className="flex items-center space-x-6 lg:space-x-8">
+						<div className="h-8 w-32 animate-pulse rounded bg-gray-200" />
+						<div className="h-8 w-32 animate-pulse rounded bg-gray-200" />
+						<div className="h-8 w-32 animate-pulse rounded bg-gray-200" />
+					</div>
+				</div>
+			</div>
+		)
 	}
 
 	return (
 		<div className="p-4 space-y-4">
-			<h2 className="text-2xl font-bold">{__('Email Logs', 'trigger')}</h2>
+			<div className="flex items-center justify-between h-12">
+				<h2 className="text-2xl font-bold">{__('Email Logs', 'trigger')}</h2>
+				<div className="flex items-center gap-4">
+					{Object.keys(rowSelection).length > 0 ? (
+						<div className="flex items-center gap-4">
+							<span className="text-sm text-muted-foreground">
+								{table.getFilteredSelectedRowModel().rows.length} {__('selected', 'trigger')}
+							</span>
+							<Button
+								variant="destructive"
+								size="sm"
+								onClick={() => setDeleteEmail({ id: -1 } as EmailLog)}
+								disabled={isBulkDeleting}
+								className="flex items-center gap-2"
+							>
+								<Trash2 className="h-4 w-4" />
+								{__('Delete Selected', 'trigger')}
+							</Button>
+						</div>
+					) : (
+						<Input
+							placeholder={__('Search by subject or email...', 'trigger')}
+							value={searchQuery}
+							onChange={(event) => {
+								const value = event.target.value;
+								setSearchQuery(value);
+								debouncedSearch(value);
+							}}
+							className="w-[300px]"
+						/>
+					)}
+				</div>
+			</div>
 
-			<DataTable<EmailLog>
-				columns={columns}
-				data={data}
-				pageCount={pageCount}
-				loading={loading}
-				sorting={sorting}
-				pagination={{ pageIndex, pageSize }}
-				columnFilters={columnFilters}
-				rowSelection={rowSelection}
-				searchKey="subject"
-				searchPlaceholder={__('Search by subject or email...', 'trigger')}
-				onSearch={handleSearch}
-				onPaginationChange={setPagination}
-				onSortingChange={setSorting}
-				onColumnFiltersChange={setColumnFilters}
-				onRowSelectionChange={setRowSelection}
-				onDeleteSelected={() => setDeleteEmail({ id: -1 } as EmailLog)}
-				enableRowSelection
-				enableSearch
-				enablePagination
-				getRowId={(row: EmailLog) => row.id.toString()}
-			/>
+			<div className="rounded-md border">
+				<Table>
+					<TableHeader>
+						{table.getHeaderGroups().map((headerGroup) => (
+							<TableRow key={headerGroup.id}>
+								{headerGroup.headers.map((header) => (
+									<TableHead key={header.id}>
+										{header.isPlaceholder
+											? null
+											: flexRender(
+												header.column.columnDef.header,
+												header.getContext()
+											)}
+									</TableHead>
+								))}
+							</TableRow>
+						))}
+					</TableHeader>
+					{loading ? (
+						<TableSkeleton />
+					) : table.getRowModel().rows?.length ? (
+						<TableBody>
+							{table.getRowModel().rows.map((row) => (
+								<TableRow
+									key={row.id}
+									data-state={row.getIsSelected() && 'selected'}
+								>
+									{row.getVisibleCells().map((cell) => (
+										<TableCell key={cell.id}>
+											{flexRender(
+												cell.column.columnDef.cell,
+												cell.getContext()
+											)}
+										</TableCell>
+									))}
+								</TableRow>
+							))}
+						</TableBody>
+					) : (
+						<TableBody>
+							<TableRow>
+								<TableCell
+									colSpan={columns.length}
+									className="h-24 text-center"
+								>
+									{__('No email logs found.', 'trigger')}
+								</TableCell>
+							</TableRow>
+						</TableBody>
+					)}
+				</Table>
+			</div>
 
-			{/* View Email Dialog */}
+			<div className="flex flex-wrap items-center justify-between space-x-2 py-4">
+				<div className="flex-1 text-sm text-muted-foreground hidden lg:block">
+					{table.getFilteredSelectedRowModel().rows.length} of{' '}
+					{table.getFilteredRowModel().rows.length} row(s) selected.
+				</div>
+				<div className="flex-1 flex space-x-2 items-center justify-center">
+					<p className="text-sm font-medium">
+						{__('Rows per page', 'trigger')}
+					</p>
+					<select
+						value={table.getState().pagination.pageSize}
+						onChange={(e) => {
+							table.setPageSize(Number(e.target.value))
+						}}
+						className="h-8 w-[70px] rounded-md border border-input bg-transparent px-2 py-1 text-sm"
+					>
+						{[10, 20, 30, 40, 50].map((pageSize) => (
+							<option key={pageSize} value={pageSize}>
+								{pageSize}
+							</option>
+						))}
+					</select>
+				</div>
+				<Pagination className="flex-1 justify-end">
+					<PaginationContent className="gap-2">
+						<PaginationItem>
+							<PaginationPrevious
+								onClick={() => table.previousPage()}
+								disabled={!table.getCanPreviousPage() || loading}
+								aria-disabled={!table.getCanPreviousPage() || loading}
+								className="h-8 min-w-8 px-2"
+							/>
+						</PaginationItem>
+						{Array.from({ length: pageCount }, (_, i) => {
+							const pageNumber = i + 1;
+							const currentPage = table.getState().pagination.pageIndex + 1;
+
+							if (
+								pageNumber === 1 ||
+								pageNumber === pageCount ||
+								(pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
+							) {
+								return (
+									<PaginationItem key={i}>
+										<PaginationLink
+											onClick={() => table.setPageIndex(i)}
+											isActive={currentPage === pageNumber}
+											className="h-8 min-w-8 px-3"
+										>
+											{pageNumber}
+										</PaginationLink>
+									</PaginationItem>
+								);
+							} else if (
+								(pageNumber === 2 && currentPage > 3) ||
+								(pageNumber === pageCount - 1 && currentPage < pageCount - 2)
+							) {
+								return (
+									<PaginationItem key={i}>
+										<PaginationEllipsis className="h-8" />
+									</PaginationItem>
+								);
+							}
+							return null;
+						})}
+						<PaginationItem>
+							<PaginationNext
+								onClick={() => table.nextPage()}
+								disabled={!table.getCanNextPage() || loading}
+								aria-disabled={!table.getCanNextPage() || loading}
+								className="h-8 min-w-8 px-2"
+							/>
+						</PaginationItem>
+					</PaginationContent>
+				</Pagination>
+				{/* <div className="flex items-center space-x-6 lg:space-x-8">
+				</div> */}
+			</div>
+
+			{/* Updated View Email Dialog */}
 			<Dialog open={!!viewEmail} onOpenChange={() => setViewEmail(null)}>
 				<DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
 					<div className="flex items-start justify-between mb-6">
 						<h2 className="text-xl font-semibold">{__('Email Log', 'trigger')}</h2>
+						{/* <button
+							onClick={() => setViewEmail(null)}
+							className="text-gray-500 hover:text-gray-700"
+						>
+							<X className="h-5 w-5" />
+						</button> */}
 					</div>
 
 					{viewEmail && (
@@ -440,6 +731,7 @@ const EmailLogs = () => {
 										{viewEmail.headers}
 									</pre>
 								</CollapsibleSection>
+
 							</div>
 						</div>
 					)}
@@ -492,7 +784,7 @@ const EmailLogs = () => {
 				{deleteEmail?.id === -1 && (
 					<div className="mt-4">
 						<p className="text-sm text-muted-foreground">
-							{Object.keys(rowSelection).length} {__('email logs will be deleted.', 'trigger')}
+							{table.getSelectedRowModel().rows.length} {__('email logs will be deleted.', 'trigger')}
 						</p>
 					</div>
 				)}

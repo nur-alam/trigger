@@ -21,22 +21,49 @@ use Trigger\Helpers\UtilityHelper;
 trait JsonResponse {
 
 	/**
-	 * JSON response
+	 * Send a success response
 	 *
-	 * @param string  $message message.
-	 * @param mixed   $data data.
-	 * @param integer $status_code status code.
-	 *
-	 * @return void   JSON data response.
+	 * @param string $message Success message.
+	 * @param mixed  $data    Optional data to include in response.
+	 * @return array
 	 */
-	public function json_response( string $message = '', $data = null, int $status_code = 200 ) {
-		wp_send_json(
-			array(
-				'status_code' => $status_code,
-				'message'     => $message,
-				'data'        => $data,
-			),
-			$status_code
+	protected function success( $message, $data = null ) {
+		return array(
+			'status_code' => 200,
+			'message'     => $message,
+			'data'        => $data,
+		);
+	}
+
+	/**
+	 * Send an error response
+	 *
+	 * @param string $message Error message.
+	 * @param mixed  $data    Optional data to include in response.
+	 * @param int    $code    HTTP status code.
+	 * @return array
+	 */
+	protected function error( $message, $data = null, $code = 400 ) {
+		return array(
+			'status_code' => $code,
+			'message'     => $message,
+			'data'        => $data,
+		);
+	}
+
+	/**
+	 * Send a JSON response
+	 *
+	 * @param string $message Response message.
+	 * @param mixed  $data    Optional data to include in response.
+	 * @param int    $code    HTTP status code.
+	 * @return array
+	 */
+	protected function json_response( $message, $data = null, $code = 200 ) {
+		return array(
+			'status_code' => $code,
+			'message'     => $message,
+			'data'        => $data,
 		);
 	}
 

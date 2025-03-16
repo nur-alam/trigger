@@ -8,4 +8,4 @@
  */
 
 ?>
-<div id="trigger-root" class="p-7 bg-background mt-5"></div>
+<div id="trigger-root" class="p-7 bg-background"></div>

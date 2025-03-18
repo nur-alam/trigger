@@ -137,7 +137,7 @@ const Connections = () => {
 					<EmptyState onAddConnection={() => navigate('/add-connection')} />
 				</div>
 			) : (
-				<ConnectionList initialConnections={connections} />
+				<ConnectionList initialConnections={connections} setInitialConnections={setConnections} />
 			)}
 		</div>
 	);

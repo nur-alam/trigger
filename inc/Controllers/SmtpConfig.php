@@ -30,9 +30,11 @@ class SmtpConfig {
 	 */
 	public function __construct() {
 		add_action( 'wp_ajax_update_email_config', array( $this, 'update_email_config' ) );
-		add_action( 'wp_ajax_trigger_fetch_email_config', array( $this, 'fetch_email_config' ) );
+		// add_action( 'wp_ajax_trigger_fetch_email_config', array( $this, 'fetch_email_config' ) );
 		add_action( 'wp_ajax_trigger_send_test_email', array( $this, 'send_test_email' ) );
+		add_action( 'wp_ajax_delete_email_config', array( $this, 'delete_email_config' ) );
 		add_action( 'wp_ajax_get_email_connections', array( $this, 'get_email_connections' ) );
+		add_action( 'wp_ajax_delete_email_logs', array( $this, 'delete_email_logs' ) );
 	}
 
 	/**
@@ -85,22 +87,6 @@ class SmtpConfig {
 	}
 
 	/**
-	 * Fetch email configuration
-	 *
-	 * @return object
-	 */
-	public function fetch_email_config() {
-		$verify = trigger_verify_request();
-		if ( ! $verify['success'] ) {
-			return $this->json_response( $verify['message'], null, $verify['code'] );
-		}
-
-		$config = get_option( TRIGGER_EMAIL_CONFIG, array() );
-
-		return $this->json_response( __( 'Email configuration fetched successfully', 'trigger' ), $config, 200 );
-	}
-
-	/**
 	 * Send test email
 	 *
 	 * @return object
@@ -133,6 +119,43 @@ class SmtpConfig {
 		} else {
 			return $this->json_response( __( 'Failed to send test email', 'trigger' ), null, 400 );
 		}
+	}
+
+	/**
+	 * Delete email configuration
+	 *
+	 * @return object
+	 */
+	public function delete_email_config() {
+		$verify = trigger_verify_request();
+		if ( ! $verify['success'] ) {
+			return $this->json_response( $verify['message'], null, $verify['code'] );
+		}
+
+		$params = $verify['data'];
+		if ( empty( $params['provider'] ) ) {
+			return $this->json_response( __( 'Provider is required', 'trigger' ), null, 400 );
+		}
+
+		$provider              = sanitize_text_field( $params['provider'] );
+		$existing_email_config = get_option( TRIGGER_EMAIL_CONFIG, array() );
+
+		if ( empty( $existing_email_config ) || ! isset( $existing_email_config[ $provider ] ) ) {
+			return $this->json_response( __( 'Configuration not found', 'trigger' ), null, 404 );
+		}
+
+		// Remove the specified provider from config
+		unset( $existing_email_config[ $provider ] );
+		// update_option( TRIGGER_EMAIL_CONFIG, $existing_email_config );
+
+		// Return the updated connections list in array format
+		$connections  = array();
+		$email_config = get_option( TRIGGER_EMAIL_CONFIG, array() );
+		foreach ( $email_config as $provider_key => $config ) {
+			$connections[] = $config;
+		}
+		sleep( 1 );
+		return $this->json_response( __( 'Email configuration deleted successfully', 'trigger' ), $connections, 200 );
 	}
 
 	/**

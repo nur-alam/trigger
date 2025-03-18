@@ -7,37 +7,56 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import config from "@/config";
-import toast from "react-hot-toast";
 import { useState } from "react";
-import { emailConfigSchema, EmailConfigFormValues } from "@/utils/validationSchema";
+import { sesConfigSchema, SesConfigFormValues } from "@/utils/validationSchema";
 import { useNavigate } from "react-router-dom";
-export type EmailProvider = "ses" | "smtp";
+import { EmailProvider, emailProvider } from "../add-connection";
+import toast from "react-hot-toast";
 
-const AwsSesForm = ({ provider }: { provider: EmailProvider }) => {
+const awsRegions = [
+	{ value: 'us-east-1', label: 'US East (N. Virginia)' },
+	{ value: 'us-east-2', label: 'US East (Ohio)' },
+	{ value: 'us-west-1', label: 'US West (N. California)' },
+	{ value: 'us-west-2', label: 'US West (Oregon)' },
+	{ value: 'eu-west-1', label: 'EU (Ireland)' },
+	{ value: 'eu-central-1', label: 'EU (Frankfurt)' },
+	{ value: 'ap-south-1', label: 'Asia Pacific (Mumbai)' },
+	{ value: 'ap-southeast-1', label: 'Asia Pacific (Singapore)' },
+	{ value: 'ap-southeast-2', label: 'Asia Pacific (Sydney)' },
+	{ value: 'ap-northeast-1', label: 'Asia Pacific (Tokyo)' }
+];
+
+const AwsSesForm = ({ selectedProvider }: { selectedProvider: EmailProvider }) => {
+	console.log('AwsSesForm selectedProvider', selectedProvider);
 	const navigate = useNavigate();
 	const [isSubmitting, setIsSubmitting] = useState(false);
-
-	const form = useForm<EmailConfigFormValues>({
-		resolver: zodResolver(emailConfigSchema),
+	console.log('selectedProvider', selectedProvider);
+	const form = useForm<SesConfigFormValues>({
+		resolver: zodResolver(sesConfigSchema),
 		defaultValues: {
-			provider: 'ses',
+			provider: selectedProvider,
 			fromName: '',
 			fromEmail: '',
-			ses: {
-				accessKeyId: '',
-				secretAccessKey: '',
-				region: 'us-east-1',
-			},
+			accessKeyId: '',
+			secretAccessKey: '',
+			region: 'us-east-1',
 		},
 	});
 
-	const onSubmit = async (values: EmailConfigFormValues) => {
+	const onSubmit = async (values: SesConfigFormValues) => {
 		setIsSubmitting(true);
 		try {
 			const formData = new FormData();
 			formData.append('action', 'update_email_config');
 			formData.append('trigger_nonce', config.nonce_value);
-			formData.append('data', JSON.stringify(values));
+			formData.append('data', JSON.stringify({
+				provider: selectedProvider,
+				fromName: values.fromName,
+				fromEmail: values.fromEmail,
+				accessKeyId: values.accessKeyId,
+				secretAccessKey: values.secretAccessKey,
+				region: values.region,
+			}));
 
 			const response = await fetch(config.ajax_url, {
 				method: 'POST',
@@ -65,19 +84,25 @@ const AwsSesForm = ({ provider }: { provider: EmailProvider }) => {
 				<CardContent className="p-6">
 					<div className="flex justify-between items-center mb-5">
 						<h2 className="text-xl font-semibold">
-							{/* {provider === "ses" ? __("Amazon SES Configuration", "trigger") : __("SMTP Configuration", "trigger")} */}
-							{provider} {__("Configuration", "trigger")}
+							{emailProvider[selectedProvider]} {__("Configuration", "trigger")}
 						</h2>
 					</div>
 
 					<Form {...form}>
-						<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+						<form
+							onSubmit={
+								form.handleSubmit((values) => {
+									onSubmit(values);
+								}, (errors) => {
+									console.log('Form validation failed:', errors);
+								})
+							}
+							className="space-y-6">
 							<div className="grid gap-6">
-								{/* AWS SES Specific Fields */}
 								<div className="grid gap-4">
 									<FormField
 										control={form.control}
-										name="ses.accessKeyId"
+										name="accessKeyId"
 										render={({ field }) => (
 											<FormItem>
 												<FormLabel>{__("Access Key ID", "trigger")}</FormLabel>
@@ -91,7 +116,7 @@ const AwsSesForm = ({ provider }: { provider: EmailProvider }) => {
 
 									<FormField
 										control={form.control}
-										name="ses.secretAccessKey"
+										name="secretAccessKey"
 										render={({ field }) => (
 											<FormItem>
 												<FormLabel>{__("Secret Access Key", "trigger")}</FormLabel>
@@ -105,7 +130,7 @@ const AwsSesForm = ({ provider }: { provider: EmailProvider }) => {
 
 									<FormField
 										control={form.control}
-										name="ses.region"
+										name="region"
 										render={({ field }) => (
 											<FormItem>
 												<FormLabel>{__("Region", "trigger")}</FormLabel>
@@ -119,16 +144,14 @@ const AwsSesForm = ({ provider }: { provider: EmailProvider }) => {
 														</SelectTrigger>
 													</FormControl>
 													<SelectContent>
-														<SelectItem value="us-east-1">US East (N. Virginia)</SelectItem>
-														<SelectItem value="us-east-2">US East (Ohio)</SelectItem>
-														<SelectItem value="us-west-1">US West (N. California)</SelectItem>
-														<SelectItem value="us-west-2">US West (Oregon)</SelectItem>
-														<SelectItem value="eu-west-1">EU (Ireland)</SelectItem>
-														<SelectItem value="eu-central-1">EU (Frankfurt)</SelectItem>
-														<SelectItem value="ap-south-1">Asia Pacific (Mumbai)</SelectItem>
-														<SelectItem value="ap-southeast-1">Asia Pacific (Singapore)</SelectItem>
-														<SelectItem value="ap-southeast-2">Asia Pacific (Sydney)</SelectItem>
-														<SelectItem value="ap-northeast-1">Asia Pacific (Tokyo)</SelectItem>
+														{awsRegions.map((region) => (
+															<SelectItem
+																key={region.value}
+																value={region.value}
+															>
+																{region.label}
+															</SelectItem>
+														))}
 													</SelectContent>
 												</Select>
 												<FormMessage />
@@ -172,9 +195,6 @@ const AwsSesForm = ({ provider }: { provider: EmailProvider }) => {
 							</div>
 
 							<div className="flex gap-2 justify-end">
-								<Button variant="outline" onClick={() => navigate('/connections')}>
-									{__("Back", "trigger")}
-								</Button>
 								<Button type="submit" disabled={isSubmitting}>
 									{isSubmitting ? __("Saving...", "trigger") : __("Save Changes", "trigger")}
 								</Button>

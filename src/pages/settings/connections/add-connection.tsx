@@ -6,16 +6,25 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import DefaultSmtp from "./provider/default-smtp";
-import AwsSes, { EmailProvider } from "./provider/aws-ses";
+import AwsSes from "./provider/aws-ses";
 import { useState } from "react";
-export const emailProvider = {
+import { MoveLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
+export const smtpSecurityOptions = [
+	{ label: 'TLS', value: 'tls' },
+	{ label: 'SSL', value: 'ssl' },
+];
+
+export type EmailProvider = "smtp" | "ses";
+export const emailProvider: Record<EmailProvider, string> = {
 	smtp: 'SMTP',
 	ses: 'Amazon SES'
 }
 
 
 const AddConnection = () => {
-
+	const navigate = useNavigate();
 	const [selectedProvider, setSelectedProvider] = useState<keyof typeof emailProvider>("smtp");
 	const [open, setOpen] = useState(false);
 	return (
@@ -24,7 +33,14 @@ const AddConnection = () => {
 				<CardContent className="p-6">
 					<div className="flex justify-between items-center mb-8">
 						<h2 className="text-xl font-semibold">{__("Email Settings", "trigger")}</h2>
-						<Sheet open={open} onOpenChange={setOpen}>
+						<div className="flex items-center gap-2">
+							<Button variant="outline" size="sm" onClick={() => navigate('/connections')}>
+								<MoveLeft className="w-4 h-4 mr-2" />
+								{__("Back", "trigger")}
+							</Button>
+							{/* <h2 className="text-xl font-semibold">{__("Email Settings", "trigger")}</h2> */}
+						</div>
+						{/* <Sheet open={open} onOpenChange={setOpen}>
 							<SheetTrigger asChild>
 								<Button variant="outline">{__("Send Test Email", "trigger")}</Button>
 							</SheetTrigger>
@@ -32,8 +48,8 @@ const AddConnection = () => {
 								<SheetTitle>{__("Send Test Email", "trigger")}</SheetTitle>
 								<SheetDescription>
 									{__("Send a test email to verify your email configuration.", "trigger")}
-								</SheetDescription>
-								{/* <div className="mt-6 space-y-4">
+								</SheetDescription> */}
+						{/* <div className="mt-6 space-y-4">
 									<div className="space-y-2">
 										<Label>{__("From Email", "trigger")}</Label>
 										<Input
@@ -58,8 +74,8 @@ const AddConnection = () => {
 										</Button>
 									</div>
 								</div> */}
-							</SheetContent>
-						</Sheet>
+						{/* </SheetContent>
+						</Sheet> */}
 					</div>
 					<Tabs
 						defaultValue="smtp"
@@ -88,11 +104,11 @@ const AddConnection = () => {
 
 						<div className="flex-1 border-l pl-6">
 							<TabsContent value="smtp">
-								<DefaultSmtp provider={emailProvider.smtp as EmailProvider} />
+								<DefaultSmtp selectedProvider={selectedProvider} />
 							</TabsContent>
 
 							<TabsContent value="ses">
-								<AwsSes provider={emailProvider.ses as EmailProvider} />
+								<AwsSes selectedProvider={selectedProvider} />
 							</TabsContent>
 						</div>
 					</Tabs>

@@ -7,13 +7,23 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { PencilIcon, Trash2Icon } from "lucide-react";
+import { PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ConnectionType } from "./index";
+import { __ } from "@wordpress/i18n";
+import { useNavigate } from "react-router-dom";
 
 const ConnectionList = ({ initialConnections }: { initialConnections: ConnectionType[] }) => {
+	const navigate = useNavigate();
+
 	return (
-		<div className="rounded-md border">
+		<div className="rounded-md border mt-10">
+			<div className="flex justify-end py-3">
+				<Button size="sm" className="gap-2" onClick={() => navigate('/add-connection')}>
+					<PlusIcon className="h-5 w-5" />
+					{__('Add Connection', 'trigger')}
+				</Button>
+			</div>
 			<Table>
 				<TableHeader>
 					<TableRow>
@@ -26,10 +36,10 @@ const ConnectionList = ({ initialConnections }: { initialConnections: Connection
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					{initialConnections.map((connection) => (
-						<TableRow key={connection.id}>
+					{initialConnections.map((connection, index) => (
+						<TableRow key={index}>
 							<TableCell>
-								{connection.type === 'ses' ? (
+								{connection.provider === 'ses' ? (
 									<img
 										src="/wp-content/plugins/trigger/assets/images/aws-logo.png"
 										alt="AWS"
@@ -54,10 +64,9 @@ const ConnectionList = ({ initialConnections }: { initialConnections: Connection
 									</div>
 								)}
 							</TableCell>
-							<TableCell>{connection.name}</TableCell>
-							<TableCell>{connection.email}</TableCell>
-							<TableCell>{connection.createdAt}</TableCell>
-							<TableCell>{connection.status}</TableCell>
+							<TableCell>{connection.provider}</TableCell>
+							<TableCell>{connection.from_email}</TableCell>
+							<TableCell>{connection.created_at}</TableCell>
 							<TableCell>
 								<Button
 									variant="outline"

@@ -12,5 +12,5 @@ define( 'TRIGGER_PLUGIN_NAME', 'trigger' );
 define( 'TRIGGER_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'TRIGGER_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'TRIGGER_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
-define( 'TRIGGER_SMTP_CONFIG', 'trigger_smtp_config' );
-define( 'TRIGGER_EMAIL_CONFIG', 'trigger_email_config' );
+define( 'TRIGGER_DEFAULT_EMAIL_PROVIDER', 'trigger_default_email_provider' ); // default email provider array
+define( 'TRIGGER_EMAIL_CONFIG', 'trigger_email_config' ); // array of email providers

@@ -57,13 +57,24 @@ trait JsonResponse {
 	 * @param string $message Response message.
 	 * @param mixed  $data    Optional data to include in response.
 	 * @param int    $code    HTTP status code.
-	 * @return array
+	 * @param array  $errors  Optional errors to include in response.
+	 * @return void
 	 */
-	protected function json_response( $message, $data = null, $code = 200 ) {
-		return array(
-			'status_code' => $code,
-			'message'     => $message,
-			'data'        => $data,
+	protected function json_response( $message, $data = null, $code = 200, $errors = null ) {
+		// return array(
+		// 'status_code' => $code,
+		// 'message'     => $message,
+		// 'data'        => $data,
+		// 'errors'      => $errors,
+		// );
+		wp_send_json(
+			array(
+				'status_code' => $code,
+				'message'     => $message,
+				'data'        => $data,
+				'errors'      => $errors,
+			),
+			$code
 		);
 	}
 

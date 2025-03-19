@@ -8,29 +8,16 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import config from "@/config";
 import { useState } from "react";
-import { sesConfigSchema, SesConfigFormValues } from "@/utils/validationSchema";
+import { sesConfigSchema, SesConfigFormValues } from "@/utils/schemaValidation";
 import { useNavigate } from "react-router-dom";
-import { EmailProvider, emailProvider } from "../add-connection";
+import { emailProviderAssociatedOptions } from "@/utils/trigger-declaration";
+import { EmailProviderOptionsType } from "@/utils/trigger-declaration";
 import toast from "react-hot-toast";
+import { AwsSesRegionAssociatedOptions } from "@/utils/trigger-declaration";
 
-const awsRegions = [
-	{ value: 'us-east-1', label: 'US East (N. Virginia)' },
-	{ value: 'us-east-2', label: 'US East (Ohio)' },
-	{ value: 'us-west-1', label: 'US West (N. California)' },
-	{ value: 'us-west-2', label: 'US West (Oregon)' },
-	{ value: 'eu-west-1', label: 'EU (Ireland)' },
-	{ value: 'eu-central-1', label: 'EU (Frankfurt)' },
-	{ value: 'ap-south-1', label: 'Asia Pacific (Mumbai)' },
-	{ value: 'ap-southeast-1', label: 'Asia Pacific (Singapore)' },
-	{ value: 'ap-southeast-2', label: 'Asia Pacific (Sydney)' },
-	{ value: 'ap-northeast-1', label: 'Asia Pacific (Tokyo)' }
-];
-
-const AwsSesForm = ({ selectedProvider }: { selectedProvider: EmailProvider }) => {
-	console.log('AwsSesForm selectedProvider', selectedProvider);
+const AwsSesForm = ({ selectedProvider }: { selectedProvider: EmailProviderOptionsType }) => {
 	const navigate = useNavigate();
 	const [isSubmitting, setIsSubmitting] = useState(false);
-	console.log('selectedProvider', selectedProvider);
 	const form = useForm<SesConfigFormValues>({
 		resolver: zodResolver(sesConfigSchema),
 		defaultValues: {
@@ -84,7 +71,7 @@ const AwsSesForm = ({ selectedProvider }: { selectedProvider: EmailProvider }) =
 				<CardContent className="p-6">
 					<div className="flex justify-between items-center mb-5">
 						<h2 className="text-xl font-semibold">
-							{emailProvider[selectedProvider]} {__("Configuration", "trigger")}
+							{emailProviderAssociatedOptions.find(option => option.value === selectedProvider)?.label} {__("Configuration", "trigger")}
 						</h2>
 					</div>
 
@@ -140,11 +127,11 @@ const AwsSesForm = ({ selectedProvider }: { selectedProvider: EmailProvider }) =
 												>
 													<FormControl>
 														<SelectTrigger>
-															<SelectValue placeholder="Select AWS region" />
+															<SelectValue placeholder={__("Select AWS region", "trigger")} />
 														</SelectTrigger>
 													</FormControl>
 													<SelectContent>
-														{awsRegions.map((region) => (
+														{AwsSesRegionAssociatedOptions.map((region) => (
 															<SelectItem
 																key={region.value}
 																value={region.value}

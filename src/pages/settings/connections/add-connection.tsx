@@ -10,22 +10,14 @@ import AwsSes from "./provider/aws-ses";
 import { useState } from "react";
 import { MoveLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { EmailProviderOptionsType } from "@/utils/trigger-declaration";
 
-export const smtpSecurityOptions = [
-	{ label: 'TLS', value: 'tls' },
-	{ label: 'SSL', value: 'ssl' },
-];
 
-export type EmailProvider = "smtp" | "ses";
-export const emailProvider: Record<EmailProvider, string> = {
-	smtp: 'SMTP',
-	ses: 'Amazon SES'
-}
 
 
 const AddConnection = () => {
 	const navigate = useNavigate();
-	const [selectedProvider, setSelectedProvider] = useState<keyof typeof emailProvider>("smtp");
+	const [selectedProvider, setSelectedProvider] = useState<EmailProviderOptionsType>("smtp");
 	const [open, setOpen] = useState(false);
 	return (
 		<div className="flex justify-center mt-5 p-5">
@@ -80,8 +72,8 @@ const AddConnection = () => {
 					<Tabs
 						defaultValue="smtp"
 						className="flex gap-6"
-						onValueChange={(value: string) => {
-							setSelectedProvider(value as keyof typeof emailProvider);
+						onValueChange={(value) => {
+							setSelectedProvider(value as EmailProviderOptionsType);
 						}}
 					>
 						<TabsList className="flex flex-col h-fit w-48 bg-muted p-2 rounded-lg">

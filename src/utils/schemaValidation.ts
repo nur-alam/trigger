@@ -1,14 +1,38 @@
 import { z } from 'zod';
+import {
+	smtpSecurityOptions,
+	emailProviderOptions,
+	SmtpSecurityOptionsType,
+	EmailProviderOptionsType,
+	smtpPortOptions,
+	SmtpPortOptionsType,
+} from './trigger-declaration';
+// todo smtp port validation with smtpPortOptions
 
-export const emailProviderSchema = z.enum(['smtp', 'ses']);
+export const emailProviderSchema = z.enum(
+	emailProviderOptions as [EmailProviderOptionsType, ...EmailProviderOptionsType[]],
+	{
+		message: 'Email Provider is required',
+	}
+);
+
+const smtpSecuritySchema = z
+	.enum(smtpSecurityOptions as [SmtpSecurityOptionsType, ...SmtpSecurityOptionsType[]], {
+		message: "SMTP Security isn't required!",
+	})
+	.default('tls');
+
+const smtpPortSchema = z.enum(smtpPortOptions as [SmtpPortOptionsType, ...SmtpPortOptionsType[]], {
+	message: "SMTP port isn't valid!",
+});
 
 export const smtpConfigSchema = z.object({
 	provider: emailProviderSchema,
 	fromName: z.string().min(1, { message: 'From Name is required' }),
 	fromEmail: z.string().email({ message: 'Invalid email address' }),
 	smtpHost: z.string().min(1, { message: 'SMTP Host is required' }),
-	smtpPort: z.string().min(1, { message: 'SMTP Port is required' }),
-	smtpSecurity: z.string().min(1, { message: 'SMTP Security is required' }),
+	smtpPort: smtpPortSchema,
+	smtpSecurity: smtpSecuritySchema,
 	smtpUsername: z.string().min(1, { message: 'SMTP Username is required' }),
 	smtpPassword: z.string().min(1, { message: 'SMTP Password is required' }),
 });

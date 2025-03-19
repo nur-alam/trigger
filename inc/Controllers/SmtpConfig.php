@@ -10,10 +10,6 @@
 
 namespace Trigger\Controllers;
 
-use Exception;
-use Trigger;
-use Trigger\Helpers\CursorValidationHelper;
-use Trigger\Helpers\UtilityHelper;
 use Trigger\Helpers\ValidationHelper;
 use Trigger\Traits\JsonResponse;
 
@@ -30,11 +26,10 @@ class SmtpConfig {
 	 */
 	public function __construct() {
 		add_action( 'wp_ajax_update_email_config', array( $this, 'update_email_config' ) );
-		// add_action( 'wp_ajax_trigger_fetch_email_config', array( $this, 'fetch_email_config' ) );
 		add_action( 'wp_ajax_trigger_send_test_email', array( $this, 'send_test_email' ) );
 		add_action( 'wp_ajax_delete_email_config', array( $this, 'delete_email_config' ) );
 		add_action( 'wp_ajax_get_email_connections', array( $this, 'get_email_connections' ) );
-		add_action( 'wp_ajax_delete_email_logs', array( $this, 'delete_email_logs' ) );
+		add_action( 'wp_ajax_edit_email_config', array( $this, 'edit_email_config' ) );
 	}
 
 	/**
@@ -79,7 +74,7 @@ class SmtpConfig {
 			return $this->json_response( __( 'Invalid provider', 'trigger' ), null, 400 );
 		}
 
-		$config[ $data['provider'] ]['created_at'] = current_time( 'mysql' );
+		$config[ $data['provider'] ]['createdAt'] = current_time( 'mysql' );
 
 		update_option( TRIGGER_EMAIL_CONFIG, $config );
 
@@ -112,7 +107,7 @@ class SmtpConfig {
 		$message = __( 'This is a test email sent from Trigger plugin.', 'trigger' );
 		$headers = array( 'Content-Type: text/html; charset=UTF-8' );
 
-		$sent = wp_mail( $to_email, $subject, $message, $headers );
+		$sent = wp_mail( $params['to_email'], $subject, $message, $headers );
 
 		if ( $sent ) {
 				return $this->json_response( __( 'Test email sent successfully', 'trigger' ), null, 200 );
@@ -146,7 +141,7 @@ class SmtpConfig {
 
 		// Remove the specified provider from config
 		unset( $existing_email_config[ $provider ] );
-		// update_option( TRIGGER_EMAIL_CONFIG, $existing_email_config );
+		update_option( TRIGGER_EMAIL_CONFIG, $existing_email_config );
 
 		// Return the updated connections list in array format
 		$connections  = array();
@@ -182,5 +177,35 @@ class SmtpConfig {
 		}
 
 		return $this->json_response( __( 'Email connections fetched successfully', 'trigger' ), $connections, 200 );
+	}
+
+	/**
+	 * Edit email configuration
+	 *
+	 * @return object
+	 */
+	public function edit_email_config() {
+		$verify = trigger_verify_request();
+		if ( ! $verify['success'] ) {
+			return $this->json_response( $verify['message'], null, $verify['code'] );
+		}
+
+		$params            = $verify['data'];
+		$data              = json_decode( $params['data'], true );
+		$data['createdAt'] = current_time( 'mysql' );
+
+		if ( empty( $data['provider'] ) ) {
+			return $this->json_response( __( 'Provider is required', 'trigger' ), null, 400 );
+		}
+
+		$existing_email_config                      = get_option( TRIGGER_EMAIL_CONFIG, array() );
+		$existing_email_config[ $data['provider'] ] = $data;
+		$update_option                              = update_option( TRIGGER_EMAIL_CONFIG, $existing_email_config );
+
+		if ( ! $update_option ) {
+			return $this->json_response( __( 'Failed to update email configuration', 'trigger' ), null, 400 );
+		}
+
+		return $this->json_response( __( 'Email configuration updated successfully', 'trigger' ), $update_option, 200 );
 	}
 }

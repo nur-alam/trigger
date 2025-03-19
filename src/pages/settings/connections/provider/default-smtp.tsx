@@ -1,31 +1,30 @@
 import { __ } from "@wordpress/i18n";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input"
-import { UseFormReturn } from "react-hook-form";
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import config from "@/config";
 import toast from "react-hot-toast";
-import { SmtpConfigFormValues, smtpConfigSchema } from "@/utils/validationSchema";
+import { SmtpConfigFormValues, smtpConfigSchema } from "@/utils/schemaValidation";
 import ErrorToast from "@/components/ErrorToast";
 import { useNavigate } from "react-router-dom";
-import { EmailProvider, emailProvider, smtpSecurityOptions } from "../add-connection";
+import { emailProviderAssociatedOptions, smtpSecurityAssociatedOptions, smtpSecurityOptions } from "@/utils/trigger-declaration";
+import { EmailProviderOptionsType, ResponseType, SmtpSecurityOptionsType } from "@/utils/trigger-declaration";
 
 export interface EmailSettingsResponse {
 	status_code: number;
 	message?: string;
 	data?: {
-		provider?: string;
+		provider?: EmailProviderOptionsType;
 		from_name?: string;
 		from_email?: string;
 		smtp_host?: string;
 		smtp_port?: string;
-		smtp_security?: string;
+		smtp_security?: SmtpSecurityOptionsType;
 		smtp_username?: string;
 		smtp_password?: string;
 	};
@@ -33,7 +32,7 @@ export interface EmailSettingsResponse {
 };
 
 
-const DefaultSmtp = ({ selectedProvider }: { selectedProvider: EmailProvider }) => {
+const DefaultSmtp = ({ selectedProvider }: { selectedProvider: EmailProviderOptionsType }) => {
 	const navigate = useNavigate();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isTestingEmail, setIsTestingEmail] = useState(false);
@@ -47,7 +46,7 @@ const DefaultSmtp = ({ selectedProvider }: { selectedProvider: EmailProvider }) 
 			fromName: '',
 			fromEmail: '',
 			smtpHost: '',
-			smtpPort: '',
+			smtpPort: '587',
 			smtpSecurity: 'tls',
 			smtpUsername: '',
 			smtpPassword: '',
@@ -67,36 +66,25 @@ const DefaultSmtp = ({ selectedProvider }: { selectedProvider: EmailProvider }) 
 				body: formData,
 			});
 
-			console.log('Raw response:', response);
-			const responseData = await response.json();
-			console.log('Response data:', responseData);
+			const responseData = await response.json() as ResponseType;
 
 			// Check for proper JSON response with status code
-			if (responseData && responseData?.status_code === 200) {
+			if (responseData.status_code === 200) {
 				toast.success(responseData?.message || __('Email configuration saved successfully!', 'trigger'));
 			} else {
-				if (responseData?.data?.errors) {
-					const errors = responseData.data.errors;
+				if (responseData?.errors) {
+					const errors = responseData.errors;
 					toast((t) => <ErrorToast errors={errors} />, {});
 				} else {
 					toast.error(responseData?.message || __('Failed to save email configuration', 'trigger'));
 				}
 			}
 		} catch (error) {
-			console.error('Form submission error:', error);
 			toast.error(__('Failed to save email configuration', 'trigger'));
 		} finally {
 			setIsSubmitting(false);
 		}
 	};
-
-	// Debug form state
-	// useEffect(() => {
-	// 	const subscription = form.watch((value) => {
-	// 		console.log('Form values changed:', value);
-	// 	});
-	// 	return () => subscription.unsubscribe();
-	// }, [form]);
 
 	return (
 		<div className="flex justify-center">
@@ -104,7 +92,7 @@ const DefaultSmtp = ({ selectedProvider }: { selectedProvider: EmailProvider }) 
 				<CardContent className="p-6">
 					<div className="flex justify-between items-center mb-5">
 						<h2 className="text-xl font-semibold">
-							{emailProvider[selectedProvider]} {__("Configuration", "trigger")}
+							{emailProviderAssociatedOptions.find(option => option.value === selectedProvider)?.label} {__("Configuration", "trigger")}
 						</h2>
 					</div>
 
@@ -165,7 +153,7 @@ const DefaultSmtp = ({ selectedProvider }: { selectedProvider: EmailProvider }) 
 														</SelectTrigger>
 													</FormControl>
 													<SelectContent>
-														{smtpSecurityOptions.map((option) => (
+														{smtpSecurityAssociatedOptions.map((option) => (
 															<SelectItem key={option.value} value={option.value}>
 																{option.label}
 															</SelectItem>

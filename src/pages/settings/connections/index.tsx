@@ -5,33 +5,22 @@ import ConnectionList from "./connection-list";
 import { __ } from "@wordpress/i18n";
 import { useNavigate } from "react-router-dom";
 import config from "@/config";
-import { EmailProvider } from "./add-connection";
-export interface ConnectionType {
-	// id: string;
-	// name: string;
-	// email: string;
-	// type: "smtp" | "ses" | "gmail";
-	// status: "active" | "inactive";
-	// createdAt: string;
-	from_email: string;
-	from_name: string;
-	provider: EmailProvider;
-	smtp_host?: string;
-	smtp_port?: string;
-	smtp_security?: string;
-	smtp_username?: string;
-	smtp_password?: string;
-	access_key_id?: string;
-	secret_access_key?: string;
-	region?: string;
-	created_at: string;
-}
+import { EmailProviderOptionsType, ResponseType } from "@/utils/trigger-declaration";
 
-// const initialConnections: ConnectionType[] = [
-// 	{ id: "1", name: "SMTP Connection", email: "nuralam862@gmail.com", type: "smtp", status: "active", createdAt: "Mar 16, 2025, 10:37 AM" },
-// 	{ id: "2", name: "SES Connection", email: "vocab@vocabthread.com", type: "ses", status: "inactive", createdAt: "Mar 16, 2025, 10:56 AM" },
-// 	{ id: "3", name: "Gmail Connection", email: "nuralam862@gmail.com", type: "gmail", status: "active", createdAt: "Mar 16, 2025, 10:56 AM" },
-// ];
+export interface ConnectionType {
+	fromEmail: string;
+	fromName: string;
+	provider: EmailProviderOptionsType;
+	smtpHost?: string;
+	smtpPort?: string;
+	smtpSecurity?: string;
+	smtpUsername?: string;
+	smtpPassword?: string;
+	accessKeyId?: string;
+	secretAccessKey?: string;
+	region?: string;
+	createdAt: string;
+}
 
 const EmptyState = ({ onAddConnection }: { onAddConnection: () => void }) => (
 	<div className="mx-auto max-w-md text-center">
@@ -117,7 +106,7 @@ const Connections = () => {
 					body: formData,
 				});
 
-				const responseData = await response.json();
+				const responseData = await response.json() as ResponseType;
 				setConnections(responseData.data);
 			} catch (error) {
 				console.error('Error fetching connections:', error);

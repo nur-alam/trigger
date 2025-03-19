@@ -15,14 +15,12 @@ import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
 import { __ } from "@wordpress/i18n";
 import config from "@/config";
+import { ConnectionType } from "@/pages/settings/connections/index";
 
 interface TestEmailSheetProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	connection: {
-		provider: string;
-		from_email: string;
-	};
+	connection: ConnectionType;
 }
 
 export function TestEmailSheet({ open, onOpenChange, connection }: TestEmailSheetProps) {
@@ -65,7 +63,7 @@ export function TestEmailSheet({ open, onOpenChange, connection }: TestEmailShee
 
 	return (
 		<Sheet open={open} onOpenChange={onOpenChange}>
-			<SheetContent>
+			<SheetContent style={{ zIndex: 999999 }}>
 				<SheetHeader>
 					<SheetTitle>{__("Send Test Email", "trigger")}</SheetTitle>
 					<SheetDescription>
@@ -80,7 +78,7 @@ export function TestEmailSheet({ open, onOpenChange, connection }: TestEmailShee
 					</div>
 					<div className="space-y-2">
 						<Label htmlFor="from">{__("From", "trigger")}</Label>
-						<Input id="from" value={connection.from_email} disabled />
+						<Input id="from" value={connection.fromEmail} disabled />
 					</div>
 					<div className="space-y-2">
 						<Label htmlFor="to" className="text-right">

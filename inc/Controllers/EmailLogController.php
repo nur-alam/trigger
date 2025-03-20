@@ -72,7 +72,7 @@ class EmailLogController {
 	public function create_email_log( $mail_data ) {
 		try {
 			$email_log_model = new \Trigger\Models\EmailLogModel();
-			$smtp_settings   = get_option( TRIGGER_SMTP_CONFIG, array() );
+			$smtp_settings   = get_option( TRIGGER_DEFAULT_EMAIL_PROVIDER, array() );
 			$log_data        = array(
 				'mail_to'     => $mail_data['to'] ?? '',
 				'mail_from'   => $smtp_settings['from_email'] ?? '',

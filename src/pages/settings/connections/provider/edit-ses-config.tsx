@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import {
 	FormItem,
 	FormLabel,
 	FormMessage,
+	FormDescription,
 } from "@/components/ui/form";
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
@@ -105,9 +106,14 @@ const EditSesConfig = ({ connection }: { connection: ConnectionType }) => {
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>{__("From Email", "trigger")}</FormLabel>
-							<FormControl>
-								<Input type="email" placeholder="sender@example.com" {...field} />
-							</FormControl>
+							<div>
+								<FormControl className="flex-1">
+									<Input type="email" placeholder="sender@example.com" {...field} />
+								</FormControl>
+							</div>
+							<FormDescription>
+								{__("AWS SES requires email addresses to be verified before they can be used to send emails.", "trigger")}
+							</FormDescription>
 							<FormMessage />
 						</FormItem>
 					)}

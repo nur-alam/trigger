@@ -71,6 +71,7 @@ const DefaultSmtp = ({ selectedProvider }: { selectedProvider: EmailProviderOpti
 			// Check for proper JSON response with status code
 			if (responseData.status_code === 200) {
 				toast.success(responseData?.message || __('Email configuration saved successfully!', 'trigger'));
+				navigate('/connections');
 			} else {
 				if (responseData?.errors) {
 					const errors = responseData.errors;

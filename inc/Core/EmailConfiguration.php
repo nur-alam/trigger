@@ -14,11 +14,6 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use Aws\Ses\SesClient;
 use Aws\Exception\AwsException;
-
-if ( ! defined( 'TRIGGER_EMAIL_CONFIG' ) ) {
-	define( 'TRIGGER_EMAIL_CONFIG', 'trigger_email_config' );
-}
-
 /**
  * Email configuration class
  */
@@ -34,8 +29,8 @@ class EmailConfiguration {
 	 * Constructor
 	 */
 	public function __construct() {
+		$this->config = get_option( TRIGGER_DEFAULT_EMAIL_PROVIDER, array() );
 		add_action( 'phpmailer_init', array( $this, 'configure_email' ), 10, 1 );
-		$this->config = get_option( TRIGGER_EMAIL_CONFIG, array() );
 	}
 
 	/**
@@ -45,13 +40,16 @@ class EmailConfiguration {
 	 * @return void
 	 */
 	public function configure_email( PHPMailer $phpmailer ) {
+
+		$this->set_default_email_provider();
+
 		if ( empty( $this->config ) ) {
 			return;
 		}
 
 		$provider   = $this->config['provider'] ?? 'smtp';
-		$from_name  = $this->config['from_name'] ?? '';
-		$from_email = $this->config['from_email'] ?? '';
+		$from_name  = $this->config['fromName'] ?? '';
+		$from_email = $this->config['fromEmail'] ?? '';
 
 		if ( '' !== $from_name ) {
 			// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
@@ -78,24 +76,37 @@ class EmailConfiguration {
 	 * @return void
 	 */
 	private function configure_smtp( PHPMailer $phpmailer ) {
-		$smtp = $this->config['smtp'] ?? array();
+		$provider = $this->config ?? array();
 
-		if ( empty( $smtp ) ) {
+		if ( empty( $provider ) ) {
 			return;
 		}
 
 		$phpmailer->isSMTP();
 		// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
-		$phpmailer->Host       = $smtp['smtp_host'] ?? '';
-		$phpmailer->Port       = $smtp['smtp_port'] ?? '';
-		$phpmailer->SMTPSecure = $smtp['smtp_security'] ?? 'ssl';
-
-		if ( ! empty( $smtp['smtp_username'] ) && ! empty( $smtp['smtp_password'] ) ) {
-			$phpmailer->SMTPAuth = true;
-			$phpmailer->Username = $smtp['smtp_username'];
-			$phpmailer->Password = $smtp['smtp_password'];
-		}
+		$phpmailer->Host       = $provider['smtpHost'] ?? '';
+		$phpmailer->Port       = $provider['smtpPort'] ?? '';
+		$phpmailer->SMTPSecure = $provider['smtpSecurity'] ?? 'ssl';
+		$phpmailer->SMTPAuth   = true;
+		$phpmailer->Username   = $provider['smtpUsername'];
+		$phpmailer->Password   = $provider['smtpPassword'];
 		// phpcs:enable
+	}
+
+	/**
+	 * Set default email provider
+	 *
+	 * @return void
+	 */
+	private function set_default_email_provider() {
+		$email_providers = get_option( TRIGGER_EMAIL_CONFIG, array() );
+		if ( empty( $email_providers ) ) {
+			return;
+		}
+
+		// $this->config = $email_providers['smtp'];
+		$this->config = $email_providers['ses'];
+		update_option( TRIGGER_DEFAULT_EMAIL_PROVIDER, $this->config );
 	}
 
 	/**
@@ -106,77 +117,38 @@ class EmailConfiguration {
 	 * @throws Exception If there's an error configuring SES.
 	 */
 	private function configure_ses( PHPMailer $phpmailer ) {
-		$smtp = $this->config['ses'] ?? array();
+		$provider = $this->config ?? array();
 
-		if ( empty( $smtp ) ) {
+		if ( empty( $provider ) ) {
 			return;
 		}
 		try {
-			$client = new SesClient(
+			// Create an AWS SES client
+			$ses_client = new SesClient(
 				array(
 					'version'     => 'latest',
-					'region'      => $smtp['region'] ?? 'us-east-1',
+					'region'      => $provider['region'] ?? 'us-east-1',
 					'credentials' => array(
-						'key'    => $smtp['access_key_id'] ?? '',
-						'secret' => $smtp['secret_access_key'] ?? '',
+						'key'    => $provider['accessKeyId'] ?? '',
+						'secret' => $provider['secretAccessKey'] ?? '',
 					),
 				)
 			);
 
-			// Override PHPMailer's send() function with our SES implementation
+			// Get credentials to use in PHPMailer
 			// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
-			$phpmailer->custom_send = function ( $phpmailer ) use ( $client ) {
-				$to = array();
-				foreach ( $phpmailer->getToAddresses() as $address ) {
-					$to[] = $address[0];
-				}
-
-				$cc = array();
-				foreach ( $phpmailer->getCcAddresses() as $address ) {
-					$cc[] = $address[0];
-				}
-
-				$bcc = array();
-				foreach ( $phpmailer->getBccAddresses() as $address ) {
-					$bcc[] = $address[0];
-				}
-
-				try {
-					$result = $client->sendEmail(
-						array(
-							'Source'      => $phpmailer->From,
-							'Destination' => array(
-								'ToAddresses'  => $to,
-								'CcAddresses'  => $cc,
-								'BccAddresses' => $bcc,
-							),
-							'Message'     => array(
-								'Subject' => array(
-									'Data'    => $phpmailer->Subject,
-									'Charset' => $phpmailer->CharSet,
-								),
-								'Body'    => array(
-									'Html' => array(
-										'Data'    => $phpmailer->Body,
-										'Charset' => $phpmailer->CharSet,
-									),
-									'Text' => array(
-										'Data'    => $phpmailer->AltBody ?: strip_tags( $phpmailer->Body ),
-										'Charset' => $phpmailer->CharSet,
-									),
-								),
-							),
-						)
-					);
-
-					return true;
-				} catch ( AwsException $e ) {
-					throw new Exception( $e->getMessage() );
-				}
-			};
+			$phpmailer->isSMTP();
+			$phpmailer->Host       = 'email-smtp.' . $provider['region'] ?? 'us-east-1.amazonaws.com';
+			$phpmailer->SMTPAuth   = true;
+			$phpmailer->Username   = $provider['accessKeyId'] ?? '';
+			$phpmailer->Password   = $provider['secretAccessKey'] ?? '';
+			$phpmailer->SMTPSecure = 'tls';
+			$phpmailer->Port       = 587;
 			// phpcs:enable
+			$phpmailer->setFrom( $provider['fromEmail'] ?? '', $provider['fromName'] ?? '' );
+
 		} catch ( AwsException $e ) {
-			throw new Exception( $e->getMessage() );
+			throw new Exception( esc_html( $e->getMessage() ) );
 		}
 	}
 }

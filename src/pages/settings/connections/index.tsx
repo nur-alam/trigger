@@ -118,7 +118,7 @@ const Connections = () => {
 	}, []);
 
 	return (
-		<div className="min-h-[600px] p-8">
+		<div className="min-h-[600px] pr-4">
 			{isLoading ? (
 				<LoadingState />
 			) : connections.length === 0 ? (

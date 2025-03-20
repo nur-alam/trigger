@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { emailProviderAssociatedOptions } from "@/utils/trigger-declaration";
 import { EmailProviderOptionsType } from "@/utils/trigger-declaration";
 import toast from "react-hot-toast";
-import { AwsSesRegionAssociatedOptions } from "@/utils/trigger-declaration";
+import { AwsSesRegionOptionsType, AwsSesRegionAssociatedOptions } from "@/utils/trigger-declaration";
 
 const AwsSesForm = ({ selectedProvider }: { selectedProvider: EmailProviderOptionsType }) => {
 	const navigate = useNavigate();
@@ -26,7 +26,7 @@ const AwsSesForm = ({ selectedProvider }: { selectedProvider: EmailProviderOptio
 			fromEmail: '',
 			accessKeyId: '',
 			secretAccessKey: '',
-			region: 'us-east-1',
+			region: AwsSesRegionAssociatedOptions[0].value,
 		},
 	});
 

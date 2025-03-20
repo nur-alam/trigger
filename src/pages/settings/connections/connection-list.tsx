@@ -7,7 +7,7 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import { CheckCircle, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ConnectionType } from "@/pages/settings/connections/index";
 import { __ } from "@wordpress/i18n";
@@ -16,6 +16,7 @@ import { SetStateAction, Dispatch, useState } from "react";
 import { TestEmailSheet } from "@/pages/settings/connections/test-email-sheet";
 import { EditConnectionSheet } from "@/pages/settings/connections/edit-connection";
 import { DeleteConnectionSheet } from "@/pages/settings/connections/delete-connection";
+import { VerifySesEmailSheet } from "./verify-ses-email";
 
 const ConnectionList = ({ initialConnections, setInitialConnections }: { initialConnections: ConnectionType[], setInitialConnections: Dispatch<SetStateAction<ConnectionType[]>> }) => {
 	const navigate = useNavigate();
@@ -23,6 +24,7 @@ const ConnectionList = ({ initialConnections, setInitialConnections }: { initial
 	const [isTestEmailSheetOpen, setIsTestEmailSheetOpen] = useState(false);
 	const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
 	const [isDeleteSheetOpen, setIsDeleteSheetOpen] = useState(false);
+	const [isVerifyEmailOpen, setIsVerifyEmailOpen] = useState(false);
 
 	const handleTestEmail = (connection: ConnectionType) => {
 		setSelectedConnection(connection);
@@ -45,22 +47,23 @@ const ConnectionList = ({ initialConnections, setInitialConnections }: { initial
 	};
 
 	return (
-		<div className="rounded-md border mt-10">
-			<div className="flex justify-end py-3">
+		<div className="rounded-md border mt-10 p-4">
+			<div className="flex justify-between py-3 mb-3" >
+				<h3 className="text-lg font-medium">{__('Connection List', 'trigger')}</h3>
 				<Button size="sm" className="gap-2" onClick={() => navigate('/add-connection')}>
 					<PlusIcon className="h-5 w-5" />
 					{__('Add Connection', 'trigger')}
 				</Button>
-			</div>
-			<Table>
-				<TableHeader>
+			</div >
+			<Table className="border-solid border border-rounded-md border-gray-200">
+				<TableHeader className="bg-gray-100">
 					<TableRow>
-						<TableHead>Connection</TableHead>
-						<TableHead>Connection Title</TableHead>
-						<TableHead>Email</TableHead>
-						<TableHead className="cursor-pointer">Created On ↓</TableHead>
-						<TableHead>Test Email</TableHead>
-						<TableHead>Actions</TableHead>
+						<TableHead>{__('Connection', 'trigger')}</TableHead>
+						<TableHead>{__('Provider', 'trigger')}</TableHead>
+						<TableHead>{__('Email', 'trigger')}</TableHead>
+						<TableHead className="cursor-pointer">{__('Created On ↓', 'trigger')}</TableHead>
+						<TableHead>{__('Test Email', 'trigger')}</TableHead>
+						<TableHead>{__('Actions', 'trigger')}</TableHead>
 					</TableRow>
 				</TableHeader>
 				<TableBody>
@@ -68,11 +71,13 @@ const ConnectionList = ({ initialConnections, setInitialConnections }: { initial
 						<TableRow key={index}>
 							<TableCell>
 								{connection.provider === 'ses' ? (
-									<img
-										src="/wp-content/plugins/trigger/assets/images/aws-logo.png"
-										alt="AWS"
-										className="h-8 w-8"
-									/>
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+										<path d="M21 5H3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2z" />
+										<polyline points="3.5 8.5 12 15 20.5 8.5" />
+										<line x1="12" y1="15" x2="12" y2="11" />
+										<path d="M12 11 L16 8" />
+										<path d="M12 11 L8 8" />
+									</svg>
 								) : (
 									<div className="flex h-8 w-8 items-center justify-center rounded-sm border">
 										<svg
@@ -96,16 +101,33 @@ const ConnectionList = ({ initialConnections, setInitialConnections }: { initial
 							<TableCell>{connection.fromEmail}</TableCell>
 							<TableCell>{connection.createdAt}</TableCell>
 							<TableCell>
-								<Button
-									variant="outline"
-									size="sm"
-									className={cn(
-										"gap-2 text-blue-600 hover:bg-blue-500 hover:text-white",
+								<div className="flex flex-wrap items-center gap-2">
+									<Button
+										variant="secondary"
+										size="sm"
+										className=" text-blue-600 hover:bg-blue-500 hover:text-white"
+										onClick={() => handleTestEmail(connection)}
+									>
+										{__('Send Test Email', 'trigger')}
+									</Button>
+									{connection.provider === 'ses' && (
+										<>
+											<Button
+												variant="outline"
+												size="sm"
+												// className=" text-blue-600 hover:bg-blue-500 hover:text-white"
+												onClick={() => setIsVerifyEmailOpen(true)}
+											>
+												{__("Verify Email", "trigger")}
+											</Button>
+											<VerifySesEmailSheet
+												open={isVerifyEmailOpen}
+												onOpenChange={setIsVerifyEmailOpen}
+												connection={connection}
+											/>
+										</>
 									)}
-									onClick={() => handleTestEmail(connection)}
-								>
-									Send Test Email
-								</Button>
+								</div>
 							</TableCell>
 							<TableCell>
 								<div className="flex items-center gap-2">
@@ -130,27 +152,29 @@ const ConnectionList = ({ initialConnections, setInitialConnections }: { initial
 				</TableBody>
 			</Table>
 
-			{selectedConnection && (
-				<>
-					<TestEmailSheet
-						open={isTestEmailSheetOpen}
-						onOpenChange={setIsTestEmailSheetOpen}
-						connection={selectedConnection}
-					/>
-					<EditConnectionSheet
-						open={isEditSheetOpen}
-						onOpenChange={setIsEditSheetOpen}
-						connection={selectedConnection}
-					/>
-					<DeleteConnectionSheet
-						open={isDeleteSheetOpen}
-						onOpenChange={setIsDeleteSheetOpen}
-						connection={selectedConnection}
-						setInitialConnections={setInitialConnections}
-					/>
-				</>
-			)}
-		</div>
+			{
+				selectedConnection && (
+					<>
+						<TestEmailSheet
+							open={isTestEmailSheetOpen}
+							onOpenChange={setIsTestEmailSheetOpen}
+							connection={selectedConnection}
+						/>
+						<EditConnectionSheet
+							open={isEditSheetOpen}
+							onOpenChange={setIsEditSheetOpen}
+							connection={selectedConnection}
+						/>
+						<DeleteConnectionSheet
+							open={isDeleteSheetOpen}
+							onOpenChange={setIsDeleteSheetOpen}
+							connection={selectedConnection}
+							setInitialConnections={setInitialConnections}
+						/>
+					</>
+				)
+			}
+		</div >
 	);
 };
 

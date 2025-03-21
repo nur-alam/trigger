@@ -14,3 +14,5 @@ define( 'TRIGGER_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'TRIGGER_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 define( 'TRIGGER_DEFAULT_EMAIL_PROVIDER', 'trigger_default_email_provider' ); // default email provider array
 define( 'TRIGGER_EMAIL_CONFIG', 'trigger_email_config' ); // array of email providers
+define( 'TRIGGER_LOG_RETENTION', 'trigger_log_retention' ); // log retention
+define( 'TRIGGER_LOG_RETENTION_DEFAULT', 30 ); // log retention default

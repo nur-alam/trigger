@@ -33,6 +33,10 @@ class SmtpConfig {
 		add_action( 'wp_ajax_edit_email_config', array( $this, 'edit_email_config' ) );
 		add_action( 'wp_ajax_verify_ses_email', array( $this, 'verify_ses_email' ) );
 		add_action( 'wp_ajax_get_verified_ses_emails', array( $this, 'get_verified_ses_emails' ) );
+		add_action( 'wp_ajax_get_default_email_connection', array( $this, 'get_default_email_connection' ) );
+		add_action( 'wp_ajax_update_default_connection', array( $this, 'update_default_connection' ) );
+		add_action( 'wp_ajax_get_log_retention', array( $this, 'get_log_retention' ) );
+		add_action( 'wp_ajax_update_log_retention', array( $this, 'update_log_retention' ) );
 	}
 
 	/**
@@ -340,5 +344,133 @@ class SmtpConfig {
 		} else {
 			return $this->json_response( $result['message'], null, 400 );
 		}
+	}
+
+	/**
+	 * Get default email connection
+	 *
+	 * @return  array
+	 */
+	public function get_default_email_connection() {
+		$default_provider = $this->get_default_provider();
+		if ( false === $default_provider ) {
+			return $this->json_response( __( 'No default email provider found', 'trigger' ), null, 404 );
+		}
+
+		return $this->json_response( 'Fetched default email connection', $default_provider, 200 );
+	}
+
+	/**
+	 * Get default email connection
+	 *
+	 * @return  array|boolean
+	 */
+	public function get_default_provider() {
+		$default_provider = get_option( TRIGGER_DEFAULT_EMAIL_PROVIDER, array() );
+
+		if ( empty( $default_provider ) ) {
+			return false;
+		}
+
+		return $default_provider;
+	}
+
+	/**
+	 * Update default email connection
+	 *
+	 * @return object
+	 */
+	public function update_default_connection() {
+		$verify = trigger_verify_request();
+		if ( ! $verify['success'] ) {
+			return $this->json_response( $verify['message'], null, $verify['code'] );
+		}
+
+		$params = $verify['data'];
+		$data   = json_decode( $params['data'], true );
+
+		if ( empty( $data['provider'] ) ) {
+			return $this->json_response( __( 'Provider is required', 'trigger' ), null, 400 );
+		}
+
+		$default_provider = get_option( TRIGGER_DEFAULT_EMAIL_PROVIDER, array() );
+
+		if ( empty( $default_provider ) || ! is_array( $default_provider ) ) {
+			// todo: add default email provider
+			$updated = $this->update_provider( $data['provider'] );
+			if ( ! $updated ) {
+				return $this->json_response( __( 'Failed to update default email provider', 'trigger' ), null, 400 );
+			}
+		}
+
+		if ( $default_provider['provider'] !== $data['provider'] ) {
+			$updated = $this->update_provider( $data['provider'] );
+			if ( ! $updated ) {
+				return $this->json_response( __( 'Failed to update default email provider', 'trigger' ), null, 400 );
+			}
+		}
+
+		return $this->json_response( __( 'Default email connection updated successfully', 'trigger' ), $data['provider'], 200 );
+	}
+
+	/**
+	 * Update provider
+	 *
+	 * @param string $provider Provider name.
+	 * @return boolean
+	 */
+	public function update_provider( $provider ) {
+		$providers = get_option( TRIGGER_EMAIL_CONFIG, array() );
+
+		if ( empty( $providers ) ) {
+			return false;
+		}
+
+		$default_provider = $providers[ $provider ];
+		$updated          = update_option( TRIGGER_DEFAULT_EMAIL_PROVIDER, $default_provider );
+
+		if ( ! $updated ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Get log retention
+	 *
+	 * @return object
+	 */
+	public function get_log_retention() {
+		$log_retention = get_option( TRIGGER_LOG_RETENTION, TRIGGER_LOG_RETENTION_DEFAULT );
+
+		if ( empty( $log_retention ) ) {
+			$log_retention = TRIGGER_LOG_RETENTION_DEFAULT;
+		}
+
+		return $this->json_response( __( 'Log retention fetched successfully', 'trigger' ), $log_retention, 200 );
+	}
+
+	/**
+	 * Update log retention
+	 *
+	 * @return object
+	 */
+	public function update_log_retention() {
+		$verify = trigger_verify_request();
+		if ( ! $verify['success'] ) {
+			return $this->json_response( $verify['message'], null, $verify['code'] );
+		}
+
+		$params = $verify['data'];
+		$data   = json_decode( $params['data'], true );
+
+		$updated = update_option( TRIGGER_LOG_RETENTION, $data['days'] );
+
+		if ( ! $updated ) {
+			return $this->json_response( __( 'Failed to update log retention', 'trigger' ), null, 400 );
+		}
+
+		return $this->json_response( __( 'Log retention updated successfully', 'trigger' ), $data['days'], 200 );
 	}
 }

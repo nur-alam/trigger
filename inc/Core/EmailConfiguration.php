@@ -62,11 +62,7 @@ class EmailConfiguration {
 			// phpcs:enable
 		}
 
-		if ( 'smtp' === $provider ) {
-			$this->configure_smtp( $phpmailer );
-		} elseif ( 'ses' === $provider ) {
-			$this->configure_ses( $phpmailer );
-		}
+		$this->configure_smtp( $phpmailer );
 	}
 
 	/**
@@ -104,8 +100,8 @@ class EmailConfiguration {
 			return;
 		}
 
-		// $this->config = $email_providers['smtp'];
-		$this->config = $email_providers['ses'];
+		$this->config = $email_providers['smtp'];
+		// $this->config = $email_providers['ses'];
 		update_option( TRIGGER_DEFAULT_EMAIL_PROVIDER, $this->config );
 	}
 

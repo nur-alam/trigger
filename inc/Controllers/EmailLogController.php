@@ -14,6 +14,7 @@ use Exception;
 use Trigger\Models\EmailLogModel;
 use Trigger\Traits\JsonResponse;
 use Trigger\Traits\RestResponse;
+use Trigger\Controllers\Provider\AwsSesController;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -57,6 +58,7 @@ class EmailLogController {
 	 */
 	public function __construct() {
 		$this->email_log_model = new EmailLogModel();
+		new AwsSesController();
 		add_filter( 'wp_mail', array( $this, 'create_email_log' ) );
 		add_action( 'wp_ajax_trigger_fetch_email_logs', array( $this, 'get_email_logs' ) );
 		add_action( 'wp_ajax_trigger_delete_email_log', array( $this, 'delete_email_log' ) );

@@ -114,7 +114,7 @@ class SmtpConfig {
 				return $this->json_response( $validation_response->message, null, 400 );
 			}
 
-			$subject = __( 'Test Email from Trigger', 'trigger' );
+			$subject = __( 'AWS SES Test Email from Trigger', 'trigger' );
 			$message = __( 'This is a test email sent from Trigger plugin.', 'trigger' );
 			$headers = array( 'Content-Type: text/html; charset=UTF-8' );
 

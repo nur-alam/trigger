@@ -59,7 +59,8 @@ class EmailLogController {
 		$this->email_log_model = new EmailLogModel();
 		new AwsSesController();
 		new LogRetention();
-		add_filter( 'wp_mail', array( $this, 'create_email_log' ) );
+		add_filter( 'wp_mail_succeeded', array( $this, 'create_email_log' ) );
+		add_filter( 'wp_mail_failed', array( $this, 'create_failed_email_log' ) );
 		add_action( 'wp_ajax_trigger_fetch_email_logs', array( $this, 'get_email_logs' ) );
 		add_action( 'wp_ajax_trigger_delete_email_log', array( $this, 'delete_email_log' ) );
 		add_action( 'wp_ajax_trigger_bulk_delete_email_logs', array( $this, 'bulk_delete_email_logs' ) );
@@ -73,16 +74,59 @@ class EmailLogController {
 	 * @return bool
 	 */
 	public function create_email_log( $mail_data ) {
+		// $ses_mailer = new SesMailer();
+		// $result     = $ses_mailer->send_email( $mail_data['to'], $mail_data['subject'], $mail_data['message'], $mail_data['headers'], $mail_data['attachments'] );
+		$mail_to = $mail_data['to'];
+		if(! empty($mail_data['to']) && is_array($mail_data['to']) ) {
+			$mail_to = $mail_data['to'][0];
+		}
 		try {
 			$email_log_model = new EmailLogModel();
 			$smtp_settings   = get_option( TRIGGER_DEFAULT_EMAIL_PROVIDER, array() );
 			$log_data        = array(
-				'mail_to'     => $mail_data['to'] ?? '',
+				'mail_to'     => $mail_to ?? '',
 				'mail_from'   => $smtp_settings['fromEmail'] ?? '',
 				'subject'     => $mail_data['subject'] ?? '',
 				'message'     => $mail_data['message'] ?? '',
 				'headers'     => $mail_data['headers'] ?? '',
 				'attachments' => $mail_data['attachments'] ?? '',
+			);
+
+			$email_log_created = $email_log_model->create_email_log( $log_data );
+			if ( ! $email_log_created['success'] ) {
+				error_log( 'Failed to log email: ' . $email_log_created['message'] );
+			}
+		} catch ( \Throwable $th ) {
+			error_log( 'Failed to log email: ' . $th->getMessage() );
+			return true;
+		}
+		return true;
+	}
+	/**
+	 * Log failed email
+	 *
+	 * @param array $mail_data Array containing the mail data.
+	 * @return bool
+	 */
+	public function create_failed_email_log( $mail_failed_info ) {
+		// $ses_mailer = new SesMailer();
+		// $result     = $ses_mailer->send_email( $mail_data['to'], $mail_data['subject'], $mail_data['message'], $mail_data['headers'], $mail_data['attachments'] );
+		
+		$wp_mail_failed = $mail_failed_info->error_data;
+		$mail_failed_data = $wp_mail_failed['wp_mail_failed'];
+		if(! empty($mail_failed_data['to']) && is_array($mail_failed_data['to']) ) {
+			$mail_to = $mail_failed_data['to'][0];
+		}
+		try {
+			$email_log_model = new EmailLogModel();
+			$smtp_settings   = get_option( TRIGGER_DEFAULT_EMAIL_PROVIDER, array() );
+			$log_data        = array(
+				'mail_to'     => $mail_to ?? '',
+				'mail_from'   => $smtp_settings['fromEmail'] ?? '',
+				'subject'     => $mail_failed_data['subject'] ?? '',
+				'message'     => $mail_failed_data['message'] ?? '',
+				'headers'     => $mail_failed_data['headers'] ?? '',
+				'attachments' => $mail_failed_data['attachments'] ?? '',
 			);
 
 			$email_log_created = $email_log_model->create_email_log( $log_data );
@@ -176,74 +220,69 @@ class EmailLogController {
 	 * @return object
 	 */
 	public function send_test_email() {
-		try {
-			$verify = trigger_verify_request();
-			if ( ! $verify['success'] ) {
-				return $this->json_response( $verify['message'], null, $verify['code'] );
-			}
-
-			$params = $verify['data'];
-
-			$data = json_decode( $params['data'], true );
-
-			$validation_rules = array(
-				'sendTo'   => 'required|email',
-				'provider' => 'required',
-			);
-
-			$validation_response = ValidationHelper::validate( $validation_rules, $data );
-			if ( ! $validation_response->success ) {
-				return $this->json_response( $validation_response->message, null, 400 );
-			}
-
-			$subject = __( 'AWS SES Test Email from Trigger', 'trigger' );
-			$message = __( 'This is a test email sent from Trigger plugin.', 'trigger' );
-			$headers = array( 'Content-Type: text/html; charset=UTF-8' );
-
-			// Get email configuration
-			$email_config = get_option( TRIGGER_EMAIL_CONFIG, array() );
-			$provider     = $data['provider'];
-
-			if ( empty( $email_config ) || ! isset( $email_config[ $provider ] ) ) {
-				return $this->json_response( __( 'Email configuration not found', 'trigger' ), null, 404 );
-			}
-
-			$config = $email_config[ $provider ];
-
-			// For SES provider, use SesMailer directly
-			if ( 'ses' === $provider ) {
-				$ses_mailer = new SesMailer();
-				// $sent       = $ses_mailer->send_email( $data['sendTo'], $subject, $message, $headers, $config );
-
-				$sent = wp_mail( $data['sendTo'], $subject, $message, $headers );
-
-				if ( true === $sent ) {
-					$email_log_model = new EmailLogModel();
-					$email_log_model->create_email_log(
-						array(
-							'mail_to'   => $data['sendTo'],
-							'mail_from' => $config['fromEmail'],
-							'subject'   => $subject,
-							'message'   => $message,
-						)
-					);
-					return $this->json_response( __( 'Test email sent successfully', 'trigger' ), null, 200 );
-				} else {
-					// translators: %s is the error message returned from the AWS SES API
-					return $this->json_response( __( 'Failed to send test email', 'trigger' ), null, 400 );
-				}
-			} else {
-				// For all other providers, use wp_mail
-				$sent = wp_mail( $data['sendTo'], $subject, $message, $headers );
-
-				if ( $sent ) {
-					return $this->json_response( __( 'Test email sent successfully', 'trigger' ), null, 200 );
-				} else {
-					return $this->json_response( __( 'Failed to send test email', 'trigger' ), null, 400 );
-				}
-			}
-		} catch ( Exception $e ) {
-			return $this->json_response( __( 'Failed to send test email, please check your email credentials', 'trigger' ), null, 400 );
+		$verify = trigger_verify_request();
+		if ( ! $verify['success'] ) {
+			return $this->json_response( $verify['message'], null, $verify['code'] );
 		}
+
+		$params = $verify['data'];
+
+		$data = json_decode( $params['data'], true );
+
+		$validation_rules = array(
+			'sendTo'   => 'required|email',
+			'provider' => 'required',
+		);
+
+		$validation_response = ValidationHelper::validate( $validation_rules, $data );
+		if ( ! $validation_response->success ) {
+			return $this->json_response( $validation_response->message, null, 400 );
+		}
+
+		$subject = __( 'AWS SES Test Email from Trigger', 'trigger' );
+		$message = __( 'This is a test email sent from Trigger plugin.', 'trigger' );
+		$headers = array( 'Content-Type: text/html; charset=UTF-8' );
+
+		// Get email configuration
+		$email_config = get_option( TRIGGER_EMAIL_CONFIG, array() );
+		$provider     = $data['provider'];
+
+		if ( empty( $email_config ) || ! isset( $email_config[ $provider ] ) ) {
+			return $this->json_response( __( 'Email configuration not found', 'trigger' ), null, 404 );
+		}
+
+		$config = $email_config[ $provider ];
+
+		// For SES provider, use SesMailer directly
+		if ( 'ses' === $provider ) {
+			$ses_mailer = new SesMailer();
+			$sent       = $ses_mailer->send_email( $data['sendTo'], $subject, $message, $headers, $config );
+
+			// $sent = wp_mail( $data['sendTo'], $subject, $message, $headers );
+			// todo: need to write custom error log
+			// file can be handleProviderTestMail.php
+
+			if ( true === $sent ) {
+				return $this->json_response( __( 'Test email sent successfully', 'trigger' ), null, 200 );
+			} else {
+				// translators: %s is the error message returned from the AWS SES API
+				return $this->json_response( __( 'Failed to send test email', 'trigger' ), null, 400 );
+			}
+		} else {
+			// For all other providers, use wp_mail
+			$sent = wp_mail( $data['sendTo'], $subject, $message, $headers );
+
+			if ( $sent ) {
+				return $this->json_response( __( 'Test email sent successfully', 'trigger' ), null, 200 );
+			} else {
+				return $this->json_response( __( 'Failed to send test email', 'trigger' ), null, 400 );
+			}
+		}
+		// try {
+		// } catch ( Exception $e ) {
+		// 	$message = $e->getMessage();
+		// 	return throw new Exception($e->getMessage());
+		// 	// return $this->json_response( __( 'Failed to send test email, please check your email credentials', 'trigger' ), null, 400 );
+		// }
 	}
 }

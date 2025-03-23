@@ -40,34 +40,33 @@ class EmailConfiguration {
 	 * @return void
 	 */
 	public function configure_email( PHPMailer $phpmailer ) {
-		if ( empty( $this->config ) ) {
-			return;
-		}
-
-		$provider   = $this->config['provider'] ?? 'smtp';
-		$from_name  = $this->config['fromName'] ?? '';
-		$from_email = $this->config['fromEmail'] ?? '';
-
-		if ( '' !== $from_name ) {
-			// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
-			$phpmailer->FromName = $from_name;
-			// phpcs:enable
-		}
-		if ( '' !== $from_email ) {
-			// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
-			$phpmailer->From = $from_email;
-			// phpcs:enable
-		}
-
 		$default_provider = get_default_provider();
-
-		// $this->configure_ses( $phpmailer );
-
 		if ( 'smtp' === $default_provider['provider'] ) {
+			if ( empty( $this->config ) ) {
+				return;
+			}
+
+			$provider   = $this->config['provider'] ?? 'smtp';
+			$from_name  = $this->config['fromName'] ?? '';
+			$from_email = $this->config['fromEmail'] ?? '';
+
+			if ( '' !== $from_name ) {
+				// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+				$phpmailer->FromName = $from_name;
+				// phpcs:enable
+			}
+			if ( '' !== $from_email ) {
+				// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+				$phpmailer->From = $from_email;
+				// phpcs:enable
+			}
+
+			// $this->configure_ses( $phpmailer );
 			$this->configure_smtp( $phpmailer );
-		} elseif ( 'ses' === $default_provider['provider'] ) {
-			$this->configure_ses( $phpmailer );
-		}
+		} 
+		// elseif ( 'ses' === $default_provider['provider'] ) {
+		// 	$this->configure_ses( $phpmailer );
+		// }
 	}
 
 	/**
@@ -102,6 +101,9 @@ class EmailConfiguration {
 	 * @throws Exception If there's an error configuring SES.
 	 */
 	private function configure_ses( PHPMailer $phpmailer ) {
+		$ses_mailer = new SesMailer();
+		$result     = $ses_mailer->create_smtp_credentials( $this->config );
+
 		$provider = $this->config ?? array();
 
 		if ( empty( $provider ) ) {

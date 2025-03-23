@@ -13,6 +13,7 @@ namespace Trigger\Core;
 use Aws\Ses\SesClient;
 use Aws\Exception\AwsException;
 use Trigger\Traits\JsonResponse;
+use Exception;
 
 /**
  * Class to send emails via AWS SES
@@ -94,12 +95,12 @@ class SesMailer {
 			return false;
 		} catch ( AwsException $e ) {
 			error_log( 'AWS SES Error: ' . $e->getMessage() );
-
 			// Check if this is an email verification error
-			if ( strpos( $e->getMessage(), 'Email address is not verified' ) !== false ) {
-				return $this->json_response( __( 'Email address is not verified. Please verify your email address before sending emails.', 'trigger' ), null, 400 );
-			}
-			return $this->json_response( __( 'Failed to send email, please check your email credentials', 'trigger' ), null, 400 );
+			// if ( strpos( $e->getMessage(), 'Email address is not verified' ) !== false ) {
+			// 	return throw new Exception(__('Email address is not verified. Please verify your email address before sending emails.', 'trigger'), 400);
+			// 	// return $this->json_response( __( 'Email address is not verified. Please verify your email address before sending emails.', 'trigger' ), null, 400 );
+			// }
+			return false;
 		}
 	}
 
@@ -266,5 +267,34 @@ class SesMailer {
 		} catch ( AwsException $e ) {
 			return $this->json_response( esc_html( $e->getMessage() ), null, 400 );
 		}
+	}
+
+	/**
+	 * Create SMTP credentials for SES
+	 *
+	 * @param array $config AWS SES configuration.
+	 *
+	 * @return array{success: bool, message: string, data?: array} Result with success status, message and data
+	 */
+	public function create_smtp_credentials( $config ) {
+		if ( empty( $config ) || ! isset( $config['accessKeyId'] ) || ! isset( $config['secretAccessKey'] ) ) {
+			return $this->json_response( __( 'AWS SES configuration is missing', 'trigger' ), null, 400 );
+		}
+
+		$ses_client = new SesClient(
+			array(
+				'version' => 'latest',
+				'region'  => $config['region'] ?? 'us-east-1',
+			)
+		);
+
+		$result = $ses_client->create_smtp_credentials(
+			array(
+				'Username' => $config['accessKeyId'],
+				'Password' => $config['secretAccessKey'],
+			)
+		);
+
+		return $result;
 	}
 }

@@ -168,7 +168,11 @@ class SmtpConfig {
 		$existing_email_config                      = get_option( TRIGGER_EMAIL_CONFIG, array() );
 		$existing_email_config[ $data['provider'] ] = $data;
 		$update_option                              = update_option( TRIGGER_EMAIL_CONFIG, $existing_email_config );
-
+		
+		$default_provider = get_default_provider();
+		if ( $default_provider['provider'] === $data['provider'] ) {
+			$this->update_default_provider( $data['provider'] );
+		}
 		if ( ! $update_option ) {
 			return $this->json_response( __( 'Failed to update email configuration', 'trigger' ), null, 400 );
 		}
@@ -212,14 +216,14 @@ class SmtpConfig {
 
 		if ( empty( $default_provider ) || ! is_array( $default_provider ) ) {
 			// todo: add default email provider
-			$updated = $this->update_provider( $data['provider'] );
+			$updated = $this->update_default_provider( $data['provider'] );
 			if ( ! $updated ) {
 				return $this->json_response( __( 'Failed to update default email provider', 'trigger' ), null, 400 );
 			}
 		}
 
 		if ( $default_provider['provider'] !== $data['provider'] ) {
-			$updated = $this->update_provider( $data['provider'] );
+			$updated = $this->update_default_provider( $data['provider'] );
 			if ( ! $updated ) {
 				return $this->json_response( __( 'Failed to update default email provider', 'trigger' ), null, 400 );
 			}
@@ -234,7 +238,7 @@ class SmtpConfig {
 	 * @param string $provider Provider name.
 	 * @return boolean
 	 */
-	public function update_provider( $provider ) {
+	public function update_default_provider( $provider ) {
 		$providers = get_option( TRIGGER_EMAIL_CONFIG, array() );
 
 		if ( empty( $providers ) ) {

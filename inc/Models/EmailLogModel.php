@@ -74,6 +74,9 @@ class EmailLogModel {
 				'attachments' => isset( $data['attachments'] ) ? wp_json_encode( $data['attachments'] ) : '',
 				'created_at'  => current_time( 'mysql' ),
 				'updated_at'  => current_time( 'mysql' ),
+				// todo
+				// email status success or failed email
+				// provider
 			);
 
 			// Insert the log entry

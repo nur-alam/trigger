@@ -10,10 +10,10 @@
 
 namespace Trigger\Controllers\Provider;
 
-use Trigger\Helpers\ValidationHelper;
 use Trigger\Traits\JsonResponse;
 use Trigger\Core\SesMailer;
 use Exception;
+use Trigger\Helpers\ValidationHelper;
 
 /**
  * AwsSesController class
@@ -26,75 +26,8 @@ class AwsSesController {
 	 * Register hooks
 	 */
 	public function __construct() {
-		add_action( 'wp_ajax_trigger_send_test_email', array( $this, 'send_test_email' ) );
 		add_action( 'wp_ajax_verify_ses_email', array( $this, 'verify_ses_email' ) );
 		add_action( 'wp_ajax_get_verified_ses_emails', array( $this, 'get_verified_ses_emails' ) );
-	}
-
-	/**
-	 * Send test email
-	 *
-	 * @return object
-	 */
-	public function send_test_email() {
-		try {
-			$verify = trigger_verify_request();
-			if ( ! $verify['success'] ) {
-				return $this->json_response( $verify['message'], null, $verify['code'] );
-			}
-
-			$params = $verify['data'];
-
-			$data = json_decode( $params['data'], true );
-
-			$validation_rules = array(
-				'sendTo'   => 'required|email',
-				'provider' => 'required',
-			);
-
-			$validation_response = ValidationHelper::validate( $validation_rules, $data );
-			if ( ! $validation_response->success ) {
-				return $this->json_response( $validation_response->message, null, 400 );
-			}
-
-			$subject = __( 'AWS SES Test Email from Trigger', 'trigger' );
-			$message = __( 'This is a test email sent from Trigger plugin.', 'trigger' );
-			$headers = array( 'Content-Type: text/html; charset=UTF-8' );
-
-			// Get email configuration
-			$email_config = get_option( TRIGGER_EMAIL_CONFIG, array() );
-			$provider     = $data['provider'];
-
-			if ( empty( $email_config ) || ! isset( $email_config[ $provider ] ) ) {
-				return $this->json_response( __( 'Email configuration not found', 'trigger' ), null, 404 );
-			}
-
-			$config = $email_config[ $provider ];
-
-			// For SES provider, use SesMailer directly
-			if ( 'ses' === $provider ) {
-				$ses_mailer = new SesMailer();
-				$sent       = $ses_mailer->send_email( $data['sendTo'], $subject, $message, $headers, $config );
-
-				if ( true === $sent ) {
-					return $this->json_response( __( 'Test email sent successfully', 'trigger' ), null, 200 );
-				} else {
-					// translators: %s is the error message returned from the AWS SES API
-					return $this->json_response( __( 'Failed to send test email', 'trigger' ), null, 400 );
-				}
-			} else {
-				// For all other providers, use wp_mail
-				$sent = wp_mail( $data['sendTo'], $subject, $message, $headers );
-
-				if ( $sent ) {
-					return $this->json_response( __( 'Test email sent successfully', 'trigger' ), null, 200 );
-				} else {
-					return $this->json_response( __( 'Failed to send test email', 'trigger' ), null, 400 );
-				}
-			}
-		} catch ( Exception $e ) {
-			return $this->json_response( __( 'Failed to send test email, please check your email credentials', 'trigger' ), null, 400 );
-		}
 	}
 
 	/**

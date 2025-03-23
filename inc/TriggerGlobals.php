@@ -22,6 +22,21 @@ function trigger_auth_check() {
 }
 
 /**
+ * Get default email connection
+ *
+ * @return  array|boolean
+ */
+function get_default_provider() {
+	$default_provider = get_option( TRIGGER_DEFAULT_EMAIL_PROVIDER, array() );
+
+	if ( empty( $default_provider ) ) {
+		return false;
+	}
+
+	return $default_provider;
+}
+
+/**
  * Verify nonce and authentication.
  *
  * @param string $nonce_key The nonce key from POST/GET request.

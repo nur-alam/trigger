@@ -40,9 +40,6 @@ class EmailConfiguration {
 	 * @return void
 	 */
 	public function configure_email( PHPMailer $phpmailer ) {
-
-		$this->set_default_email_provider();
-
 		if ( empty( $this->config ) ) {
 			return;
 		}
@@ -62,7 +59,15 @@ class EmailConfiguration {
 			// phpcs:enable
 		}
 
-		$this->configure_smtp( $phpmailer );
+		$default_provider = get_default_provider();
+
+		// $this->configure_ses( $phpmailer );
+
+		if ( 'smtp' === $default_provider['provider'] ) {
+			$this->configure_smtp( $phpmailer );
+		} elseif ( 'ses' === $default_provider['provider'] ) {
+			$this->configure_ses( $phpmailer );
+		}
 	}
 
 	/**
@@ -90,22 +95,6 @@ class EmailConfiguration {
 	}
 
 	/**
-	 * Set default email provider
-	 *
-	 * @return void
-	 */
-	private function set_default_email_provider() {
-		$email_providers = get_option( TRIGGER_EMAIL_CONFIG, array() );
-		if ( empty( $email_providers ) ) {
-			return;
-		}
-
-		$this->config = $email_providers['smtp'];
-		// $this->config = $email_providers['ses'];
-		update_option( TRIGGER_DEFAULT_EMAIL_PROVIDER, $this->config );
-	}
-
-	/**
 	 * Configure Amazon SES settings
 	 *
 	 * @param PHPMailer $phpmailer PHPMailer instance.
@@ -118,23 +107,13 @@ class EmailConfiguration {
 		if ( empty( $provider ) ) {
 			return;
 		}
+		// $host = 'email-smtp.' . $provider['region'] ?? 'us-east-1.amazonaws.com';
+		$host = 'email-smtp.us-east-1.amazonaws.com';
 		try {
-			// Create an AWS SES client
-			$ses_client = new SesClient(
-				array(
-					'version'     => 'latest',
-					'region'      => $provider['region'] ?? 'us-east-1',
-					'credentials' => array(
-						'key'    => $provider['accessKeyId'] ?? '',
-						'secret' => $provider['secretAccessKey'] ?? '',
-					),
-				)
-			);
-
 			// Get credentials to use in PHPMailer
 			// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 			$phpmailer->isSMTP();
-			$phpmailer->Host       = 'email-smtp.' . $provider['region'] ?? 'us-east-1.amazonaws.com';
+			$phpmailer->Host       = $host;
 			$phpmailer->SMTPAuth   = true;
 			$phpmailer->Username   = $provider['accessKeyId'] ?? '';
 			$phpmailer->Password   = $provider['secretAccessKey'] ?? '';

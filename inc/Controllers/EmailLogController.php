@@ -14,8 +14,8 @@ use Exception;
 use Trigger\Models\EmailLogModel;
 use Trigger\Traits\JsonResponse;
 use Trigger\Traits\RestResponse;
-use Trigger\Controllers\Provider\AwsSesController;
-use Trigger\Core\SesMailer;
+use Trigger\Controllers\Provider\aws\AwsSesController;
+use Trigger\Controllers\Provider\aws\SesMailer;
 use Trigger\Helpers\ValidationHelper;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -77,7 +77,7 @@ class EmailLogController {
 		// $ses_mailer = new SesMailer();
 		// $result     = $ses_mailer->send_email( $mail_data['to'], $mail_data['subject'], $mail_data['message'], $mail_data['headers'], $mail_data['attachments'] );
 		$mail_to = $mail_data['to'];
-		if(! empty($mail_data['to']) && is_array($mail_data['to']) ) {
+		if ( ! empty( $mail_data['to'] ) && is_array( $mail_data['to'] ) ) {
 			$mail_to = $mail_data['to'][0];
 		}
 		try {
@@ -102,19 +102,17 @@ class EmailLogController {
 		}
 		return true;
 	}
+
 	/**
 	 * Log failed email
 	 *
-	 * @param array $mail_data Array containing the mail data.
+	 * @param object $mail_failed_info Array containing the mail data.
 	 * @return bool
 	 */
 	public function create_failed_email_log( $mail_failed_info ) {
-		// $ses_mailer = new SesMailer();
-		// $result     = $ses_mailer->send_email( $mail_data['to'], $mail_data['subject'], $mail_data['message'], $mail_data['headers'], $mail_data['attachments'] );
-		
-		$wp_mail_failed = $mail_failed_info->error_data;
+		$wp_mail_failed   = $mail_failed_info->error_data;
 		$mail_failed_data = $wp_mail_failed['wp_mail_failed'];
-		if(! empty($mail_failed_data['to']) && is_array($mail_failed_data['to']) ) {
+		if ( ! empty( $mail_failed_data['to'] ) && is_array( $mail_failed_data['to'] ) ) {
 			$mail_to = $mail_failed_data['to'][0];
 		}
 		try {
@@ -280,9 +278,9 @@ class EmailLogController {
 		}
 		// try {
 		// } catch ( Exception $e ) {
-		// 	$message = $e->getMessage();
-		// 	return throw new Exception($e->getMessage());
-		// 	// return $this->json_response( __( 'Failed to send test email, please check your email credentials', 'trigger' ), null, 400 );
+		// $message = $e->getMessage();
+		// return throw new Exception($e->getMessage());
+		// return $this->json_response( __( 'Failed to send test email, please check your email credentials', 'trigger' ), null, 400 );
 		// }
 	}
 }

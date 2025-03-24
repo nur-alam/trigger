@@ -8,7 +8,7 @@
  * @since 1.0.0
  */
 
-namespace Trigger\Core;
+namespace Trigger\Controllers\Provider\aws;
 
 use Aws\Ses\SesClient;
 use Aws\Exception\AwsException;
@@ -57,10 +57,21 @@ class SesMailer {
 			);
 
 			// Format email parameters correctly for AWS SES
+			// Check if HTML content type is specified in headers
+			$is_html = false;
+			if ( ! empty( $headers ) ) {
+				foreach ( $headers as $header ) {
+					if ( stripos( $header, 'Content-Type: text/html' ) !== false ) {
+						$is_html = true;
+						break;
+					}
+				}
+			}
+
 			$email_params = array(
 				'Source'      => $config['fromEmail'] ?? 'noreply@example.com',
 				'Destination' => array(
-					'ToAddresses' => is_array( $to ) ? $to : array( $to ), // Convert to array if not already
+					'ToAddresses' => is_array( $to ) ? $to : array( $to ),
 				),
 				'Message'     => array(
 					'Subject' => array(
@@ -69,7 +80,7 @@ class SesMailer {
 					),
 					'Body'    => array(
 						'Html' => array(
-							'Data'    => $message,
+							'Data'    => $is_html ? $message : nl2br( $message ),
 							'Charset' => 'UTF-8',
 						),
 						'Text' => array(
@@ -79,9 +90,6 @@ class SesMailer {
 					),
 				),
 			);
-
-			// Debug output
-			// error_log( 'AWS SES Email Params: ' . print_r( $email_params, true ) );
 
 			// Send the email using AWS SES
 			$result      = $ses_client->sendEmail( $email_params );
@@ -97,8 +105,8 @@ class SesMailer {
 			error_log( 'AWS SES Error: ' . $e->getMessage() );
 			// Check if this is an email verification error
 			// if ( strpos( $e->getMessage(), 'Email address is not verified' ) !== false ) {
-			// 	return throw new Exception(__('Email address is not verified. Please verify your email address before sending emails.', 'trigger'), 400);
-			// 	// return $this->json_response( __( 'Email address is not verified. Please verify your email address before sending emails.', 'trigger' ), null, 400 );
+			// return throw new Exception(__('Email address is not verified. Please verify your email address before sending emails.', 'trigger'), 400);
+			// return $this->json_response( __( 'Email address is not verified. Please verify your email address before sending emails.', 'trigger' ), null, 400 );
 			// }
 			return false;
 		}
@@ -267,34 +275,5 @@ class SesMailer {
 		} catch ( AwsException $e ) {
 			return $this->json_response( esc_html( $e->getMessage() ), null, 400 );
 		}
-	}
-
-	/**
-	 * Create SMTP credentials for SES
-	 *
-	 * @param array $config AWS SES configuration.
-	 *
-	 * @return array{success: bool, message: string, data?: array} Result with success status, message and data
-	 */
-	public function create_smtp_credentials( $config ) {
-		if ( empty( $config ) || ! isset( $config['accessKeyId'] ) || ! isset( $config['secretAccessKey'] ) ) {
-			return $this->json_response( __( 'AWS SES configuration is missing', 'trigger' ), null, 400 );
-		}
-
-		$ses_client = new SesClient(
-			array(
-				'version' => 'latest',
-				'region'  => $config['region'] ?? 'us-east-1',
-			)
-		);
-
-		$result = $ses_client->create_smtp_credentials(
-			array(
-				'Username' => $config['accessKeyId'],
-				'Password' => $config['secretAccessKey'],
-			)
-		);
-
-		return $result;
 	}
 }

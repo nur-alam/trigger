@@ -8,10 +8,10 @@
  * @since 1.0.0
  */
 
-namespace Trigger\Controllers\Provider;
+namespace Trigger\Controllers\Provider\aws;
 
 use Trigger\Traits\JsonResponse;
-use Trigger\Core\SesMailer;
+use Trigger\Controllers\Provider\aws\SesMailer;
 use Exception;
 use Trigger\Helpers\ValidationHelper;
 

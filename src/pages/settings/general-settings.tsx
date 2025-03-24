@@ -1,10 +1,8 @@
+import { useEffect, useState } from "react";
 import { __ } from "@wordpress/i18n";
-import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
 import { HelpCircle, Loader2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { useEffect, useState } from "react";
 import config from "@/config";
 import { ResponseType } from "@/utils/trigger-declaration";
 import { toast } from "react-hot-toast";

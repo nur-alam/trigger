@@ -1,19 +1,13 @@
 import { __ } from "@wordpress/i18n";
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import DefaultSmtp from "./provider/default-smtp";
-import AwsSes from "./provider/aws-ses";
 import { useState } from "react";
 import { MoveLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import DefaultSmtp from "./provider/default-smtp";
+import AwsSes from "./provider/aws-ses";
 import { EmailProviderOptionsType } from "@/utils/trigger-declaration";
-
-
-
 
 const AddConnection = () => {
 	const navigate = useNavigate();
@@ -82,7 +76,7 @@ const AddConnection = () => {
 									<rect width="20" height="16" x="2" y="4" rx="2" />
 									<path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
 								</svg>
-								SMTP
+								{__('SMTP', 'trigger')}
 							</TabsTrigger>
 							<TabsTrigger value="ses" className="w-full justify-start gap-2 p-2.5">
 								<img
@@ -90,7 +84,7 @@ const AddConnection = () => {
 									alt="AWS"
 									className="h-5 w-5"
 								/>
-								Amazon SES
+								{__('Amazon SES', 'trigger')}
 							</TabsTrigger>
 						</TabsList>
 

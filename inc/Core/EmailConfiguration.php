@@ -12,8 +12,8 @@ namespace Trigger\Core;
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-use Aws\Ses\SesClient;
 use Aws\Exception\AwsException;
+use Trigger\Controllers\Provider\aws\SesMailer;
 /**
  * Email configuration class
  */
@@ -63,10 +63,7 @@ class EmailConfiguration {
 
 			// $this->configure_ses( $phpmailer );
 			$this->configure_smtp( $phpmailer );
-		} 
-		// elseif ( 'ses' === $default_provider['provider'] ) {
-		// 	$this->configure_ses( $phpmailer );
-		// }
+		}
 	}
 
 	/**
@@ -101,16 +98,13 @@ class EmailConfiguration {
 	 * @throws Exception If there's an error configuring SES.
 	 */
 	private function configure_ses( PHPMailer $phpmailer ) {
-		$ses_mailer = new SesMailer();
-		$result     = $ses_mailer->create_smtp_credentials( $this->config );
-
 		$provider = $this->config ?? array();
 
 		if ( empty( $provider ) ) {
 			return;
 		}
-		// $host = 'email-smtp.' . $provider['region'] ?? 'us-east-1.amazonaws.com';
-		$host = 'email-smtp.us-east-1.amazonaws.com';
+		$host = 'email-smtp.' . $provider['region'] ?? 'us-east-1.amazonaws.com';
+		// $host = 'email-smtp.us-east-1.amazonaws.com';
 		try {
 			// Get credentials to use in PHPMailer
 			// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase

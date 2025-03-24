@@ -12,7 +12,7 @@ namespace Trigger\Controllers;
 
 use Trigger\Helpers\ValidationHelper;
 use Trigger\Traits\JsonResponse;
-use Trigger\Core\SesMailer;
+use Trigger\Controllers\Provider\aws\SesMailer;
 use Exception;
 
 /**
@@ -168,7 +168,7 @@ class SmtpConfig {
 		$existing_email_config                      = get_option( TRIGGER_EMAIL_CONFIG, array() );
 		$existing_email_config[ $data['provider'] ] = $data;
 		$update_option                              = update_option( TRIGGER_EMAIL_CONFIG, $existing_email_config );
-		
+
 		$default_provider = get_default_provider();
 		if ( $default_provider['provider'] === $data['provider'] ) {
 			$this->update_default_provider( $data['provider'] );

@@ -44,6 +44,7 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { AwsSesVerifiedEmailType } from "@/utils/trigger-declaration";
 
 interface VerifySesEmailSheetProps {
 	open: boolean;
@@ -59,14 +60,9 @@ const verifyEmailFormSchema = z.object({
 
 type VerifyEmailFormValues = z.infer<typeof verifyEmailFormSchema>;
 
-type VerifiedEmail = {
-	email: string;
-	status: string;
-};
-
 export function VerifySesEmailSheet({ open, onOpenChange, connection }: VerifySesEmailSheetProps) {
 	const [isVerifying, setIsVerifying] = useState(false);
-	const [verifiedEmails, setVerifiedEmails] = useState<VerifiedEmail[]>([]);
+	const [verifiedEmails, setVerifiedEmails] = useState<AwsSesVerifiedEmailType[]>([]);
 	const [isLoadingEmails, setIsLoadingEmails] = useState(false);
 
 	const form = useForm<VerifyEmailFormValues>({

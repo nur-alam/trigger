@@ -228,8 +228,9 @@ class EmailLogController {
 		$data = json_decode( $params['data'], true );
 
 		$validation_rules = array(
-			'sendTo'   => 'required|email',
-			'provider' => 'required',
+			'sendTo'    => 'required|email',
+			'fromEmail' => 'required|email',
+			'provider'  => 'required',
 		);
 
 		$validation_response = ValidationHelper::validate( $validation_rules, $data );
@@ -244,7 +245,7 @@ class EmailLogController {
 		// Get email configuration
 		$email_config = get_option( TRIGGER_EMAIL_CONFIG, array() );
 		$provider     = $data['provider'];
-
+		$from_email   = $data['fromEmail'];
 		if ( empty( $email_config ) || ! isset( $email_config[ $provider ] ) ) {
 			return $this->json_response( __( 'Email configuration not found', 'trigger' ), null, 404 );
 		}
@@ -254,7 +255,7 @@ class EmailLogController {
 		// For SES provider, use SesMailer directly
 		if ( 'ses' === $provider ) {
 			$ses_mailer = new SesMailer();
-			$sent       = $ses_mailer->send_email( $data['sendTo'], $subject, $message, $headers, $config );
+			$sent       = $ses_mailer->send_email( $data['sendTo'], $from_email, $subject, $message, $headers, $config );
 
 			// $sent = wp_mail( $data['sendTo'], $subject, $message, $headers );
 			// todo: need to write custom error log

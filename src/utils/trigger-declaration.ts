@@ -53,3 +53,9 @@ export type ResponseType = {
 	data: any;
 	errors?: Record<string, string[]>;
 };
+
+// Verified Email
+export type AwsSesVerifiedEmailType = {
+	email: string;
+	status: string;
+};

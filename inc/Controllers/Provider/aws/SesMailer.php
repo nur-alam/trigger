@@ -33,7 +33,7 @@ class SesMailer {
 	 *
 	 * @return bool|string True on success, error message on failure
 	 */
-	public function send_email( $to, $subject, $message, $headers = array(), $config = array() ) {
+	public function send_email( $to, $from_email, $subject, $message, $headers = array(), $config = array() ) {
 		try {
 			// If no config is provided, get from options
 			if ( empty( $config ) ) {
@@ -69,7 +69,7 @@ class SesMailer {
 			}
 
 			$email_params = array(
-				'Source'      => $config['fromEmail'] ?? 'noreply@example.com',
+				'Source'      => $from_email ?? $config['fromEmail'],
 				'Destination' => array(
 					'ToAddresses' => is_array( $to ) ? $to : array( $to ),
 				),

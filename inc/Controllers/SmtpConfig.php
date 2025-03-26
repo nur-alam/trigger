@@ -116,7 +116,7 @@ class SmtpConfig {
 		foreach ( $email_config as $provider_key => $config ) {
 			$connections[] = $config;
 		}
-		sleep( 1 );
+
 		return $this->json_response( __( 'Email configuration deleted successfully', 'trigger' ), $connections, 200 );
 	}
 

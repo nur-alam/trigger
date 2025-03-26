@@ -26,6 +26,7 @@ class SesMailer {
 	 * Send an email using AWS SES
 	 *
 	 * @param string $to Recipient email address.
+	 * @param string $from_email Sender email address.
 	 * @param string $subject Email subject.
 	 * @param string $message Email body (HTML).
 	 * @param array  $headers Email headers.

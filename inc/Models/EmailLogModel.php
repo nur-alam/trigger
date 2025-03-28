@@ -66,6 +66,8 @@ class EmailLogModel {
 
 			// Sanitize and prepare data
 			$log_data = array(
+				'provider'    => sanitize_text_field( $data['provider'] ),
+				'status'      => sanitize_text_field( $data['status'] ),
 				'mail_to'     => sanitize_email( $data['mail_to'] ),
 				'mail_from'   => sanitize_email( $data['mail_from'] ),
 				'subject'     => sanitize_text_field( $data['subject'] ),
@@ -74,9 +76,6 @@ class EmailLogModel {
 				'attachments' => isset( $data['attachments'] ) ? wp_json_encode( $data['attachments'] ) : '',
 				'created_at'  => current_time( 'mysql' ),
 				'updated_at'  => current_time( 'mysql' ),
-				// todo
-				// email status success or failed email
-				// provider
 			);
 
 			// Insert the log entry

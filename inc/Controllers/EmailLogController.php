@@ -74,8 +74,6 @@ class EmailLogController {
 	 * @return bool
 	 */
 	public function create_email_log( $mail_data ) {
-		// $ses_mailer = new SesMailer();
-		// $result     = $ses_mailer->send_email( $mail_data['to'], $mail_data['subject'], $mail_data['message'], $mail_data['headers'], $mail_data['attachments'] );
 		$mail_to = $mail_data['to'];
 		if ( ! empty( $mail_data['to'] ) && is_array( $mail_data['to'] ) ) {
 			$mail_to = $mail_data['to'][0];
@@ -84,6 +82,8 @@ class EmailLogController {
 			$email_log_model = new EmailLogModel();
 			$smtp_settings   = get_option( TRIGGER_DEFAULT_EMAIL_PROVIDER, array() );
 			$log_data        = array(
+				'provider'    => $smtp_settings['provider'] ?? '',
+				'status'      => 'success',
 				'mail_to'     => $mail_to ?? '',
 				'mail_from'   => $smtp_settings['fromEmail'] ?? '',
 				'subject'     => $mail_data['subject'] ?? '',
@@ -119,6 +119,8 @@ class EmailLogController {
 			$email_log_model = new EmailLogModel();
 			$smtp_settings   = get_option( TRIGGER_DEFAULT_EMAIL_PROVIDER, array() );
 			$log_data        = array(
+				'provider'    => $smtp_settings['provider'] ?? '',
+				'status'      => 'failed',
 				'mail_to'     => $mail_to ?? '',
 				'mail_from'   => $smtp_settings['fromEmail'] ?? '',
 				'subject'     => $mail_failed_data['subject'] ?? '',

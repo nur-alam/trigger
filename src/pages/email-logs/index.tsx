@@ -225,16 +225,26 @@ const EmailLogs = () => {
 			enableHiding: false,
 		},
 		{
-			accessorKey: 'id',
-			header: __('ID', 'trigger'),
-		},
-		{
 			accessorKey: 'mail_to',
 			header: __('To', 'trigger'),
 		},
 		{
 			accessorKey: 'subject',
 			header: __('Subject', 'trigger'),
+		},
+		{
+			accessorKey: 'status',
+			header: __('Status', 'trigger'),
+			cell: ({ row }) => {
+				const status = row.getValue('status') as string
+				return <Badge variant="outline" className={status === 'success' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'}>
+					{status === 'success' ? 'Successful' : 'Failed'}
+				</Badge>
+			},
+		},
+		{
+			accessorKey: 'provider',
+			header: __('Provider', 'trigger'),
 		},
 		{
 			accessorKey: 'created_at',

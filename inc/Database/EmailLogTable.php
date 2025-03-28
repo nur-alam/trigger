@@ -63,6 +63,8 @@ class EmailLogTable extends DatabaseAbstract {
 	public function get_table_schema(): string {
 		$schema = "CREATE TABLE {$this->name} (
 			`id` BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+			`provider` VARCHAR(30),
+			`status` VARCHAR(30),
 			`mail_to` VARCHAR(30),
 			`mail_from` VARCHAR(30),
 			`subject` VARCHAR(100),

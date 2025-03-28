@@ -104,10 +104,14 @@ export function SmtpSendTestMail({ open, onOpenChange, connection }: TestEmailSh
 					</SheetDescription>
 				</SheetHeader>
 
-				<div className="pyt-4">
+				<div className="pt-4">
 					<div className="mb-4">
 						<p className="text-sm font-medium mb-1">{__("Provider", "trigger")}</p>
-						<Input className="text-sm" value={connection.provider} disabled />
+						<Input
+							className="text-sm [&:disabled]:opacity-100"
+							value={connection.provider}
+							disabled
+						/>
 					</div>
 				</div>
 
@@ -115,7 +119,11 @@ export function SmtpSendTestMail({ open, onOpenChange, connection }: TestEmailSh
 					<form onSubmit={form.handleSubmit(handleSendTestEmail)} className="space-y-4">
 						<div className="mb-4">
 							<p className="text-sm font-medium mb-1">{__("From", "trigger")}</p>
-							<Input className="text-sm" value={connection.fromEmail} disabled />
+							<Input
+								className="text-sm [&:disabled]:opacity-100"
+								value={connection.fromEmail}
+								disabled
+							/>
 						</div>
 						<FormField
 							control={form.control}
@@ -124,7 +132,11 @@ export function SmtpSendTestMail({ open, onOpenChange, connection }: TestEmailSh
 								<FormItem>
 									<FormLabel>{__("Send To", "trigger")}</FormLabel>
 									<FormControl>
-										<Input placeholder="example@example.com" {...field} />
+										<Input
+											placeholder="example@example.com"
+											{...field}
+											autoFocus
+										/>
 									</FormControl>
 									<FormMessage />
 								</FormItem>

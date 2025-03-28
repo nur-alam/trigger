@@ -93,7 +93,7 @@ const EditSesConfig = ({ connection }: { connection: ConnectionType }) => {
 						<FormItem>
 							<FormLabel>{__("From Name", "trigger")}</FormLabel>
 							<FormControl>
-								<Input placeholder="Sender Name" {...field} />
+								<Input placeholder="Sender Name" {...field} autoFocus />
 							</FormControl>
 							<FormMessage />
 						</FormItem>

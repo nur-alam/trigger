@@ -159,7 +159,7 @@ export function AwsSendTestMail({ open, onOpenChange, connection }: TestEmailShe
 				<div className="pt-4">
 					<div className="mb-4">
 						<p className="text-sm font-medium mb-1">{__("Provider", "trigger")}</p>
-						<Input className="text-sm" value={connection.provider} disabled />
+						<Input className="text-sm [&:disabled]:opacity-100" value={connection.provider} disabled />
 					</div>
 				</div>
 
@@ -205,7 +205,7 @@ export function AwsSendTestMail({ open, onOpenChange, connection }: TestEmailShe
 								<FormItem>
 									<FormLabel>{__("Send To", "trigger")}</FormLabel>
 									<FormControl>
-										<Input placeholder="example@example.com" {...field} />
+										<Input placeholder="example@example.com" {...field} autoFocus />
 									</FormControl>
 									<FormMessage />
 								</FormItem>

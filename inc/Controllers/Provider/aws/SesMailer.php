@@ -26,7 +26,6 @@ class SesMailer {
 	 * Send an email using AWS SES
 	 *
 	 * @param string $to Recipient email address.
-	 * @param string $from_email Sender email address.
 	 * @param string $subject Email subject.
 	 * @param string $message Email body (HTML).
 	 * @param array  $headers Email headers.
@@ -34,7 +33,7 @@ class SesMailer {
 	 *
 	 * @return bool|string True on success, error message on failure
 	 */
-	public function send_email( $to, $from_email, $subject, $message, $headers = array(), $config = array() ) {
+	public function send_email( $to, $subject, $message, $headers = array(), $config = array() ) {
 		try {
 			// If no config is provided, get from options
 			if ( empty( $config ) ) {
@@ -69,8 +68,11 @@ class SesMailer {
 				}
 			}
 
+			// Ensure message is a string
+			$message_text = is_array( $message ) ? json_encode( $message ) : (string) $message;
+
 			$email_params = array(
-				'Source'      => $from_email ?? $config['fromEmail'],
+				'Source'      => $config['fromEmail'],
 				'Destination' => array(
 					'ToAddresses' => is_array( $to ) ? $to : array( $to ),
 				),
@@ -81,11 +83,11 @@ class SesMailer {
 					),
 					'Body'    => array(
 						'Html' => array(
-							'Data'    => $is_html ? $message : nl2br( $message ),
+							'Data'    => $is_html ? $message_text : $message_text,
 							'Charset' => 'UTF-8',
 						),
 						'Text' => array(
-							'Data'    => strip_tags( $message ),
+							'Data'    => $message_text,
 							'Charset' => 'UTF-8',
 						),
 					),
@@ -108,7 +110,6 @@ class SesMailer {
 			// if ( strpos( $e->getMessage(), 'Email address is not verified' ) !== false ) {
 			// return throw new Exception(__('Email address is not verified. Please verify your email address before sending emails.', 'trigger'), 400);
 			// return $this->json_response( __( 'Email address is not verified. Please verify your email address before sending emails.', 'trigger' ), null, 400 );
-			// }
 			return false;
 		}
 	}

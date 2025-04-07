@@ -321,4 +321,51 @@ class EmailLogModel {
 			return false;
 		}
 	}
+
+	/**
+	 * Get email stats
+	 *
+	 * @return mixed array|WP_Error
+	 */
+	public function get_email_stats() {
+		global $wpdb;
+
+		$total_logs = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				'SELECT COUNT(*) FROM `' . esc_sql( $this->table_name ) . '`'
+			)
+		);
+
+		$total_success_logs = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				'SELECT COUNT(*) FROM `' . esc_sql( $this->table_name ) . '` WHERE status = %s',
+				'success'
+			)
+		);
+
+		$total_failed_logs = $total_logs - $total_success_logs;
+
+		$chart_data = array();
+		for ( $i = 0; $i < 7; $i++ ) {
+			$date         = gmdate( 'Y-m-d', strtotime( '+' . $i . ' day' ) );
+			$success_logs = (int) $wpdb->get_var(
+				$wpdb->prepare(
+					'SELECT COUNT(*) FROM `' . esc_sql( $this->table_name ) . '` WHERE status = %s AND created_at LIKE %s',
+					'success',
+					'%' . $date . '%'
+				)
+			);
+			$chart_data[] = array(
+				'date'    => $date,
+				'success' => $success_logs,
+			);
+		}
+
+		return array(
+			'total'      => $total_logs,
+			'success'    => $total_success_logs,
+			'failed'     => $total_failed_logs,
+			'chart_data' => $chart_data,
+		);
+	}
 }

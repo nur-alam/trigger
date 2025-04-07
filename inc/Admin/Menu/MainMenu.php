@@ -134,10 +134,11 @@ class MainMenu {
 		// Register main menu.
 		add_submenu_page(
 			$this->slug(),
-			'Email Logs',
+			'Dashboard',
+			'Dashboard',
 			$this->capability(),
 			$this->slug(),
-			$this->capability(),
+			array( $this, 'view' )
 		);
 
 		// $submenus = $this->submenu_factory();

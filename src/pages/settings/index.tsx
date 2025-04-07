@@ -1,8 +1,8 @@
 import { HashRouter, Routes, Route } from "react-router-dom";
 import SettingHeader from "@pages/settings/setting-header";
-import GeneralSettings from "@pages/settings/general-settings";
-import Connections from "@pages/settings/connections";
-import AddConnection from "./connections/add-connection";
+import Connections from "./connections";
+import GeneralSettings from "./general-settings";
+
 
 interface MenuItem {
 	id: string;
@@ -18,17 +18,9 @@ const menuItems: MenuItem[] = [
 ];
 
 const Settings = () => {
-	return (
-		<HashRouter>
-			<SettingHeader menuItems={menuItems} />
-			<Routes>
-				<Route path="/" element={<Connections />} />
-				<Route path="/connections" element={<Connections />} />
-				<Route path="/general" element={<GeneralSettings />} />
-				<Route path="/add-connection" element={<AddConnection />} />
-			</Routes>
-		</HashRouter>
-	);
+	return <>
+		<GeneralSettings />
+	</>
 };
 
 export default Settings;

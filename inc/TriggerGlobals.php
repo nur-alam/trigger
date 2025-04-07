@@ -305,8 +305,8 @@ if ( ! function_exists( 'wp_mail' ) ) :
 		$phpmailer->clearAttachments();
 		$phpmailer->clearCustomHeaders();
 		$phpmailer->clearReplyTos();
-		$phpmailer->Body    = '';
-		$phpmailer->AltBody = '';
+		$phpmailer->Body    = ''; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+		$phpmailer->AltBody = ''; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 
 		// Set "From" name and email.
 
@@ -367,8 +367,8 @@ if ( ! function_exists( 'wp_mail' ) ) :
 		}
 
 		// Set mail's subject and body.
-		$phpmailer->Subject = $subject;
-		$phpmailer->Body    = $message;
+		$phpmailer->Subject = $subject; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+		$phpmailer->Body    = $message; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 
 		// Set destination addresses, using appropriate methods for handling addresses.
 		$address_headers = compact( 'to', 'cc', 'bcc', 'reply_to' );
@@ -429,7 +429,7 @@ if ( ! function_exists( 'wp_mail' ) ) :
 		 */
 		$content_type = apply_filters( 'wp_mail_content_type', $content_type );
 
-		$phpmailer->ContentType = $content_type;
+		$phpmailer->ContentType = $content_type; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 
 		// Set whether it's plaintext, depending on $content_type.
 		if ( 'text/html' === $content_type ) {
@@ -448,7 +448,7 @@ if ( ! function_exists( 'wp_mail' ) ) :
 		 *
 		 * @param string $charset Default email charset.
 		 */
-		$phpmailer->CharSet = apply_filters( 'wp_mail_charset', $charset );
+		$phpmailer->CharSet = apply_filters( 'wp_mail_charset', $charset ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 
 		// Set custom headers.
 		if ( ! empty( $headers ) ) {

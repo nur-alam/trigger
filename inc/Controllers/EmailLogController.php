@@ -61,6 +61,7 @@ class EmailLogController {
 		new LogRetention();
 		add_filter( 'wp_mail_succeeded', array( $this, 'create_email_log' ) );
 		add_filter( 'wp_mail_failed', array( $this, 'create_failed_email_log' ) );
+		add_action( 'wp_ajax_get_email_stats', array( $this, 'get_email_stats' ) );
 		add_action( 'wp_ajax_trigger_fetch_email_logs', array( $this, 'get_email_logs' ) );
 		add_action( 'wp_ajax_trigger_delete_email_log', array( $this, 'delete_email_log' ) );
 		add_action( 'wp_ajax_trigger_bulk_delete_email_logs', array( $this, 'bulk_delete_email_logs' ) );
@@ -138,6 +139,25 @@ class EmailLogController {
 			return true;
 		}
 		return true;
+	}
+
+	/**
+	 * Get email stats
+	 *
+	 * @return mixed array|WP_Error
+	 */
+	public function get_email_stats() {
+		$verify = trigger_verify_request();
+		if ( ! $verify['success'] ) {
+			return $this->json_response( $verify['message'], null, $verify['code'] );
+		}
+
+		try {
+			$result = $this->email_log_model->get_email_stats();
+			return $this->json_response( 'Email stats fetched successfully', $result, 200 );
+		} catch ( \Throwable $th ) {
+			return $this->json_response( 'Error fetching email stats: ' . $th->getMessage(), null, 500 );
+		}
 	}
 
 	/**
@@ -230,9 +250,8 @@ class EmailLogController {
 		$data = json_decode( $params['data'], true );
 
 		$validation_rules = array(
-			'sendTo'    => 'required|email',
-			'fromEmail' => 'required|email',
-			'provider'  => 'required',
+			'sendTo'   => 'required|email',
+			'provider' => 'required',
 		);
 
 		$validation_response = ValidationHelper::validate( $validation_rules, $data );
@@ -247,7 +266,6 @@ class EmailLogController {
 		// Get email configuration
 		$email_config = get_option( TRIGGER_EMAIL_CONFIG, array() );
 		$provider     = $data['provider'];
-		$from_email   = $data['fromEmail'];
 		if ( empty( $email_config ) || ! isset( $email_config[ $provider ] ) ) {
 			return $this->json_response( __( 'Email configuration not found', 'trigger' ), null, 404 );
 		}
@@ -257,13 +275,23 @@ class EmailLogController {
 		// For SES provider, use SesMailer directly
 		if ( 'ses' === $provider ) {
 			$ses_mailer = new SesMailer();
-			$sent       = $ses_mailer->send_email( $data['sendTo'], $from_email, $subject, $message, $headers, $config );
+			$sent       = $ses_mailer->send_email( $data['sendTo'], $subject, $message, $headers, $config );
 
 			// $sent = wp_mail( $data['sendTo'], $subject, $message, $headers );
 			// todo: need to write custom error log
 			// file can be handleProviderTestMail.php
 
 			if ( true === $sent ) {
+				// $this->create_email_log( $data['sendTo'], $subject, $message, $headers );
+				do_action(
+					'wp_mail_succeeded',
+					array(
+						'to'      => $data['sendTo'],
+						'subject' => $subject,
+						'message' => $message,
+						'headers' => $headers,
+					)
+				);
 				return $this->json_response( __( 'Test email sent successfully', 'trigger' ), null, 200 );
 			} else {
 				// translators: %s is the error message returned from the AWS SES API

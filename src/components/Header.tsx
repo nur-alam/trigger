@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { HomeIcon, SettingsIcon, LinkIcon, MailIcon } from "lucide-react";
 
 
 interface MenuItem {
@@ -7,13 +8,14 @@ interface MenuItem {
 	label: string;
 	path: string;
 	badge?: string;
+	icon?: React.ReactNode;
 }
 
 const menuItems: MenuItem[] = [
-	{ id: "dashboard", label: "Dashboard", path: "/dashboard" },
-	{ id: "email_logs", label: "Email Logs", path: "/email_logs" },
-	{ id: "connections", label: "Connections", path: "/connections" },
-	{ id: "settings", label: "Settings", path: "/settings" },
+	{ id: "dashboard", label: "Dashboard", path: "/dashboard", icon: <HomeIcon /> },
+	{ id: "email_logs", label: "Email Logs", path: "/email_logs", icon: <MailIcon /> },
+	{ id: "connections", label: "Connections", path: "/connections", icon: <LinkIcon /> },
+	{ id: "settings", label: "Settings", path: "/settings", icon: <SettingsIcon /> },
 	// { id: "general", label: "General", path: "/general" },
 	// { id: "add-connection", label: "Add Connection", path: "/add-connection", badge: "Coming Soon" },
 ];

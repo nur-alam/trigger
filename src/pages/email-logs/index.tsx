@@ -14,7 +14,7 @@ import { ConfirmationDialog } from '@/components/ui/confirmation-dialog'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DataTable } from '@/components/data-table'
-
+import { getProviderFullName } from '@/utils/utils'
 interface EmailLog {
 	id: number
 	mail_to: string
@@ -237,7 +237,8 @@ const EmailLogs = () => {
 			header: __('Status', 'trigger'),
 			cell: ({ row }) => {
 				const status = row.getValue('status') as string
-				return <Badge variant="outline" className={status === 'success' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'}>
+				return <Badge variant="outline"
+					className={`${status === 'success' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
 					{status === 'success' ? 'Successful' : 'Failed'}
 				</Badge>
 			},
@@ -245,6 +246,10 @@ const EmailLogs = () => {
 		{
 			accessorKey: 'provider',
 			header: __('Provider', 'trigger'),
+			cell: ({ row }) => {
+				const provider = row.getValue('provider') as string
+				return getProviderFullName(provider);
+			},
 		},
 		{
 			accessorKey: 'created_at',

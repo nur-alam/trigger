@@ -213,7 +213,7 @@ const GeneralSettings = () => {
 					</div>
 
 					{/* Delete Logs Section */}
-					<div className="space-y-4 pt-4 border-t">
+					{/* <div className="space-y-4 pt-4 border-t">
 						<div className="flex items-center space-x-2">
 							<h3 className="text-lg font-medium">{__('Delete Logs', 'trigger')}</h3>
 							<TooltipProvider>
@@ -261,7 +261,7 @@ const GeneralSettings = () => {
 						<p className="text-muted-foreground">
 							{__('Logs will be automatically deleted after the chosen duration.', 'trigger')}
 						</p>
-					</div>
+					</div> */}
 
 				</div>
 			</div>

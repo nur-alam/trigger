@@ -46,7 +46,9 @@ export function DataTableToolbar<TData>({
 				renderCustomContent()
 			) : (
 				<>
-					<div className="flex-1" />
+					<div className="flex-1">
+						<h3 className="text-lg font-medium">{__('Email Logs', 'trigger')}</h3>
+					</div>
 					<div className="flex items-center gap-4">
 						{selectedRows.length > 0 ? (
 							<div className="flex items-center gap-4">

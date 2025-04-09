@@ -143,26 +143,26 @@ class MainMenu {
 
 		// $submenus = $this->submenu_factory();
 
-		$email_logs_submenu = new EmailLogs();
-		add_submenu_page(
-			$this->slug(),
-			$email_logs_submenu->page_title(),
-			$email_logs_submenu->menu_title(),
-			$email_logs_submenu->capability(),
-			$email_logs_submenu->slug(),
-			array( $this, 'view' )
-		);
+		// $email_logs_submenu = new EmailLogs();
+		// add_submenu_page(
+		// $this->slug(),
+		// $email_logs_submenu->page_title(),
+		// $email_logs_submenu->menu_title(),
+		// $email_logs_submenu->capability(),
+		// $email_logs_submenu->slug(),
+		// array( $this, 'view' )
+		// );
 
-		// Register sub-menus.
-		$settings_submenu = new Settings();
-		add_submenu_page(
-			$this->slug(),
-			$settings_submenu->page_title(),
-			$settings_submenu->menu_title(),
-			$settings_submenu->capability(),
-			$settings_submenu->slug(),
-			array( $this, 'view' )
-		);
+		// // Register sub-menus.
+		// $settings_submenu = new Settings();
+		// add_submenu_page(
+		// $this->slug(),
+		// $settings_submenu->page_title(),
+		// $settings_submenu->menu_title(),
+		// $settings_submenu->capability(),
+		// $settings_submenu->slug(),
+		// array( $this, 'view' )
+		// );
 	}
 
 	/**

@@ -71,3 +71,12 @@
 }
 
 body {}
+
+.wp-person a:focus .gravatar,
+.wp-person a:focus,
+.wp-person a:focus .media-icon img,
+.wp-person a:focus .plugin-icon {
+	color: #043959 !important;
+	box-shadow: 0 0 0 0px #2271b1 !important;
+	outline: 0px solid transparent !important;
+}

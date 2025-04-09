@@ -339,7 +339,7 @@ const EmailLogs = () => {
 
 	return (
 		<div className="p-4 space-y-4">
-			<h2 className="text-2xl font-bold">{__('Email Logs', 'trigger')}</h2>
+			{/* <h2 className="text-2xl font-bold">{__('Email Logs', 'trigger')}</h2> */}
 
 			<DataTable<EmailLog>
 				columns={columns}

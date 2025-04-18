@@ -46,15 +46,6 @@ if ( ! class_exists( 'Trigger' ) ) {
 		public static $instance = null;
 
 		/**
-		 * Payment Gateway instance
-		 *
-		 * @since 1.0.0
-		 *
-		 * @var $instance
-		 */
-		private static $payment_gateway = null;
-
-		/**
 		 * Register hooks and load dependent files
 		 *
 		 * @since v1.0.0
@@ -74,7 +65,17 @@ if ( ! class_exists( 'Trigger' ) ) {
 			register_activation_hook( __FILE__, array( __CLASS__, 'register_activation' ) );
 			register_deactivation_hook( __FILE__, array( __CLASS__, 'register_deactivation' ) );
 			add_action( 'init', array( __CLASS__, 'load_textdomain' ) );
+			// new Init();
+			// Initialize plugin.
+			add_action( 'init', array( $this, 'init_plugin' ) );
+		}
 
+		/**
+		 * Initialize plugin after init hook
+		 *
+		 * @return void
+		 */
+		public function init_plugin() {
 			// Initialize plugin.
 			new Init();
 		}
@@ -87,20 +88,21 @@ if ( ! class_exists( 'Trigger' ) ) {
 		 * @return array  contains plugin meta data
 		 */
 		public static function plugin_data() {
-			if ( ! function_exists( 'get_plugin_data' ) ) {
-				require_once ABSPATH . 'wp-admin/includes/plugin.php';
+			if ( empty( self::$plugin_data ) ) {
+				if ( ! function_exists( 'get_plugin_data' ) ) {
+					require_once ABSPATH . 'wp-admin/includes/plugin.php';
+				}
+				self::$plugin_data                 = get_plugin_data( __FILE__, false, false );
+				self::$plugin_data['plugin_url']   = plugin_dir_url( __FILE__ );
+				self::$plugin_data['plugin_path']  = plugin_dir_path( __FILE__ );
+				self::$plugin_data['base_name']    = plugin_basename( __FILE__ );
+				self::$plugin_data['templates']    = trailingslashit( plugin_dir_path( __FILE__ ) . 'templates' );
+				self::$plugin_data['views']        = trailingslashit( plugin_dir_path( __FILE__ ) . 'views' );
+				self::$plugin_data['assets']       = trailingslashit( plugin_dir_url( __FILE__ ) . 'assets' );
+				self::$plugin_data['env']          = 'DEV';
+				self::$plugin_data['nonce_key']    = 'trigger_nonce';
+				self::$plugin_data['nonce_action'] = 'trigger';
 			}
-			self::$plugin_data                 = get_plugin_data( __FILE__ );
-			self::$plugin_data['plugin_url']   = plugin_dir_url( __FILE__ );
-			self::$plugin_data['plugin_path']  = plugin_dir_path( __FILE__ );
-			self::$plugin_data['base_name']    = plugin_basename( __FILE__ );
-			self::$plugin_data['templates']    = trailingslashit( plugin_dir_path( __FILE__ ) . 'templates' );
-			self::$plugin_data['views']        = trailingslashit( plugin_dir_path( __FILE__ ) . 'views' );
-			self::$plugin_data['assets']       = trailingslashit( plugin_dir_url( __FILE__ ) . 'assets' );
-			self::$plugin_data['base_name']    = plugin_basename( __FILE__ );
-			self::$plugin_data['env']          = 'DEV';
-			self::$plugin_data['nonce_key']    = 'trigger_nonce';
-			self::$plugin_data['nonce_action'] = 'trigger';
 			return self::$plugin_data;
 		}
 

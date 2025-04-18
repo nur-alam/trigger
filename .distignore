@@ -17,8 +17,9 @@ composer.lock
 node_modules
 package-lock.json
 package.json
+webpack.config.js
 webpack.mix.js
-src
+/src
 assets/src
 assets/dist/mix-manifest.json
 .travis.yml

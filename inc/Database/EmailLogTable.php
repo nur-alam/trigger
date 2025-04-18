@@ -73,7 +73,6 @@ class EmailLogTable extends DatabaseAbstract {
 			`attachments` TEXT,
 			`created_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 			`updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-			// -- INDEX idx_user_id (user_id)
 		) ENGINE = INNODB ";
 
 		return $schema;

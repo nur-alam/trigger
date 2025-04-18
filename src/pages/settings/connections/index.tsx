@@ -24,7 +24,7 @@ export interface ConnectionType {
 
 const EmptyState = ({ onAddConnection }: { onAddConnection: () => void }) => (
 	<div className="mx-auto max-w-md text-center">
-		<div className="flex justify-center mb-6">
+		<div className="flex justify-center mb-6 mt-10">
 			<svg width="200" height="100" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
 				{/* Background Shape */}
 				<path d="M50 150C50 80 120 30 200 30C280 30 350 80 350 150C350 220 280 270 200 270C120 270 50 220 50 150Z" fill="#F3F4F6" opacity="0.5" />

@@ -376,11 +376,11 @@ const EmailLogs = () => {
 							<div className="space-y-4">
 								<div className="flex items-center justify-between">
 									<div className="space-y-1">
-										<div className="flex items-center gap-2">
+										{/* <div className="flex items-center gap-2">
 											<span className="text-gray-500">{__('Sent by:', 'trigger')}</span>
 											<span>WordPress</span>
 											<span className="text-gray-400">&lt;&gt;</span>
-										</div>
+										</div> */}
 										<div className="flex items-center gap-2">
 											<span className="text-gray-500">{__('Sent to:', 'trigger')}</span>
 											<span>{viewEmail.mail_to}</span>
@@ -389,15 +389,15 @@ const EmailLogs = () => {
 											<span className="text-gray-500">{__('Subject:', 'trigger')}</span>
 											<span>{viewEmail.subject}</span>
 										</div>
-										<div className="flex items-center gap-2">
+										{/* <div className="flex items-center gap-2">
 											<span className="text-gray-500">{__('Retries:', 'trigger')}</span>
 											<span>0</span>
-										</div>
+										</div> */}
 									</div>
 
 									<div className="text-right space-y-2">
 										<div className="flex justify-end gap-2">
-											<Badge variant="outline">{__('Default', 'trigger')}</Badge>
+											{/* <Badge variant="outline">{__('Default', 'trigger')}</Badge> */}
 											<Badge variant="success">{__('Successful', 'trigger')}</Badge>
 										</div>
 										<div className="text-gray-500">

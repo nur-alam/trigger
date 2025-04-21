@@ -1,20 +1,17 @@
-import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
 import { HashRouter, Route, Routes } from 'react-router-dom';
-import Connections from './pages/settings/connections';
-import GeneralSettings from './pages/settings/general-settings';
-import AddConnection from './pages/settings/connections/add-connection';
-import Header from './components/Header';
-import TriggerDashboard from './pages/trigger';
+import Connections from '@/pages/settings/connections';
+import GeneralSettings from '@/pages/settings/general-settings';
+import AddConnection from '@/pages/settings/connections/add-connection';
+import Header from '@/components/Header';
+import TriggerDashboard from '@/pages/trigger';
 import EmailLogs from '@/pages/email-logs';
-import Settings from './pages/settings';
+import Settings from '@/pages/settings';
 import { Toaster } from 'react-hot-toast';
 const root = ReactDOM.createRoot(document.getElementById('trigger-root') as HTMLElement);
 
 root.render(
 	<HashRouter>
-		{/* <App /> */}
 		<Header />
 		<Routes>
 			<Route path="/" element={<TriggerDashboard />} />
@@ -54,6 +51,5 @@ root.render(
 				},
 			}}
 		/>
-
 	</HashRouter>
 );

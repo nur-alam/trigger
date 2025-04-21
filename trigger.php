@@ -5,7 +5,7 @@
  * Requires at least: 5.3
  * Requires PHP: 7.4
  * Plugin URI: https://trigger.com
- * Description: Trigger for Managing Products & License
+ * Description: Trigger for deliver your site email & manage email logs.
  * Author: nur
  * Author URI: https://nur.com
  * License: GPLv2 or later

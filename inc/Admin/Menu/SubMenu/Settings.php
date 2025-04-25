@@ -45,7 +45,7 @@ class Settings implements SubMenuInterface {
 	 * @return string
 	 */
 	public function page_view(): string {
-		return __( 'settings-view' );
+		return __( 'settings-view', 'trigger' );
 	}
 
 	/**

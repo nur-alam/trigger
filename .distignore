@@ -9,10 +9,13 @@
 .gitattributes
 .github
 .gitignore
+.babelrc
+.editorconfig
+.env.example
+.env
 \*.zip
 phpcs.xml
 readme.md
-composer.json
 composer.lock
 node_modules
 package-lock.json

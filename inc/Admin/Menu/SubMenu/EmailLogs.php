@@ -45,7 +45,7 @@ class EmailLogs implements SubMenuInterface {
 	 * @return string
 	 */
 	public function page_view(): string {
-		return __( 'email-logs-view' );
+		return __( 'email-logs-view', 'trigger' );
 	}
 
 	/**

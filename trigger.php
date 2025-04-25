@@ -8,9 +8,9 @@
  * Description: Trigger for deliver your site email & manage email logs.
  * Author: nur
  * Author URI: https://nur.com
- * License: GPLv2 or later
+ * License: GPLv3 or later
  * Text Domain: trigger
- * Domain Path: /assets/languages
+ * Domain Path: /languages
  *
  * @package trigger
  */

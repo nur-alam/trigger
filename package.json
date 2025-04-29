@@ -9,7 +9,7 @@
 		"watch": "concurrently \"npm run dev\" \"npm run mix\"",
 		"prod": "webpack --mode production",
 		"make-pot": "wp i18n make-pot --exclude='node_modules, vendor' . languages/trigger.pot",
-		"bundle": "wp dist-archive . ../trigger-$(grep 'Version:' trigger.php | awk '{print $3}').zip",
+		"bundle": "wp dist-archive . ../triggermail-$(grep 'Version:' trigger.php | awk '{print $3}').zip",
 		"build": "composer i --no-dev && npm run prod && npm run make-pot && npm run bundle"
 	},
 	"author": "nur",

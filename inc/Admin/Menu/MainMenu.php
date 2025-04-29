@@ -108,7 +108,9 @@ class MainMenu {
 	 * @return string
 	 */
 	public function icon_name(): string {
-		return '';
+		$icon_base64   = 'PHN2ZyB3aWR0aD0iMjY0IiBoZWlnaHQ9IjI3MiIgdmlld0JveD0iMCAwIDI2NCAyNzIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0yMCA1MUM2MCAzNiAxNDAgMTYgMjAwIDIxQzIxMCAyMSAyMTUgMzYgMjAwIDQxTDEzMCA1MUMxMjAgNTEgMTEwIDY2IDExMCA4MUw3MCAyMzFDNjUgMjUxIDkwIDI2MSAxMDAgMjQxTDE1MCAxMTFDMTU1IDEwMSAxNjAgOTEgMTcwIDkxTDIzMCA4MUMyNTAgNzYgMjUwIDUxIDIyMCA1MUMxNjAgNDYgOTAgNjYgNDAgODFMMjAgNTFaIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjQwIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+Cg==';
+		$icon_data_url = 'data:image/svg+xml;base64,' . $icon_base64;
+		return $icon_data_url;
 	}
 
 	/**

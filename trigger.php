@@ -1,13 +1,13 @@
 <?php
 /**
- * Plugin Name: Trigger
+ * Plugin Name: Trigger Mail
  * Version: 1.0.0
  * Requires at least: 5.3
  * Requires PHP: 7.4
- * Plugin URI: https://trigger.com
+ * Plugin URI: https://wptriggermail.com/
  * Description: Trigger for deliver your site email & manage email logs.
- * Author: nur
- * Author URI: https://nur.com
+ * Author: nurwp
+ * Author URI: https://wptriggermail.com/
  * License: GPLv3 or later
  * Text Domain: trigger
  * Domain Path: /languages
@@ -64,7 +64,6 @@ if ( ! class_exists( 'Trigger' ) ) {
 
 			register_activation_hook( __FILE__, array( __CLASS__, 'register_activation' ) );
 			register_deactivation_hook( __FILE__, array( __CLASS__, 'register_deactivation' ) );
-			add_action( 'init', array( __CLASS__, 'load_textdomain' ) );
 			// new Init();
 			// Initialize plugin.
 			add_action( 'init', array( $this, 'init_plugin' ) );
@@ -142,15 +141,6 @@ if ( ! class_exists( 'Trigger' ) ) {
 		 */
 		public static function register_deactivation() {
 			flush_rewrite_rules();
-		}
-
-		/**
-		 * Load plugin text domain
-		 *
-		 * @return void
-		 */
-		public static function load_textdomain() {
-			load_plugin_textdomain( 'trigger', false, dirname( plugin_basename( __FILE__ ) ) . '/assets/languages' );
 		}
 	}
 

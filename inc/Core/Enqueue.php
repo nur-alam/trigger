@@ -29,7 +29,7 @@ class Enqueue {
 	 */
 	public function __construct() {
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'load_admin_scripts' ) );
-		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'load_front_end_scripts' ) );
+		// add_action( 'wp_enqueue_scripts', array( __CLASS__, 'load_front_end_scripts' ) );
 	}
 
 	/**
@@ -46,7 +46,7 @@ class Enqueue {
 		$trigger_style_bundle = $plugin_data['plugin_url'] . 'assets/dist/css/style.min.css';
 		$trigger_admin_bundle = $plugin_data['plugin_url'] . 'assets/dist/js/backend-bundle.min.js';
 
-		if ( 'toplevel_page_trigger' !== $page || 'trigger_page_trigger-settings' !== $page ) {
+		if ( 'toplevel_page_trigger' === $page ) {
 			wp_enqueue_style(
 				'trigger-style',
 				$trigger_style_bundle,

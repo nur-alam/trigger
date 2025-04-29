@@ -7,14 +7,10 @@ declare module '*.jpeg';
 declare module '*.jpg';
 
 declare global {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const wp: any;
 	interface Window {
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		wp: any;
 		ajaxurl: string;
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		tinymce: any;
 		_triggerObject: {
 			user_id: Int;
 			site_url: string;

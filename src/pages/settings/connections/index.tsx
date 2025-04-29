@@ -68,14 +68,14 @@ const EmptyState = ({ onAddConnection }: { onAddConnection: () => void }) => (
 			</svg>
 		</div>
 		<h2 className="mb-4 text-2xl font-semibold tracking-tight">
-			{__('Create Your First Connection', 'trigger')}
+			{__('Create Your First Connection', 'triggermail')}
 		</h2>
 		<p className="mb-4 text-muted-foreground">
-			{__('It looks like you haven\'t set up a SMTP connection yet. Connect to a reliable SMTP provider to ensure your emails are delivered effectively and securely.', 'trigger')}
+			{__('It looks like you haven\'t set up a SMTP connection yet. Connect to a reliable SMTP provider to ensure your emails are delivered effectively and securely.', 'triggermail')}
 		</p>
 		<Button size="lg" className="gap-2" onClick={onAddConnection}>
 			<PlusIcon className="h-5 w-5" />
-			{__('Add Connection', 'trigger')}
+			{__('Add Connection', 'triggermail')}
 		</Button>
 	</div>
 );

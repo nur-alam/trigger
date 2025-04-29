@@ -54,7 +54,7 @@ class UtilityHelper {
 	 * @return string
 	 */
 	public static function sanitize_get_field( string $key, callable $callback = null ) {
-		$data = $_GET;
+		$data = $_GET; //phpcs:ignore
 		if ( is_null( $callback ) ) {
 			$callback = 'sanitize_text_field';
 		}

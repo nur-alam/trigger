@@ -49,21 +49,21 @@ const ConnectionList = ({ initialConnections, setInitialConnections }: { initial
 	return (
 		<div className="rounded-md border mt-10 p-4">
 			<div className="flex justify-between py-3 mb-3" >
-				<h3 className="text-lg font-medium">{__('Connection List', 'trigger')}</h3>
+				<h3 className="text-lg font-medium">{__('Connection List', 'triggermail')}</h3>
 				<Button size="sm" className="gap-2" onClick={() => navigate('/add-connection')}>
 					<PlusIcon className="h-5 w-5" />
-					{__('Add Connection', 'trigger')}
+					{__('Add Connection', 'triggermail')}
 				</Button>
 			</div >
 			<Table className="border-solid border border-rounded-md border-gray-200">
 				<TableHeader className="bg-gray-100">
 					<TableRow>
-						<TableHead>{__('Connection', 'trigger')}</TableHead>
-						<TableHead>{__('Provider', 'trigger')}</TableHead>
-						<TableHead>{__('Email', 'trigger')}</TableHead>
-						<TableHead className="cursor-pointer">{__('Created On ↓', 'trigger')}</TableHead>
-						<TableHead>{__('Test Email', 'trigger')}</TableHead>
-						<TableHead>{__('Actions', 'trigger')}</TableHead>
+						<TableHead>{__('Connection', 'triggermail')}</TableHead>
+						<TableHead>{__('Provider', 'triggermail')}</TableHead>
+						<TableHead>{__('Email', 'triggermail')}</TableHead>
+						<TableHead className="cursor-pointer">{__('Created On ↓', 'triggermail')}</TableHead>
+						<TableHead>{__('Test Email', 'triggermail')}</TableHead>
+						<TableHead>{__('Actions', 'triggermail')}</TableHead>
 					</TableRow>
 				</TableHeader>
 				<TableBody>
@@ -105,7 +105,7 @@ const ConnectionList = ({ initialConnections, setInitialConnections }: { initial
 										className=" text-blue-600 hover:bg-blue-500 hover:text-white"
 										onClick={() => handleTestEmail(connection)}
 									>
-										{__('Send Test Email', 'trigger')}
+										{__('Send Test Email', 'triggermail')}
 									</Button>
 									{connection.provider === 'ses' && (
 										<>
@@ -115,7 +115,7 @@ const ConnectionList = ({ initialConnections, setInitialConnections }: { initial
 												// className=" text-blue-600 hover:bg-blue-500 hover:text-white"
 												onClick={() => setIsVerifyEmailOpen(true)}
 											>
-												{__("Verify Email", "trigger")}
+												{__("Verify Email", "triggermail")}
 											</Button>
 											<VerifySesEmailSheet
 												open={isVerifyEmailOpen}

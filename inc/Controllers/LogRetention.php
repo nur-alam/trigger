@@ -39,7 +39,7 @@ class LogRetention {
 			$log_retention = TRIGGER_LOG_RETENTION_DEFAULT;
 		}
 
-		return $this->json_response( __( 'Log retention fetched successfully', 'trigger' ), $log_retention, 200 );
+		return $this->json_response( __( 'Log retention fetched successfully', 'triggermail' ), $log_retention, 200 );
 	}
 
 	/**
@@ -59,9 +59,9 @@ class LogRetention {
 		$updated = update_option( TRIGGER_LOG_RETENTION, $data['days'] );
 
 		if ( ! $updated ) {
-			return $this->json_response( __( 'Failed to update log retention', 'trigger' ), null, 400 );
+			return $this->json_response( __( 'Failed to update log retention', 'triggermail' ), null, 400 );
 		}
 
-		return $this->json_response( __( 'Log retention updated successfully', 'trigger' ), $data['days'], 200 );
+		return $this->json_response( __( 'Log retention updated successfully', 'triggermail' ), $data['days'], 200 );
 	}
 }

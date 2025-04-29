@@ -179,14 +179,14 @@
 
 // 			if (responseData?.status_code === 200) {
 // 				setData(data.filter(email => email.id !== id))
-// 				toast.success(responseData?.message || __('Email log deleted successfully', 'trigger'))
+// 				toast.success(responseData?.message || __('Email log deleted successfully', 'triggermail'))
 // 				console.log('delete response', responseData)
 // 			} else {
-// 				toast.error(responseData?.message || __('Failed to delete email log', 'trigger'))
+// 				toast.error(responseData?.message || __('Failed to delete email log', 'triggermail'))
 // 			}
 // 		} catch (error) {
 // 			console.error('Error deleting email log:', error)
-// 			toast.error(__('Failed to delete email log', 'trigger'))
+// 			toast.error(__('Failed to delete email log', 'triggermail'))
 // 		} finally {
 // 			setIsDeleting(false)
 // 			setDeleteEmail(null)
@@ -214,12 +214,12 @@
 // 			if (responseData?.status_code === 200) {
 // 				setData(data.filter(email => !selectedIds.includes(email.id)))
 // 				setRowSelection({})
-// 				toast.success(__('Selected email logs deleted successfully', 'trigger'))
+// 				toast.success(__('Selected email logs deleted successfully', 'triggermail'))
 // 			} else {
-// 				toast.error(responseData?.message || __('Failed to delete email logs', 'trigger'))
+// 				toast.error(responseData?.message || __('Failed to delete email logs', 'triggermail'))
 // 			}
 // 		} catch (error) {
-// 			toast.error(__('Failed to delete email logs', 'trigger'))
+// 			toast.error(__('Failed to delete email logs', 'triggermail'))
 // 		} finally {
 // 			setIsBulkDeleting(false)
 // 		}
@@ -235,7 +235,7 @@
 // 						(table.getIsSomePageRowsSelected() && 'indeterminate')
 // 					}
 // 					onCheckedChange={(value: boolean | 'indeterminate') => table.toggleAllPageRowsSelected(!!value)}
-// 					aria-label={__('Select all', 'trigger')}
+// 					aria-label={__('Select all', 'triggermail')}
 // 				/>
 // 			),
 // 			cell: ({ row }) => {
@@ -266,7 +266,7 @@
 // 						checked={row.getIsSelected()}
 // 						onClick={handleCheckboxClick}
 // 						onCheckedChange={(value: boolean) => row.toggleSelected(!!value)}
-// 						aria-label={__('Select row', 'trigger')}
+// 						aria-label={__('Select row', 'triggermail')}
 // 					/>
 // 				)
 // 			},
@@ -275,23 +275,23 @@
 // 		},
 // 		{
 // 			accessorKey: 'id',
-// 			header: __('ID', 'trigger'),
+// 			header: __('ID', 'triggermail'),
 // 		},
 // 		{
 // 			accessorKey: 'mail_to',
-// 			header: __('To', 'trigger'),
+// 			header: __('To', 'triggermail'),
 // 		},
 // 		// {
 // 		// 	accessorKey: 'mail_from',
-// 		// 	header: __('From', 'trigger'),
+// 		// 	header: __('From', 'triggermail'),
 // 		// },
 // 		{
 // 			accessorKey: 'subject',
-// 			header: __('Subject', 'trigger'),
+// 			header: __('Subject', 'triggermail'),
 // 		},
 // 		{
 // 			accessorKey: 'provider',
-// 			header: __('Provider', 'trigger'),
+// 			header: __('Provider', 'triggermail'),
 // 			cell: ({ row }) => {
 // 				const provider = row.getValue('provider') as string
 // 				return getProviderFullName(provider);
@@ -299,7 +299,7 @@
 // 		},
 // 		// {
 // 		// 	accessorKey: 'message',
-// 		// 	header: __('Message', 'trigger'),
+// 		// 	header: __('Message', 'triggermail'),
 // 		// 	cell: ({ row }) => {
 // 		// 		const message = row.getValue('message') as string
 // 		// 		return <div className="max-w-[500px] truncate">{message}</div>
@@ -307,7 +307,7 @@
 // 		// },
 // 		{
 // 			accessorKey: 'created_at',
-// 			header: __('Date', 'trigger'),
+// 			header: __('Date', 'triggermail'),
 // 			cell: ({ row }) => {
 // 				const date = new Date(row.getValue('created_at'))
 // 				return format(date, 'PPpp')
@@ -315,7 +315,7 @@
 // 		},
 // 		{
 // 			id: 'actions',
-// 			header: __('Actions', 'trigger'),
+// 			header: __('Actions', 'triggermail'),
 // 			cell: ({ row }) => {
 // 				const email = row.original
 // 				return (
@@ -364,10 +364,10 @@
 // 				setData(responseData.data.email_logs)
 // 				setPageCount(responseData.data.meta.total_pages)
 // 			} else {
-// 				toast.error(responseData?.message || __('Failed to fetch email logs', 'trigger'))
+// 				toast.error(responseData?.message || __('Failed to fetch email logs', 'triggermail'))
 // 			}
 // 		} catch (error) {
-// 			toast.error(__('Failed to fetch email logs', 'trigger'))
+// 			toast.error(__('Failed to fetch email logs', 'triggermail'))
 // 		} finally {
 // 			setLoading(false)
 // 		}
@@ -407,12 +407,12 @@
 // 			<div className="p-4 space-y-4">
 
 // 				<div className="flex items-center justify-between h-12">
-// 					<h2 className="text-2xl font-bold">{__('Email Logs', 'trigger')}</h2>
+// 					<h2 className="text-2xl font-bold">{__('Email Logs', 'triggermail')}</h2>
 // 					<div className="flex items-center gap-4">
 // 						{Object.keys(rowSelection).length > 0 ? (
 // 							<div className="flex items-center gap-4">
 // 								<span className="text-sm text-muted-foreground">
-// 									{table.getFilteredSelectedRowModel().rows.length} {__('selected', 'trigger')}
+// 									{table.getFilteredSelectedRowModel().rows.length} {__('selected', 'triggermail')}
 // 								</span>
 // 								<Button
 // 									variant="destructive"
@@ -424,12 +424,12 @@
 // 									className="flex items-center gap-2"
 // 								>
 // 									<Trash2 className="h-4 w-4" />
-// 									{__('Delete Selected', 'trigger')}
+// 									{__('Delete Selected', 'triggermail')}
 // 								</Button>
 // 							</div>
 // 						) : (
 // 							<Input
-// 								placeholder={__('Search by subject or email...', 'trigger')}
+// 								placeholder={__('Search by subject or email...', 'triggermail')}
 // 								value={searchQuery}
 // 								onChange={(event) => {
 // 									setSearchQuery(event.target.value);
@@ -478,12 +478,12 @@
 // 	return (
 // 		<div className="p-4 space-y-4">
 // 			<div className="flex items-center justify-between h-12">
-// 				<h2 className="text-2xl font-bold">{__('Email Logs', 'trigger')}</h2>
+// 				<h2 className="text-2xl font-bold">{__('Email Logs', 'triggermail')}</h2>
 // 				<div className="flex items-center gap-4">
 // 					{Object.keys(rowSelection).length > 0 ? (
 // 						<div className="flex items-center gap-4">
 // 							<span className="text-sm text-muted-foreground">
-// 								{table.getFilteredSelectedRowModel().rows.length} {__('selected', 'trigger')}
+// 								{table.getFilteredSelectedRowModel().rows.length} {__('selected', 'triggermail')}
 // 							</span>
 // 							<Button
 // 								variant="destructive"
@@ -493,12 +493,12 @@
 // 								className="flex items-center gap-2"
 // 							>
 // 								<Trash2 className="h-4 w-4" />
-// 								{__('Delete Selected', 'trigger')}
+// 								{__('Delete Selected', 'triggermail')}
 // 							</Button>
 // 						</div>
 // 					) : (
 // 						<Input
-// 							placeholder={__('Search by subject or email...', 'trigger')}
+// 							placeholder={__('Search by subject or email...', 'triggermail')}
 // 							value={searchQuery}
 // 							onChange={(event) => {
 // 								const value = event.target.value;
@@ -556,7 +556,7 @@
 // 									colSpan={columns.length}
 // 									className="h-24 text-center"
 // 								>
-// 									{__('No email logs found.', 'trigger')}
+// 									{__('No email logs found.', 'triggermail')}
 // 								</TableCell>
 // 							</TableRow>
 // 						</TableBody>
@@ -571,7 +571,7 @@
 // 				</div>
 // 				<div className="flex-1 flex space-x-2 items-center justify-center">
 // 					<p className="text-sm font-medium">
-// 						{__('Rows per page', 'trigger')}
+// 						{__('Rows per page', 'triggermail')}
 // 					</p>
 // 					<select
 // 						value={table.getState().pagination.pageSize}
@@ -647,7 +647,7 @@
 // 			<Dialog open={!!viewEmail} onOpenChange={() => setViewEmail(null)}>
 // 				<DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
 // 					<div className="flex items-start justify-between mb-6">
-// 						<h2 className="text-xl font-semibold">{__('Email Log', 'trigger')}</h2>
+// 						<h2 className="text-xl font-semibold">{__('Email Log', 'triggermail')}</h2>
 // 						{/* <button
 // 							onClick={() => setViewEmail(null)}
 // 							className="text-gray-500 hover:text-gray-700"
@@ -662,28 +662,28 @@
 // 								<div className="flex items-center justify-between">
 // 									<div className="space-y-1">
 // 										<div className="flex items-center gap-2">
-// 											<span className="text-gray-500">{__('Sent by:', 'trigger')}</span>
+// 											<span className="text-gray-500">{__('Sent by:', 'triggermail')}</span>
 // 											<span>WordPress</span>
 // 											<span className="text-gray-400">&lt;&gt;</span>
 // 										</div>
 // 										<div className="flex items-center gap-2">
-// 											<span className="text-gray-500">{__('Sent to:', 'trigger')}</span>
+// 											<span className="text-gray-500">{__('Sent to:', 'triggermail')}</span>
 // 											<span>{viewEmail.mail_to}</span>
 // 										</div>
 // 										<div className="flex items-center gap-2">
-// 											<span className="text-gray-500">{__('Subject:', 'trigger')}</span>
+// 											<span className="text-gray-500">{__('Subject:', 'triggermail')}</span>
 // 											<span>{viewEmail.subject}</span>
 // 										</div>
 // 										<div className="flex items-center gap-2">
-// 											<span className="text-gray-500">{__('Retries:', 'trigger')}</span>
+// 											<span className="text-gray-500">{__('Retries:', 'triggermail')}</span>
 // 											<span>0</span>
 // 										</div>
 // 									</div>
 
 // 									<div className="text-right space-y-2">
 // 										<div className="flex justify-end gap-2">
-// 											<Badge variant="outline">{__('Default', 'trigger')}</Badge>
-// 											<Badge variant="success">{__('Successful', 'trigger')}</Badge>
+// 											<Badge variant="outline">{__('Default', 'triggermail')}</Badge>
+// 											<Badge variant="success">{__('Successful', 'triggermail')}</Badge>
 // 										</div>
 // 										<div className="text-gray-500">
 // 											{format(new Date(viewEmail.created_at), 'MMM dd, yyyy, hh:mm a')}
@@ -731,7 +731,7 @@
 
 // 								<CollapsibleSection title="Attachments (0)">
 // 									<div className="text-gray-500 italic">
-// 										{__('No attachments found.', 'trigger')}
+// 										{__('No attachments found.', 'triggermail')}
 // 									</div>
 // 								</CollapsibleSection>
 
@@ -751,15 +751,15 @@
 // 			<ConfirmationDialog
 // 				open={!!deleteEmail}
 // 				onOpenChange={(open) => !open && setDeleteEmail(null)}
-// 				title={deleteEmail?.id === -1 ? __('Delete Selected Email Logs', 'trigger') : __('Delete Email Log', 'trigger')}
+// 				title={deleteEmail?.id === -1 ? __('Delete Selected Email Logs', 'triggermail') : __('Delete Email Log', 'triggermail')}
 // 				description={deleteEmail?.id === -1
-// 					? __('Are you sure you want to delete all selected email logs? This action cannot be undone.', 'trigger')
-// 					: __('Are you sure you want to delete this email log? This action cannot be undone.', 'trigger')
+// 					? __('Are you sure you want to delete all selected email logs? This action cannot be undone.', 'triggermail')
+// 					: __('Are you sure you want to delete this email log? This action cannot be undone.', 'triggermail')
 // 				}
 // 				icon={<AlertTriangle className="h-5 w-5 text-destructive" />}
 // 				variant="danger"
-// 				confirmText={__('Delete', 'trigger')}
-// 				cancelText={__('Cancel', 'trigger')}
+// 				confirmText={__('Delete', 'triggermail')}
+// 				cancelText={__('Cancel', 'triggermail')}
 // 				onConfirm={async () => {
 // 					if (deleteEmail) {
 // 						if (deleteEmail.id === -1) {
@@ -770,22 +770,22 @@
 // 					}
 // 				}}
 // 				loading={isDeleting || isBulkDeleting}
-// 				loadingText={__('Deleting...', 'trigger')}
+// 				loadingText={__('Deleting...', 'triggermail')}
 // 			>
 // 				{deleteEmail && deleteEmail.id !== -1 && (
 // 					<div className="space-y-2 mt-4">
 // 						<div className="grid grid-cols-2 gap-2">
 // 							<div>
-// 								<span className="font-medium">{__('From:', 'trigger')}</span>
+// 								<span className="font-medium">{__('From:', 'triggermail')}</span>
 // 								<p className="text-sm text-muted-foreground">{deleteEmail.mail_from}</p>
 // 							</div>
 // 							<div>
-// 								<span className="font-medium">{__('To:', 'trigger')}</span>
+// 								<span className="font-medium">{__('To:', 'triggermail')}</span>
 // 								<p className="text-sm text-muted-foreground">{deleteEmail.mail_to}</p>
 // 							</div>
 // 						</div>
 // 						<div>
-// 							<span className="font-medium">{__('Subject:', 'trigger')}</span>
+// 							<span className="font-medium">{__('Subject:', 'triggermail')}</span>
 // 							<p className="text-sm text-muted-foreground">{deleteEmail.subject}</p>
 // 						</div>
 // 					</div>
@@ -793,7 +793,7 @@
 // 				{deleteEmail?.id === -1 && (
 // 					<div className="mt-4">
 // 						<p className="text-sm text-muted-foreground">
-// 							{table.getSelectedRowModel().rows.length} {__('email logs will be deleted.', 'trigger')}
+// 							{table.getSelectedRowModel().rows.length} {__('email logs will be deleted.', 'triggermail')}
 // 						</p>
 // 					</div>
 // 				)}

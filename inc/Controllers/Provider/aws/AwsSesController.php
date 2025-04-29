@@ -60,11 +60,11 @@ class AwsSesController {
 		$provider     = $data['provider'];
 
 		if ( empty( $email_config ) || ! isset( $email_config[ $provider ] ) ) {
-			return $this->json_response( __( 'Email configuration not found', 'trigger' ), null, 404 );
+			return $this->json_response( __( 'Email configuration not found', 'triggermail' ), null, 404 );
 		}
 
 		if ( 'ses' !== $provider ) {
-			return $this->json_response( __( 'This feature is only available for AWS SES providers', 'trigger' ), null, 400 );
+			return $this->json_response( __( 'This feature is only available for AWS SES providers', 'triggermail' ), null, 400 );
 		}
 
 		$config = $email_config[ $provider ];
@@ -109,11 +109,11 @@ class AwsSesController {
 		$provider     = $data['provider'];
 
 		if ( empty( $email_config ) || ! isset( $email_config[ $provider ] ) ) {
-			return $this->json_response( __( 'Email configuration not found', 'trigger' ), null, 404 );
+			return $this->json_response( __( 'Email configuration not found', 'triggermail' ), null, 404 );
 		}
 
 		if ( 'ses' !== $provider ) {
-			return $this->json_response( __( 'This feature is only available for AWS SES providers', 'trigger' ), null, 400 );
+			return $this->json_response( __( 'This feature is only available for AWS SES providers', 'triggermail' ), null, 400 );
 		}
 
 		$config = $email_config[ $provider ];

@@ -34,7 +34,7 @@ class MainMenu {
 	 *
 	 * @var string $slug
 	 */
-	private $slug = 'trigger';
+	private $slug = 'triggermail';
 
 	/**
 	 * Hold plugin meta data
@@ -63,7 +63,7 @@ class MainMenu {
 	 * @return string
 	 */
 	public function page_title(): string {
-		return __( 'Trigger', 'trigger' );
+		return __( 'Triggermail', 'triggermail' );
 	}
 
 	/**
@@ -72,7 +72,7 @@ class MainMenu {
 	 * @return string
 	 */
 	public function menu_title(): string {
-		return __( 'Trigger', 'trigger' );
+		return __( 'Triggermail', 'triggermail' );
 	}
 
 	/**
@@ -134,14 +134,14 @@ class MainMenu {
 		);
 
 		// Register main menu.
-		add_submenu_page(
-			$this->slug(),
-			'Dashboard',
-			'Dashboard',
-			$this->capability(),
-			$this->slug(),
-			array( $this, 'view' )
-		);
+		// add_submenu_page(
+		// $this->slug(),
+		// 'Dashboard',
+		// 'Dashboard',
+		// $this->capability(),
+		// $this->slug(),
+		// array( $this, 'view' )
+		// );
 
 		// $submenus = $this->submenu_factory();
 
@@ -189,15 +189,7 @@ class MainMenu {
 	 * @return void
 	 */
 	public function view() {
+		$dpage = trailingslashit( $this->plugin_data['views'] . 'pages' ) . 'trigger-view.php';
 		include trailingslashit( $this->plugin_data['views'] . 'pages' ) . 'trigger-view.php';
-	}
-
-	/**
-	 * Page view
-	 *
-	 * @return void
-	 */
-	public function word_view() {
-		include trailingslashit( $this->plugin_data['views'] . 'pages' ) . 'settings-view.php';
 	}
 }

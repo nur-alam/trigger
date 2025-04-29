@@ -1,7 +1,7 @@
-import Trigger from '@pages/trigger';
+import Trigger from '@/pages/triggermail';
 import Settings from '@pages/settings';
 import EmailLogs from '@pages/email-logs';
-const SLUG = 'trigger';
+const SLUG = 'triggermail';
 
 export const pageUrls = {
 	TRIGGER: SLUG,

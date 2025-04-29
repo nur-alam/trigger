@@ -1,6 +1,6 @@
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@components/ui/table'
-import { users } from '@pages/trigger/data'
+import { users } from '@/pages/triggermail/data'
 
 const DataTable = () => {
 	return (

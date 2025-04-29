@@ -76,7 +76,7 @@ const AddConnection = () => {
 									<rect width="20" height="16" x="2" y="4" rx="2" />
 									<path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
 								</svg>
-								{__('SMTP', 'trigger')}
+								{__('SMTP', 'triggermail')}
 							</TabsTrigger>
 							<TabsTrigger value="ses" className="w-full justify-start gap-2 p-2.5">
 								<svg width="25" height="25" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -94,7 +94,7 @@ const AddConnection = () => {
 										</clipPath>
 									</defs>
 								</svg>
-								{__('Amazon SES', 'trigger')}
+								{__('Amazon SES', 'triggermail')}
 							</TabsTrigger>
 						</TabsList>
 

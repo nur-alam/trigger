@@ -59,10 +59,10 @@ const TriggerDashboard = () => {
 	return (
 		<div className="p-4 space-y-6">
 			<div className="flex justify-between items-center">
-				<h2 className="text-2xl font-bold">{__('Trigger Dashboard', 'trigger')}</h2>
+				<h2 className="text-2xl font-bold">{__('Trigger Dashboard', 'triggermail')}</h2>
 				<Button size="sm" className="gap-2" onClick={() => navigate('/add-connection')}>
 					<PlusIcon className="h-5 w-5" />
-					{__('Add Connection', 'trigger')}
+					{__('Add Connection', 'triggermail')}
 				</Button>
 			</div>
 
@@ -71,7 +71,7 @@ const TriggerDashboard = () => {
 				<Card>
 					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 						<CardTitle className="text-sm font-medium">
-							{__('Total Emails', 'trigger')}
+							{__('Total Emails', 'triggermail')}
 						</CardTitle>
 						<Mail className="h-4 w-4 text-muted-foreground" />
 					</CardHeader>
@@ -82,7 +82,7 @@ const TriggerDashboard = () => {
 				<Card>
 					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 						<CardTitle className="text-sm font-medium">
-							{__('Successful', 'trigger')}
+							{__('Successful', 'triggermail')}
 						</CardTitle>
 						<CheckCircle className="h-4 w-4 text-green-600" />
 					</CardHeader>
@@ -93,7 +93,7 @@ const TriggerDashboard = () => {
 				<Card>
 					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 						<CardTitle className="text-sm font-medium">
-							{__('Failed', 'trigger')}
+							{__('Failed', 'triggermail')}
 						</CardTitle>
 						<XCircle className="h-4 w-4 text-red-600" />
 					</CardHeader>
@@ -106,7 +106,7 @@ const TriggerDashboard = () => {
 			{/* Email Sending Rate Chart */}
 			<Card>
 				<CardHeader>
-					<CardTitle>{__('Email Sending Rate', 'trigger')}</CardTitle>
+					<CardTitle>{__('Email Sending Rate', 'triggermail')}</CardTitle>
 				</CardHeader>
 				<CardContent>
 					<div className="h-[300px]">
@@ -125,13 +125,13 @@ const TriggerDashboard = () => {
 									type="monotone"
 									dataKey="success"
 									stroke="#16a34a"
-									name={__('Successful', 'trigger')}
+									name={__('Successful', 'triggermail')}
 								/>
 								<Line
 									type="monotone"
 									dataKey="failed"
 									stroke="#dc2626"
-									name={__('Failed', 'trigger')}
+									name={__('Failed', 'triggermail')}
 								/>
 							</LineChart>
 						</ResponsiveContainer>

@@ -4,7 +4,7 @@ import Connections from '@/pages/settings/connections';
 import GeneralSettings from '@/pages/settings/general-settings';
 import AddConnection from '@/pages/settings/connections/add-connection';
 import Header from '@/components/Header';
-import TriggerDashboard from '@/pages/trigger';
+import TriggerDashboard from '@/pages/triggermail';
 import EmailLogs from '@/pages/email-logs';
 import Settings from '@/pages/settings';
 import { Toaster } from 'react-hot-toast';

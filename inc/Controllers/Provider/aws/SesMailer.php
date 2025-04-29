@@ -41,7 +41,7 @@ class SesMailer {
 			}
 
 			if ( empty( $config ) || ! isset( $config['accessKeyId'] ) || ! isset( $config['secretAccessKey'] ) ) {
-				return $this->json_response( __( 'AWS SES configuration is missing', 'trigger' ), null, 400 );
+				return $this->json_response( __( 'AWS SES configuration is missing', 'triggermail' ), null, 400 );
 			}
 
 			// Create SES client
@@ -105,11 +105,11 @@ class SesMailer {
 
 			return false;
 		} catch ( AwsException $e ) {
-			error_log( 'AWS SES Error: ' . $e->getMessage() );
+			// error_log( 'AWS SES Error: ' . $e->getMessage() );
 			// Check if this is an email verification error
 			// if ( strpos( $e->getMessage(), 'Email address is not verified' ) !== false ) {
-			// return throw new Exception(__('Email address is not verified. Please verify your email address before sending emails.', 'trigger'), 400);
-			// return $this->json_response( __( 'Email address is not verified. Please verify your email address before sending emails.', 'trigger' ), null, 400 );
+			// return throw new Exception(__('Email address is not verified. Please verify your email address before sending emails.', 'triggermail'), 400);
+			// return $this->json_response( __( 'Email address is not verified. Please verify your email address before sending emails.', 'triggermail' ), null, 400 );
 			return false;
 		}
 	}
@@ -124,7 +124,7 @@ class SesMailer {
 	 */
 	public function verify_email_address( $email_address, $config = array() ) {
 		if ( empty( $email_address ) || ! is_email( $email_address ) ) {
-			return $this->json_response( __( 'Invalid email address', 'trigger' ), null, 400 );
+			return $this->json_response( __( 'Invalid email address', 'triggermail' ), null, 400 );
 		}
 
 		// If no config is provided, get from options
@@ -133,7 +133,7 @@ class SesMailer {
 		}
 
 		if ( empty( $config ) || ! isset( $config['accessKeyId'] ) || ! isset( $config['secretAccessKey'] ) ) {
-			return $this->json_response( __( 'AWS SES configuration is missing', 'trigger' ), null, 400 );
+			return $this->json_response( __( 'AWS SES configuration is missing', 'triggermail' ), null, 400 );
 		}
 
 		try {
@@ -162,7 +162,7 @@ class SesMailer {
 				return $this->json_response(
 					sprintf(
 					/* translators: %s: Email address that was verified */
-						__( 'Verification email sent to %s. Please check your inbox and follow the instructions to verify your email address.', 'trigger' ),
+						__( 'Verification email sent to %s. Please check your inbox and follow the instructions to verify your email address.', 'triggermail' ),
 						$email_address
 					),
 					null,
@@ -170,9 +170,9 @@ class SesMailer {
 				);
 			}
 
-			return $this->json_response( __( 'Failed to verify email address', 'trigger' ), null, 400 );
+			return $this->json_response( __( 'Failed to verify email address', 'triggermail' ), null, 400 );
 		} catch ( AwsException $e ) {
-			return $this->json_response( __( 'Failed to verify email address, please provide valid email address', 'trigger' ), null, 400 );
+			return $this->json_response( __( 'Failed to verify email address, please provide valid email address', 'triggermail' ), null, 400 );
 		}
 	}
 
@@ -192,7 +192,7 @@ class SesMailer {
 		if ( empty( $config ) || ! isset( $config['accessKeyId'] ) || ! isset( $config['secretAccessKey'] ) ) {
 			return array(
 				'success' => false,
-				'message' => __( 'AWS SES configuration is missing', 'trigger' ),
+				'message' => __( 'AWS SES configuration is missing', 'triggermail' ),
 			);
 		}
 
@@ -238,13 +238,13 @@ class SesMailer {
 
 			return array(
 				'success' => true,
-				'message' => __( 'Verified email addresses retrieved successfully', 'trigger' ),
+				'message' => __( 'Verified email addresses retrieved successfully', 'triggermail' ),
 				'data'    => $verified_emails,
 			);
 		} catch ( AwsException $e ) {
 			return array(
 				'success' => false,
-				'message' => __( 'Failed to retrieve verified email addresses', 'trigger' ),
+				'message' => __( 'Failed to retrieve verified email addresses', 'triggermail' ),
 			);
 		}
 	}
@@ -258,7 +258,7 @@ class SesMailer {
 	 */
 	public function verify_ses_config( $config ) {
 		if ( empty( $config ) || ! isset( $config['accessKeyId'] ) || ! isset( $config['secretAccessKey'] ) ) {
-			return $this->json_response( __( 'AWS SES configuration is missing', 'trigger' ), null, 400 );
+			return $this->json_response( __( 'AWS SES configuration is missing', 'triggermail' ), null, 400 );
 		}
 
 		try {

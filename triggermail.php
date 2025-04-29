@@ -7,9 +7,8 @@
  * Plugin URI: https://wptriggermail.com/
  * Description: Trigger for deliver your site email & manage email logs.
  * Author: nurwp
- * Author URI: https://wptriggermail.com/
  * License: GPLv3 or later
- * Text Domain: trigger
+ * Text Domain: triggermail
  * Domain Path: /languages
  *
  * @package trigger

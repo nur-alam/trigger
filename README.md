@@ -9,6 +9,8 @@ Trigger
 -   Requires WordPress: 6.0
 -   Tested up to: 6.4
 -   Requires PHP: 7.4
+## Source Code link
+Source code link : https://github.com/nur-alam/trigger
 
 ## Installation
 

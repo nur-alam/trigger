@@ -34,7 +34,7 @@ class MainMenu {
 	 *
 	 * @var string $slug
 	 */
-	private $slug = 'triggermail';
+	private $slug = 'trigger';
 
 	/**
 	 * Hold plugin meta data
@@ -63,7 +63,7 @@ class MainMenu {
 	 * @return string
 	 */
 	public function page_title(): string {
-		return __( 'Triggermail', 'triggermail' );
+		return __( 'Trigger', 'trigger' );
 	}
 
 	/**
@@ -72,7 +72,7 @@ class MainMenu {
 	 * @return string
 	 */
 	public function menu_title(): string {
-		return __( 'Triggermail', 'triggermail' );
+		return __( 'Trigger', 'trigger' );
 	}
 
 	/**

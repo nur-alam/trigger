@@ -1,6 +1,6 @@
-=== Trigger Mail ===
+=== Trigger ===
 Contributors: nurwp
-Tags: SMTP, email delivery, email logs, email tracking, WordPress email, mail delivery, email notifications, email management, SMTP server, email configuration
+Tags: SMTP configuration, Email delivery, Email logs, Email tracking, WordPress email
 Requires at least: 5.3
 Tested up to: 6.8
 Requires PHP: 7.4
@@ -8,12 +8,9 @@ Stable tag: 1.0.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Trigger Mail is a powerful WordPress email management plugin that simplifies your site's email delivery system. With advanced SMTP integration, detailed email logging, and comprehensive tracking features, ensure your important emails reach their destination reliably.
+Trigger is a powerful WordPress SMTP configuration plugin that simplifies your site's email delivery system with detailed email logging.
 
 == Description ==
-
-Take control of your WordPress site's email system with Trigger Mail. This robust plugin offers everything you need to manage, monitor, and optimize your email communications.
-
 Key Features:
 
 * Easy SMTP Configuration: Set up your preferred SMTP provider in minutes
@@ -24,15 +21,4 @@ Key Features:
 * Debug Mode: Troubleshoot email delivery issues effectively
 * Responsive Support: Get help when you need it
 
-Perfect for:
-* Website owners who need reliable email delivery
-* Developers managing multiple WordPress sites
-* E-commerce stores sending transaction emails
-* Newsletter publishers requiring delivery tracking
-* Anyone wanting better email management
-
-== Installation ==
-
-1. Upload the plugin files to `/wp-content/plugins/trigger`
-2. Activate the plugin through the 'Plugins' menu in WordPress
-3. Configure your SMTP settings in the Trigger dashboard
+Source code link : https://github.com/nur-alam/trigger

@@ -74,18 +74,18 @@ const DefaultSmtp = ({ selectedProvider }: { selectedProvider: EmailProviderOpti
 
 			// Check for proper JSON response with status code
 			if (responseData.status_code === 200) {
-				toast.success(responseData?.message || __('Email configuration saved successfully!', 'triggermail'));
+				toast.success(responseData?.message || __('Email configuration saved successfully!', 'trigger'));
 				navigate('/connections');
 			} else {
 				if (responseData?.errors) {
 					const errors = responseData.errors;
 					toast((t) => <ErrorToast errors={errors} />, {});
 				} else {
-					toast.error(responseData?.message || __('Failed to save email configuration', 'triggermail'));
+					toast.error(responseData?.message || __('Failed to save email configuration', 'trigger'));
 				}
 			}
 		} catch (error) {
-			toast.error(__('Failed to save email configuration', 'triggermail'));
+			toast.error(__('Failed to save email configuration', 'trigger'));
 		} finally {
 			setIsSubmitting(false);
 		}

@@ -40,7 +40,7 @@ class EmailConfiguration {
 	 * @return void
 	 */
 	public function configure_email( PHPMailer $phpmailer ) {
-		$default_provider = get_default_provider();
+		$default_provider = trigger_get_default_provider();
 		if ( 'smtp' === $default_provider['provider'] ) {
 			if ( empty( $this->config ) ) {
 				return;
@@ -103,8 +103,7 @@ class EmailConfiguration {
 		if ( empty( $provider ) ) {
 			return;
 		}
-		$host = 'email-smtp.' . $provider['region'] ?? 'us-east-1.amazonaws.com';
-		// $host = 'email-smtp.us-east-1.amazonaws.com';
+		$host = 'email-smtp.' . $provider['region'] ?? '';
 		try {
 			// Get credentials to use in PHPMailer
 			// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase

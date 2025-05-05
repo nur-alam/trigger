@@ -74,13 +74,13 @@ const GeneralSettings = () => {
 			const responseData = await response.json() as ResponseType;
 
 			if (responseData.status_code === 200) {
-				toast.success(__('Default connection updated successfully', 'triggermail'));
+				toast.success(__('Default connection updated successfully', 'trigger'));
 			} else {
-				toast.error(responseData.message || __('Failed to update default connection', 'triggermail'));
+				toast.error(responseData.message || __('Failed to update default connection', 'trigger'));
 			}
 		} catch (error) {
 			console.error('Error updating default connection:', error);
-			toast.error(__('Failed to update default connection', 'triggermail'));
+			toast.error(__('Failed to update default connection', 'trigger'));
 		} finally {
 			setIsSaving(false);
 			setConnectionIsLoading(false);
@@ -129,12 +129,12 @@ const GeneralSettings = () => {
 
 			if (responseData.status_code === 200) {
 				setLogRetention(responseData.data);
-				toast.success(__('Log retention updated', 'triggermail'));
+				toast.success(__('Log retention updated', 'trigger'));
 			} else {
-				toast.error(responseData.message || __('Failed to update log retention', 'triggermail'));
+				toast.error(responseData.message || __('Failed to update log retention', 'trigger'));
 			}
 		} catch (error) {
-			toast.error(__('Failed to update log retention', 'triggermail'));
+			toast.error(__('Failed to update log retention', 'trigger'));
 		} finally {
 			setIsSaving(false);
 			setLogRetentionIsLoading(false);
@@ -163,11 +163,11 @@ const GeneralSettings = () => {
 	return (
 		<div className="space-y-8 p-6">
 			<div className="flex items-center justify-between">
-				<h3 className="text-lg font-medium">{__('General Settings', 'triggermail')}</h3>
+				<h3 className="text-lg font-medium">{__('General Settings', 'trigger')}</h3>
 				{isSaving && (
 					<div className="flex items-center text-sm text-muted-foreground">
 						<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-						{__('Saving changes...', 'triggermail')}
+						{__('Saving changes...', 'trigger')}
 					</div>
 				)}
 			</div>
@@ -177,11 +177,11 @@ const GeneralSettings = () => {
 
 					{/* Default Connection Section */}
 					<div className="space-y-4 pt-4 border-t first:border-t-0 first:pt-0">
-						<h3 className="text-lg font-medium">{__('Default Connection', 'triggermail')}</h3>
+						<h3 className="text-lg font-medium">{__('Default Connection', 'trigger')}</h3>
 						{connectionIsLoading ? (
 							<div className="flex items-center space-x-2 h-[40px]">
 								<Loader2 className="h-4 w-4 animate-spin" />
-								<span>{__('Loading connections...', 'triggermail')}</span>
+								<span>{__('Loading connections...', 'trigger')}</span>
 							</div>
 						) : (
 							<Select
@@ -190,11 +190,11 @@ const GeneralSettings = () => {
 								disabled={connectionIsLoading || isSaving}
 							>
 								<SelectTrigger className="max-w-fit">
-									<SelectValue placeholder={__('Select connection', 'triggermail')} />
+									<SelectValue placeholder={__('Select connection', 'trigger')} />
 								</SelectTrigger>
 								<SelectContent>
 									<SelectItem value="none">
-										{__('None', 'triggermail')}
+										{__('None', 'trigger')}
 									</SelectItem>
 									{connections.map((connection: ConnectionType) => (
 										<SelectItem
@@ -208,21 +208,21 @@ const GeneralSettings = () => {
 							</Select>
 						)}
 						<p className="text-muted-foreground">
-							{__('This connection will be used by default unless a specific "from email" address is provided in the email headers.', 'triggermail')}
+							{__('This connection will be used by default unless a specific "from email" address is provided in the email headers.', 'trigger')}
 						</p>
 					</div>
 
 					{/* Delete Logs Section */}
 					{/* <div className="space-y-4 pt-4 border-t">
 						<div className="flex items-center space-x-2">
-							<h3 className="text-lg font-medium">{__('Delete Logs', 'triggermail')}</h3>
+							<h3 className="text-lg font-medium">{__('Delete Logs', 'trigger')}</h3>
 							<TooltipProvider>
 								<Tooltip>
 									<TooltipTrigger>
 										<HelpCircle className="h-4 w-4 text-muted-foreground" />
 									</TooltipTrigger>
 									<TooltipContent>
-										<p>{__('Choose when to automatically delete email logs', 'triggermail')}</p>
+										<p>{__('Choose when to automatically delete email logs', 'trigger')}</p>
 									</TooltipContent>
 								</Tooltip>
 							</TooltipProvider>
@@ -230,7 +230,7 @@ const GeneralSettings = () => {
 						{logRetentionIsLoading ? (
 							<div className="flex items-center space-x-2 h-[40px]">
 								<Loader2 className="h-4 w-4 animate-spin" />
-								<span>{__('Loading log retention...', 'triggermail')}</span>
+								<span>{__('Loading log retention...', 'trigger')}</span>
 							</div>
 						) : (
 							<>
@@ -245,21 +245,21 @@ const GeneralSettings = () => {
 									defaultValue={logRetention}
 								>
 									<SelectTrigger className="max-w-fit">
-										<SelectValue placeholder={__('Select duration', 'triggermail')} />
+										<SelectValue placeholder={__('Select duration', 'trigger')} />
 									</SelectTrigger>
 									<SelectContent>
-										<SelectItem value="7">{__('Delete after 7 days', 'triggermail')}</SelectItem>
-										<SelectItem value="14">{__('Delete after 14 days', 'triggermail')}</SelectItem>
-										<SelectItem value="30">{__('Delete after 30 days', 'triggermail')}</SelectItem>
-										<SelectItem value="60">{__('Delete after 60 days', 'triggermail')}</SelectItem>
-										<SelectItem value="90">{__('Delete after 90 days', 'triggermail')}</SelectItem>
-										<SelectItem value="never">{__('Never delete', 'triggermail')}</SelectItem>
+										<SelectItem value="7">{__('Delete after 7 days', 'trigger')}</SelectItem>
+										<SelectItem value="14">{__('Delete after 14 days', 'trigger')}</SelectItem>
+										<SelectItem value="30">{__('Delete after 30 days', 'trigger')}</SelectItem>
+										<SelectItem value="60">{__('Delete after 60 days', 'trigger')}</SelectItem>
+										<SelectItem value="90">{__('Delete after 90 days', 'trigger')}</SelectItem>
+										<SelectItem value="never">{__('Never delete', 'trigger')}</SelectItem>
 									</SelectContent>
 								</Select>
 							</>
 						)}
 						<p className="text-muted-foreground">
-							{__('Logs will be automatically deleted after the chosen duration.', 'triggermail')}
+							{__('Logs will be automatically deleted after the chosen duration.', 'trigger')}
 						</p>
 					</div> */}
 

@@ -46,7 +46,7 @@ class Enqueue {
 		$trigger_style_bundle = $plugin_data['plugin_url'] . 'assets/dist/css/style.min.css';
 		$trigger_admin_bundle = $plugin_data['plugin_url'] . 'assets/dist/js/backend-bundle.min.js';
 
-		if ( 'toplevel_page_triggermail' === $page ) {
+		if ( 'toplevel_page_trigger' === $page ) {
 			wp_enqueue_style(
 				'trigger-style',
 				$trigger_style_bundle,

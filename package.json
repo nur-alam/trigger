@@ -1,18 +1,18 @@
 {
-	"name": "triggermail",
+	"name": "trigger",
 	"version": "1.0.0",
-	"description": "learning app",
+	"description": "Email logging app",
 	"main": "index.js",
 	"scripts": {
 		"dev": "webpack --mode development --watch",
 		"mix": "npx mix watch",
 		"watch": "concurrently \"npm run dev\" \"npm run mix\"",
 		"prod": "webpack --mode production",
-		"make-pot": "wp i18n make-pot --exclude='node_modules, vendor' . languages/triggermail.pot",
-		"bundle": "wp dist-archive . ../triggermail-$(grep 'Version:' triggermail.php | awk '{print $3}').zip",
+		"make-pot": "wp i18n make-pot --exclude='node_modules, vendor' . languages/trigger.pot",
+		"bundle": "wp dist-archive . ../trigger.zip",
 		"build": "composer i --no-dev && npm run prod && npm run make-pot && npm run bundle"
 	},
-	"author": "nur",
+	"author": "nurwp",
 	"license": "ISC",
 	"dependencies": {
 		"@hookform/resolvers": "^3.10.0",

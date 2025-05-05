@@ -29,7 +29,7 @@ export function DataTablePagination<TData>({
 			</div>
 			<div className="flex-1 flex space-x-2 items-center justify-center">
 				<p className="text-sm font-medium">
-					{__('Rows per page', 'triggermail')}
+					{__('Rows per page', 'trigger')}
 				</p>
 				<select
 					value={table.getState().pagination.pageSize}

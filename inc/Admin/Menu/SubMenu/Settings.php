@@ -23,7 +23,7 @@ class Settings implements SubMenuInterface {
 	 * @return string  page title
 	 */
 	public function page_title(): string {
-		return __( 'Settings', 'triggermail' );
+		return __( 'Settings', 'trigger' );
 	}
 
 	/**
@@ -34,7 +34,7 @@ class Settings implements SubMenuInterface {
 	 * @return string  menu title
 	 */
 	public function menu_title(): string {
-		return __( 'Settings', 'triggermail' );
+		return __( 'Settings', 'trigger' );
 	}
 
 	/**
@@ -45,7 +45,7 @@ class Settings implements SubMenuInterface {
 	 * @return string
 	 */
 	public function page_view(): string {
-		return __( 'settings-view', 'triggermail' );
+		return __( 'settings-view', 'trigger' );
 	}
 
 	/**

@@ -14,14 +14,14 @@
 	},
 	"authors": [
 		{
-			"name": "Trigger",
-			"email": "info@trigger.com"
+			"name": "nurwp",
+			"email": "nur@wptriggermail.com"
 		}
 	],
 	"minimum-stability": "stable",
 	"require": {
 		"php": ">=7.4",
-		"aws/aws-sdk-php": "^3.342",
+		"aws/aws-sdk-php": "^3.343",
 		"ralouphie/getallheaders": "^3.0"
 	}
 }

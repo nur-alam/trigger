@@ -259,15 +259,15 @@ class EmailLogController {
 			return $this->json_response( $validation_response->message, null, 400 );
 		}
 
-		$subject = __( 'AWS SES Test Email from Trigger', 'triggermail' );
-		$message = __( 'This is a test email sent from Trigger plugin.', 'triggermail' );
+		$subject = __( 'AWS SES Test Email from Trigger', 'trigger' );
+		$message = __( 'This is a test email sent from Trigger plugin.', 'trigger' );
 		$headers = array( 'Content-Type: text/html; charset=UTF-8' );
 
 		// Get email configuration
 		$email_config = get_option( TRIGGER_EMAIL_CONFIG, array() );
 		$provider     = $data['provider'];
 		if ( empty( $email_config ) || ! isset( $email_config[ $provider ] ) ) {
-			return $this->json_response( __( 'Email configuration not found', 'triggermail' ), null, 404 );
+			return $this->json_response( __( 'Email configuration not found', 'trigger' ), null, 404 );
 		}
 
 		$config = $email_config[ $provider ];
@@ -292,26 +292,26 @@ class EmailLogController {
 						'headers' => $headers,
 					)
 				);
-				return $this->json_response( __( 'Test email sent successfully', 'triggermail' ), null, 200 );
+				return $this->json_response( __( 'Test email sent successfully', 'trigger' ), null, 200 );
 			} else {
 				// translators: %s is the error message returned from the AWS SES API
-				return $this->json_response( __( 'Failed to send test email', 'triggermail' ), null, 400 );
+				return $this->json_response( __( 'Failed to send test email', 'trigger' ), null, 400 );
 			}
 		} else {
 			// For all other providers, use wp_mail
 			$sent = wp_mail( $data['sendTo'], $subject, $message, $headers );
 
 			if ( $sent ) {
-				return $this->json_response( __( 'Test email sent successfully', 'triggermail' ), null, 200 );
+				return $this->json_response( __( 'Test email sent successfully', 'trigger' ), null, 200 );
 			} else {
-				return $this->json_response( __( 'Failed to send test email', 'triggermail' ), null, 400 );
+				return $this->json_response( __( 'Failed to send test email', 'trigger' ), null, 400 );
 			}
 		}
 		// try {
 		// } catch ( Exception $e ) {
 		// $message = $e->getMessage();
 		// return throw new Exception($e->getMessage());
-		// return $this->json_response( __( 'Failed to send test email, please check your email credentials', 'triggermail' ), null, 400 );
+		// return $this->json_response( __( 'Failed to send test email, please check your email credentials', 'trigger' ), null, 400 );
 		// }
 	}
 }

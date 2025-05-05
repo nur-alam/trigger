@@ -49,21 +49,21 @@ const ConnectionList = ({ initialConnections, setInitialConnections }: { initial
 	return (
 		<div className="rounded-md border mt-10 p-4">
 			<div className="flex justify-between py-3 mb-3" >
-				<h3 className="text-lg font-medium">{__('Connection List', 'triggermail')}</h3>
+				<h3 className="text-lg font-medium">{__('Connection List', 'trigger')}</h3>
 				<Button size="sm" className="gap-2" onClick={() => navigate('/add-connection')}>
 					<PlusIcon className="h-5 w-5" />
-					{__('Add Connection', 'triggermail')}
+					{__('Add Connection', 'trigger')}
 				</Button>
 			</div >
 			<Table className="border-solid border border-rounded-md border-gray-200">
 				<TableHeader className="bg-gray-100">
 					<TableRow>
-						<TableHead>{__('Connection', 'triggermail')}</TableHead>
-						<TableHead>{__('Provider', 'triggermail')}</TableHead>
-						<TableHead>{__('Email', 'triggermail')}</TableHead>
-						<TableHead className="cursor-pointer">{__('Created On ↓', 'triggermail')}</TableHead>
-						<TableHead>{__('Test Email', 'triggermail')}</TableHead>
-						<TableHead>{__('Actions', 'triggermail')}</TableHead>
+						<TableHead>{__('Connection', 'trigger')}</TableHead>
+						<TableHead>{__('Provider', 'trigger')}</TableHead>
+						<TableHead>{__('Email', 'trigger')}</TableHead>
+						<TableHead className="cursor-pointer">{__('Created On ↓', 'trigger')}</TableHead>
+						<TableHead>{__('Test Email', 'trigger')}</TableHead>
+						<TableHead>{__('Actions', 'trigger')}</TableHead>
 					</TableRow>
 				</TableHeader>
 				<TableBody>
@@ -89,8 +89,8 @@ const ConnectionList = ({ initialConnections, setInitialConnections }: { initial
 								) : (
 									<svg width="25" height="25" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
 										<rect width="20" height="20" rx="2" fill="#5278FF" />
-										<path d="M15.0714 4H4.78571C4.07563 4 3.5 4.67157 3.5 5.5V14.5C3.5 15.3284 4.07563 16 4.78571 16H15.0714C15.7815 16 16.3571 15.3284 16.3571 14.5V5.5C16.3571 4.67157 15.7815 4 15.0714 4Z" stroke="white" stroke-width="0.833333" />
-										<path d="M16 8L10.618 11.8025C10.4328 11.9316 10.2186 12 10 12C9.78141 12 9.56724 11.9316 9.382 11.8025L4 8" stroke="white" stroke-width="0.833333" />
+										<path d="M15.0714 4H4.78571C4.07563 4 3.5 4.67157 3.5 5.5V14.5C3.5 15.3284 4.07563 16 4.78571 16H15.0714C15.7815 16 16.3571 15.3284 16.3571 14.5V5.5C16.3571 4.67157 15.7815 4 15.0714 4Z" stroke="white" strokeWidth="0.833333" />
+										<path d="M16 8L10.618 11.8025C10.4328 11.9316 10.2186 12 10 12C9.78141 12 9.56724 11.9316 9.382 11.8025L4 8" stroke="white" strokeWidth="0.833333" />
 									</svg>
 								)}
 							</TableCell>
@@ -105,7 +105,7 @@ const ConnectionList = ({ initialConnections, setInitialConnections }: { initial
 										className=" text-blue-600 hover:bg-blue-500 hover:text-white"
 										onClick={() => handleTestEmail(connection)}
 									>
-										{__('Send Test Email', 'triggermail')}
+										{__('Send Test Email', 'trigger')}
 									</Button>
 									{connection.provider === 'ses' && (
 										<>
@@ -115,7 +115,7 @@ const ConnectionList = ({ initialConnections, setInitialConnections }: { initial
 												// className=" text-blue-600 hover:bg-blue-500 hover:text-white"
 												onClick={() => setIsVerifyEmailOpen(true)}
 											>
-												{__("Verify Email", "triggermail")}
+												{__("Verify Email", "trigger")}
 											</Button>
 											<VerifySesEmailSheet
 												open={isVerifyEmailOpen}

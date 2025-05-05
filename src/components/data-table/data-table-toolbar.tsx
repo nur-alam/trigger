@@ -47,13 +47,13 @@ export function DataTableToolbar<TData>({
 			) : (
 				<>
 					<div className="flex-1">
-						<h3 className="text-lg font-medium">{__('Email Logs', 'triggermail')}</h3>
+						<h3 className="text-lg font-medium">{__('Email Logs', 'trigger')}</h3>
 					</div>
 					<div className="flex items-center gap-4">
 						{selectedRows.length > 0 ? (
 							<div className="flex items-center gap-4">
 								<span className="text-sm text-muted-foreground">
-									{selectedRows.length} {__('selected', 'triggermail')}
+									{selectedRows.length} {__('selected', 'trigger')}
 								</span>
 								{onDeleteSelected && (
 									<Button
@@ -63,7 +63,7 @@ export function DataTableToolbar<TData>({
 										className="flex items-center gap-2"
 									>
 										<Trash2 className="h-4 w-4" />
-										{__('Delete Selected', 'triggermail')}
+										{__('Delete Selected', 'trigger')}
 									</Button>
 								)}
 							</div>

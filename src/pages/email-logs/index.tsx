@@ -113,17 +113,17 @@ const EmailLogs = () => {
 			const responseData = await response.json() as EmailLogsResponse;
 
 			if (responseData?.status_code === 200) {
-				toast.success(responseData?.message || __('Email log deleted successfully', 'triggermail'))
+				toast.success(responseData?.message || __('Email log deleted successfully', 'trigger'))
 				await fetchEmailLogs({
 					page: pageIndex + 1,
 					per_page: pageSize,
 					search: searchQuery,
 				});
 			} else {
-				toast.error(responseData?.message || __('Failed to delete email log', 'triggermail'))
+				toast.error(responseData?.message || __('Failed to delete email log', 'trigger'))
 			}
 		} catch (error) {
-			toast.error(__('Failed to delete email log', 'triggermail'))
+			toast.error(__('Failed to delete email log', 'trigger'))
 		} finally {
 			setIsDeleting(false)
 			setDeleteEmail(null)
@@ -153,17 +153,17 @@ const EmailLogs = () => {
 
 			if (responseData?.status_code === 200) {
 				setRowSelection({})
-				toast.success(__('Selected email logs deleted successfully', 'triggermail'))
+				toast.success(__('Selected email logs deleted successfully', 'trigger'))
 				await fetchEmailLogs({
 					page: pageIndex + 1,
 					per_page: pageSize,
 					search: searchQuery,
 				});
 			} else {
-				toast.error(responseData?.message || __('Failed to delete email logs', 'triggermail'))
+				toast.error(responseData?.message || __('Failed to delete email logs', 'trigger'))
 			}
 		} catch (error) {
-			toast.error(__('Failed to delete email logs', 'triggermail'))
+			toast.error(__('Failed to delete email logs', 'trigger'))
 		} finally {
 			setIsBulkDeleting(false)
 			setDeleteEmail(null)
@@ -205,7 +205,7 @@ const EmailLogs = () => {
 						(table.getIsSomePageRowsSelected() && 'indeterminate')
 					}
 					onCheckedChange={(value: boolean | 'indeterminate') => table.toggleAllPageRowsSelected(!!value)}
-					aria-label={__('Select all', 'triggermail')}
+					aria-label={__('Select all', 'trigger')}
 				/>
 			),
 			cell: ({ row, table }) => {
@@ -217,7 +217,7 @@ const EmailLogs = () => {
 							const event = window.event as MouseEvent | undefined;
 							handleRowSelection(rowIndex, checked, event?.shiftKey ?? false);
 						}}
-						aria-label={__('Select row', 'triggermail')}
+						aria-label={__('Select row', 'trigger')}
 					/>
 				);
 			},
@@ -226,15 +226,15 @@ const EmailLogs = () => {
 		},
 		{
 			accessorKey: 'mail_to',
-			header: __('To', 'triggermail'),
+			header: __('To', 'trigger'),
 		},
 		{
 			accessorKey: 'subject',
-			header: __('Subject', 'triggermail'),
+			header: __('Subject', 'trigger'),
 		},
 		{
 			accessorKey: 'status',
-			header: __('Status', 'triggermail'),
+			header: __('Status', 'trigger'),
 			cell: ({ row }) => {
 				const status = row.getValue('status') as string
 				return <Badge variant="outline"
@@ -245,7 +245,7 @@ const EmailLogs = () => {
 		},
 		{
 			accessorKey: 'provider',
-			header: __('Provider', 'triggermail'),
+			header: __('Provider', 'trigger'),
 			cell: ({ row }) => {
 				const provider = row.getValue('provider') as string
 				return getProviderFullName(provider);
@@ -253,7 +253,7 @@ const EmailLogs = () => {
 		},
 		{
 			accessorKey: 'created_at',
-			header: __('Date', 'triggermail'),
+			header: __('Date', 'trigger'),
 			cell: ({ row }) => {
 				const date = new Date(row.getValue('created_at'))
 				return format(date, 'PPpp')
@@ -261,7 +261,7 @@ const EmailLogs = () => {
 		},
 		{
 			id: 'actions',
-			header: __('Actions', 'triggermail'),
+			header: __('Actions', 'trigger'),
 			cell: ({ row }) => {
 				const email = row.original
 				return (
@@ -310,10 +310,10 @@ const EmailLogs = () => {
 				setData(responseData.data.email_logs)
 				setPageCount(responseData.data.meta.total_pages)
 			} else {
-				toast.error(responseData?.message || __('Failed to fetch email logs', 'triggermail'))
+				toast.error(responseData?.message || __('Failed to fetch email logs', 'trigger'))
 			}
 		} catch (error) {
-			toast.error(__('Failed to fetch email logs', 'triggermail'))
+			toast.error(__('Failed to fetch email logs', 'trigger'))
 		} finally {
 			setLoading(false)
 		}
@@ -339,7 +339,7 @@ const EmailLogs = () => {
 
 	return (
 		<div className="p-4 space-y-4">
-			{/* <h2 className="text-2xl font-bold">{__('Email Logs', 'triggermail')}</h2> */}
+			{/* <h2 className="text-2xl font-bold">{__('Email Logs', 'trigger')}</h2> */}
 
 			<DataTable<EmailLog>
 				columns={columns}
@@ -351,7 +351,7 @@ const EmailLogs = () => {
 				columnFilters={columnFilters}
 				rowSelection={rowSelection}
 				searchKey="subject"
-				searchPlaceholder={__('Search by subject or email...', 'triggermail')}
+				searchPlaceholder={__('Search by subject or email...', 'trigger')}
 				onSearch={handleSearch}
 				onPaginationChange={setPagination}
 				onSortingChange={setSorting}
@@ -368,7 +368,7 @@ const EmailLogs = () => {
 			<Dialog open={!!viewEmail} onOpenChange={() => setViewEmail(null)}>
 				<DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
 					<div className="flex items-start justify-between mb-6">
-						<h2 className="text-xl font-semibold">{__('Email Log', 'triggermail')}</h2>
+						<h2 className="text-xl font-semibold">{__('Email Log', 'trigger')}</h2>
 					</div>
 
 					{viewEmail && (
@@ -377,28 +377,28 @@ const EmailLogs = () => {
 								<div className="flex items-center justify-between">
 									<div className="space-y-1">
 										{/* <div className="flex items-center gap-2">
-											<span className="text-gray-500">{__('Sent by:', 'triggermail')}</span>
+											<span className="text-gray-500">{__('Sent by:', 'trigger')}</span>
 											<span>WordPress</span>
 											<span className="text-gray-400">&lt;&gt;</span>
 										</div> */}
 										<div className="flex items-center gap-2">
-											<span className="text-gray-500">{__('Sent to:', 'triggermail')}</span>
+											<span className="text-gray-500">{__('Sent to:', 'trigger')}</span>
 											<span>{viewEmail.mail_to}</span>
 										</div>
 										<div className="flex items-center gap-2">
-											<span className="text-gray-500">{__('Subject:', 'triggermail')}</span>
+											<span className="text-gray-500">{__('Subject:', 'trigger')}</span>
 											<span>{viewEmail.subject}</span>
 										</div>
 										{/* <div className="flex items-center gap-2">
-											<span className="text-gray-500">{__('Retries:', 'triggermail')}</span>
+											<span className="text-gray-500">{__('Retries:', 'trigger')}</span>
 											<span>0</span>
 										</div> */}
 									</div>
 
 									<div className="text-right space-y-2">
 										<div className="flex justify-end gap-2">
-											{/* <Badge variant="outline">{__('Default', 'triggermail')}</Badge> */}
-											<Badge variant="success">{__('Successful', 'triggermail')}</Badge>
+											{/* <Badge variant="outline">{__('Default', 'trigger')}</Badge> */}
+											<Badge variant="success">{__('Successful', 'trigger')}</Badge>
 										</div>
 										<div className="text-gray-500">
 											{format(new Date(viewEmail.created_at), 'MMM dd, yyyy, hh:mm a')}
@@ -446,7 +446,7 @@ const EmailLogs = () => {
 
 								<CollapsibleSection title="Attachments (0)">
 									<div className="text-gray-500 italic">
-										{__('No attachments found.', 'triggermail')}
+										{__('No attachments found.', 'trigger')}
 									</div>
 								</CollapsibleSection>
 
@@ -465,15 +465,15 @@ const EmailLogs = () => {
 			<ConfirmationDialog
 				open={!!deleteEmail}
 				onOpenChange={(open) => !open && setDeleteEmail(null)}
-				title={deleteEmail?.id === -1 ? __('Delete Selected Email Logs', 'triggermail') : __('Delete Email Log', 'triggermail')}
+				title={deleteEmail?.id === -1 ? __('Delete Selected Email Logs', 'trigger') : __('Delete Email Log', 'trigger')}
 				description={deleteEmail?.id === -1
-					? __('Are you sure you want to delete all selected email logs? This action cannot be undone.', 'triggermail')
-					: __('Are you sure you want to delete this email log? This action cannot be undone.', 'triggermail')
+					? __('Are you sure you want to delete all selected email logs? This action cannot be undone.', 'trigger')
+					: __('Are you sure you want to delete this email log? This action cannot be undone.', 'trigger')
 				}
 				icon={<AlertTriangle className="h-5 w-5 text-destructive" />}
 				variant="danger"
-				confirmText={__('Delete', 'triggermail')}
-				cancelText={__('Cancel', 'triggermail')}
+				confirmText={__('Delete', 'trigger')}
+				cancelText={__('Cancel', 'trigger')}
 				onConfirm={async () => {
 					if (deleteEmail) {
 						if (deleteEmail.id === -1) {
@@ -484,22 +484,22 @@ const EmailLogs = () => {
 					}
 				}}
 				loading={isDeleting || isBulkDeleting}
-				loadingText={__('Deleting...', 'triggermail')}
+				loadingText={__('Deleting...', 'trigger')}
 			>
 				{deleteEmail && deleteEmail.id !== -1 && (
 					<div className="space-y-2 mt-4">
 						<div className="grid grid-cols-2 gap-2">
 							<div>
-								<span className="font-medium">{__('From:', 'triggermail')}</span>
+								<span className="font-medium">{__('From:', 'trigger')}</span>
 								<p className="text-sm text-muted-foreground">{deleteEmail.mail_from}</p>
 							</div>
 							<div>
-								<span className="font-medium">{__('To:', 'triggermail')}</span>
+								<span className="font-medium">{__('To:', 'trigger')}</span>
 								<p className="text-sm text-muted-foreground">{deleteEmail.mail_to}</p>
 							</div>
 						</div>
 						<div>
-							<span className="font-medium">{__('Subject:', 'triggermail')}</span>
+							<span className="font-medium">{__('Subject:', 'trigger')}</span>
 							<p className="text-sm text-muted-foreground">{deleteEmail.subject}</p>
 						</div>
 					</div>
@@ -507,7 +507,7 @@ const EmailLogs = () => {
 				{deleteEmail?.id === -1 && (
 					<div className="mt-4">
 						<p className="text-sm text-muted-foreground">
-							{Object.keys(rowSelection).length} {__('email logs will be deleted.', 'triggermail')}
+							{Object.keys(rowSelection).length} {__('email logs will be deleted.', 'trigger')}
 						</p>
 					</div>
 				)}

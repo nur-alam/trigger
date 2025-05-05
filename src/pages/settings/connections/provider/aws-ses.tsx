@@ -59,13 +59,13 @@ const AwsSesForm = ({ selectedProvider }: { selectedProvider: EmailProviderOptio
 			const data = await response.json();
 
 			if (data.status_code === 200) {
-				toast.success(__('Email configuration saved successfully!', 'triggermail'));
+				toast.success(__('Email configuration saved successfully!', 'trigger'));
 				navigate('/connections');
 			} else {
-				toast.error(data.message || __('Failed to save email configuration', 'triggermail'));
+				toast.error(data.message || __('Failed to save email configuration', 'trigger'));
 			}
 		} catch (error) {
-			toast.error(__('Failed to save email configuration', 'triggermail'));
+			toast.error(__('Failed to save email configuration', 'trigger'));
 		} finally {
 			setIsSubmitting(false);
 		}

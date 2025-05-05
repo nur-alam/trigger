@@ -23,7 +23,7 @@ class EmailLogs implements SubMenuInterface {
 	 * @return string  page title
 	 */
 	public function page_title(): string {
-		return __( 'Email Logs', 'triggermail' );
+		return __( 'Email Logs', 'trigger' );
 	}
 
 	/**
@@ -34,7 +34,7 @@ class EmailLogs implements SubMenuInterface {
 	 * @return string  menu title
 	 */
 	public function menu_title(): string {
-		return __( 'Email Logs', 'triggermail' );
+		return __( 'Email Logs', 'trigger' );
 	}
 
 	/**
@@ -45,7 +45,7 @@ class EmailLogs implements SubMenuInterface {
 	 * @return string
 	 */
 	public function page_view(): string {
-		return __( 'email-logs-view', 'triggermail' );
+		return __( 'email-logs-view', 'trigger' );
 	}
 
 	/**

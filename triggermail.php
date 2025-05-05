@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Trigger Mail
+ * Plugin Name: Trigger SMTP, Mail Logs, Deliver Mail
  * Version: 1.0.0
  * Requires at least: 5.3
  * Requires PHP: 7.4
@@ -8,7 +8,7 @@
  * Description: Trigger for deliver your site email & manage email logs.
  * Author: nurwp
  * License: GPLv3 or later
- * Text Domain: triggermail
+ * Text Domain: trigger
  * Domain Path: /languages
  *
  * @package trigger
@@ -16,8 +16,6 @@
 
 use Trigger\Init;
 use Trigger\Database\Migration;
-use Trigger\Frontend\Pages\PageManager;
-
 
 if ( ! class_exists( 'Trigger' ) ) {
 

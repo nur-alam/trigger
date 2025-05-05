@@ -60,25 +60,25 @@ export function DeleteConnectionSheet({
 		<ConfirmationDialog
 			open={open}
 			onOpenChange={onOpenChange}
-			title={__('Delete Connection', 'triggermail')}
-			description={__('Are you sure you want to delete this connection? This action cannot be undone.', 'triggermail')}
+			title={__('Delete Connection', 'trigger')}
+			description={__('Are you sure you want to delete this connection? This action cannot be undone.', 'trigger')}
 			icon={<AlertTriangle className="h-5 w-5 text-destructive" />}
 			variant="danger"
-			confirmText={__('Delete', 'triggermail')}
-			cancelText={__('Cancel', 'triggermail')}
+			confirmText={__('Delete', 'trigger')}
+			cancelText={__('Cancel', 'trigger')}
 			onConfirm={handleDelete}
 			loading={isDeleting}
-			loadingText={__('Deleting...', 'triggermail')}
+			loadingText={__('Deleting...', 'trigger')}
 		>
 			{connection && (
 				<div className="space-y-2 mt-2 mb-4">
 					<div className="grid grid-cols-2 gap-2">
 						<div>
-							<span className="font-medium">{__('Provider:', 'triggermail')}</span>
+							<span className="font-medium">{__('Provider:', 'trigger')}</span>
 							<p className="text-sm text-muted-foreground">{connection.provider}</p>
 						</div>
 						<div>
-							<span className="font-medium">{__('Email:', 'triggermail')}</span>
+							<span className="font-medium">{__('Email:', 'trigger')}</span>
 							<p className="text-sm text-muted-foreground">{connection.fromEmail}</p>
 						</div>
 					</div>

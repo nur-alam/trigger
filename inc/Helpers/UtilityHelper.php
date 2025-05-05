@@ -93,7 +93,7 @@ class UtilityHelper {
 	 */
 	public static function verify_nonce() {
 		$plugin_data = Trigger::plugin_data();
-		return isset( $_POST[ $plugin_data['nonce_key'] ] ) && wp_verify_nonce( $_POST[ $plugin_data['nonce_key'] ], $plugin_data['nonce_action'] ); //phpcs:ignore
+		return isset( $_POST[ $plugin_data['nonce_key'] ] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST[ $plugin_data['nonce_key'] ] ) ), $plugin_data['nonce_action'] ); //phpcs:ignore
 	}
 
 	/**

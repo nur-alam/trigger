@@ -27,7 +27,7 @@ function trigger_auth_check() {
  *
  * @return  array|boolean
  */
-function get_default_provider() {
+function trigger_get_default_provider() {
 	$default_provider = get_option( TRIGGER_DEFAULT_EMAIL_PROVIDER, array() );
 
 	if ( empty( $default_provider ) ) {
@@ -50,7 +50,7 @@ function trigger_verify_request( $nonce_key = 'trigger_nonce', $action = '', $ch
 	if ( $check_auth && ! is_user_logged_in() ) {
 		return array(
 			'success' => false,
-			'message' => __( 'Access denied! Please login to access this feature.', 'triggermail' ),
+			'message' => __( 'Access denied! Please login to access this feature.', 'trigger' ),
 			'code'    => 403,
 		);
 	}
@@ -68,7 +68,7 @@ function trigger_verify_request( $nonce_key = 'trigger_nonce', $action = '', $ch
 	) ) {
 		return array(
 			'success' => false,
-			'message' => __( 'Invalid security token! Please refresh the page and try again.', 'triggermail' ),
+			'message' => __( 'Invalid security token! Please refresh the page and try again.', 'trigger' ),
 			'code'    => 400,
 		);
 	}
@@ -76,22 +76,11 @@ function trigger_verify_request( $nonce_key = 'trigger_nonce', $action = '', $ch
 	// Return success with sanitized POST data
 	return array(
 		'success' => true,
-		'message' => __( 'Verification successful.', 'triggermail' ),
+		'message' => __( 'Verification successful.', 'trigger' ),
 		'code'    => 200,
 		'data'    => UtilityHelper::sanitize_array( $_POST ),
 	);
 }
-
-/**
- * Nonce checking.
- *
- * @param   string $nonce_key      $nonce_key nonce key.
- * @param   string $nonce_value    $nonce_value nonce value.
- * @return  boolean
- */
-// function trigger_verify_nonce( $nonce_key, $nonce_value ) {
-// return true;
-// }
 
 if ( ! function_exists( 'wp_mail' ) ) :
 	/**
@@ -493,7 +482,7 @@ if ( ! function_exists( 'wp_mail' ) ) :
 
 		// Send!
 		try {
-			$default_provider = get_default_provider();
+			$default_provider = trigger_get_default_provider();
 			$send             = false;
 			if ( 'ses' === $default_provider['provider'] ) {
 				$headers    = array_merge( $headers, array( 'Content-Type: text/html' ) );

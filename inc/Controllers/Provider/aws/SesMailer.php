@@ -23,6 +23,76 @@ class SesMailer {
 	use JsonResponse;
 
 	/**
+	 * AWS SES credentials
+	 *
+	 * @var string
+	 */
+	private $access_key;
+
+	/**
+	 * AWS SES credentials
+	 *
+	 * @var string
+	 */
+	private $secret_key;
+
+	/**
+	 * AWS SES region
+	 *
+	 * @var string
+	 */
+	public $region;
+
+	/**
+	 * AWS SES service
+	 *
+	 * @var string
+	 */
+	private $service = 'ses';
+
+	/**
+	 * AWS SES host
+	 *
+	 * @var string
+	 */
+	public $host;
+
+	/**
+	 * AWS SES endpoint
+	 *
+	 * @var string
+	 */
+	public $endpoint;
+
+	/**
+	 * AWS SES provider config
+	 *
+	 * @var array
+	 */
+	public $provider_config = array();
+
+	/**
+	 * Constructor
+	 */
+	public function __construct() {
+		$config = get_option( TRIGGER_EMAIL_CONFIG, array() );
+
+		if ( ! empty( $config ) ) {
+			$this->provider_config = $config['ses'];
+		}
+
+		// if ( empty( $config ) || ! isset( $config['accessKeyId'] ) || ! isset( $config['secretAccessKey'] ) ) {
+		// return $this->json_response( __( 'AWS SES configuration is missing', 'trigger' ), null, 400 );
+		// }
+
+		$this->access_key = $this->provider_config['accessKeyId'] ?? '';
+		$this->secret_key = $this->provider_config['secretAccessKey'] ?? '';
+		$this->region     = $this->provider_config['region'] ?? 'us-east-1';
+		$this->host       = 'email.' . $this->provider_config['region'] . '.amazonaws.com';
+		$this->endpoint   = "https://{$this->host}";
+	}
+
+	/**
 	 * Send an email using AWS SES
 	 *
 	 * @param string $to Recipient email address.
@@ -36,70 +106,26 @@ class SesMailer {
 	public function send_email( $to, $subject, $message, $headers = array(), $config = array() ) {
 		try {
 			// If no config is provided, get from options
-			if ( empty( $config ) ) {
-				$config = get_option( TRIGGER_DEFAULT_EMAIL_PROVIDER, array() );
+			if ( empty( $this->provider_config ) ) {
+				$this->provider_config = get_option( TRIGGER_EMAIL_CONFIG, array() )['ses'] ?? array();
 			}
 
-			if ( empty( $config ) || ! isset( $config['accessKeyId'] ) || ! isset( $config['secretAccessKey'] ) ) {
-				return $this->json_response( __( 'AWS SES configuration is missing', 'trigger' ), null, 400 );
-			}
+			// if ( empty( $provider_config ) || ! isset( $provider_config['accessKeyId'] ) || ! isset( $provider_config['secretAccessKey'] ) ) {
+			// return $this->json_response( __( 'AWS SES configuration is missing', 'trigger' ), null, 400 );
+			// }
 
-			// Create SES client
-			$ses_client = new SesClient(
-				array(
-					'version'     => 'latest',
-					'region'      => $config['region'] ?? 'us-east-1',
-					'credentials' => array(
-						'key'    => $config['accessKeyId'],
-						'secret' => $config['secretAccessKey'],
-					),
-				)
+			$params = array(
+				'Action'                           => 'SendEmail',
+				'Source'                           => $this->provider_config['fromEmail'] ?? '',
+				'Destination.ToAddresses.member.1' => $to ?? $to[0],
+				'Message.Subject.Data'             => $subject,
+				'Message.Body.Html.Data'           => $message,
+				'Version'                          => '2010-12-01',
 			);
 
-			// Format email parameters correctly for AWS SES
-			// Check if HTML content type is specified in headers
-			$is_html = false;
-			if ( ! empty( $headers ) ) {
-				foreach ( $headers as $header ) {
-					if ( stripos( $header, 'Content-Type: text/html' ) !== false ) {
-						$is_html = true;
-						break;
-					}
-				}
-			}
+			$body = $this->make_request( $params );
 
-			// Ensure message is a string
-			$message_text = is_array( $message ) ? json_encode( $message ) : (string) $message;
-
-			$email_params = array(
-				'Source'      => $config['fromEmail'],
-				'Destination' => array(
-					'ToAddresses' => is_array( $to ) ? $to : array( $to ),
-				),
-				'Message'     => array(
-					'Subject' => array(
-						'Data'    => $subject,
-						'Charset' => 'UTF-8',
-					),
-					'Body'    => array(
-						'Html' => array(
-							'Data'    => $is_html ? $message_text : $message_text,
-							'Charset' => 'UTF-8',
-						),
-						'Text' => array(
-							'Data'    => $message_text,
-							'Charset' => 'UTF-8',
-						),
-					),
-				),
-			);
-
-			// Send the email using AWS SES
-			$result      = $ses_client->sendEmail( $email_params );
-			$msg         = $result->get( 'MessageId' );
-			$metadata    = $result->get( '@metadata' );
-			$status_code = $metadata['statusCode'];
-			if ( $msg && 200 === $status_code ) {
+			if ( strpos( $body, '<SendEmailResult' ) !== false ) {
 				return true;
 			}
 
@@ -123,42 +149,16 @@ class SesMailer {
 	 * @return array{success: bool, message: string} Result with success status and message
 	 */
 	public function verify_email_address( $email_address, $config = array() ) {
-		if ( empty( $email_address ) || ! is_email( $email_address ) ) {
-			return $this->json_response( __( 'Invalid email address', 'trigger' ), null, 400 );
-		}
-
-		// If no config is provided, get from options
-		if ( empty( $config ) ) {
-			$config = get_option( TRIGGER_DEFAULT_EMAIL_PROVIDER, array() );
-		}
-
-		if ( empty( $config ) || ! isset( $config['accessKeyId'] ) || ! isset( $config['secretAccessKey'] ) ) {
-			return $this->json_response( __( 'AWS SES configuration is missing', 'trigger' ), null, 400 );
-		}
-
 		try {
-			// Create SES client
-			$ses_client = new SesClient(
-				array(
-					'version'     => 'latest',
-					'region'      => $config['region'] ?? 'us-east-1',
-					'credentials' => array(
-						'key'    => $config['accessKeyId'],
-						'secret' => $config['secretAccessKey'],
-					),
-				)
+			$params = array(
+				'Action'       => 'VerifyEmailIdentity',
+				'EmailAddress' => $email_address,
+				'Version'      => '2010-12-01',
 			);
 
-			// Send verification email
-			$result = $ses_client->verifyEmailIdentity(
-				array(
-					'EmailAddress' => $email_address,
-				)
-			);
+			$body = $this->make_request( $params );
 
-			$metadata    = $result->get( '@metadata' );
-			$status_code = $metadata['statusCode'];
-			if ( 200 === $status_code ) {
+			if ( strpos( $body, '<VerifyEmailIdentityResult' ) !== false ) {
 				return $this->json_response(
 					sprintf(
 					/* translators: %s: Email address that was verified */
@@ -184,7 +184,7 @@ class SesMailer {
 	 * @return array{success: bool, message: string, data?: array} Result with success status, message and data
 	 */
 	public function get_verified_emails( $config = array() ) {
-		// If no config is provided, get from options
+		// if no config is provided, get from options
 		if ( empty( $config ) ) {
 			$config = get_option( TRIGGER_DEFAULT_EMAIL_PROVIDER, array() );
 		}
@@ -197,42 +197,59 @@ class SesMailer {
 		}
 
 		try {
-			// Create SES client
-			$ses_client = new SesClient(
-				array(
-					'version'     => 'latest',
-					'region'      => $config['region'] ?? 'us-east-1',
-					'credentials' => array(
-						'key'    => $config['accessKeyId'],
-						'secret' => $config['secretAccessKey'],
-					),
-				)
+
+			$params = array(
+				'Action'       => 'ListIdentities',
+				'IdentityType' => 'EmailAddress',
+				'MaxItems'     => '100',
+				'Version'      => '2010-12-01',
+
 			);
 
-			// Get list of verified email identities
-			$result = $ses_client->listIdentities(
-				array(
-					'IdentityType' => 'EmailAddress',
-				)
-			);
+			$body = $this->make_request( $params );
 
-			$identities = $result->get( 'Identities' );
+			if ( isset( $body['error'] ) ) {
+				return array(
+					'success' => false,
+					'message' => __( 'Failed to retrieve verified email addresses', 'trigger' ),
+				);
+			}
 
-			// Get verification status for each identity
+			// Parse XML response to get email addresses
+			$xml             = simplexml_load_string( $body );
 			$verified_emails = array();
-			if ( ! empty( $identities ) ) {
-				$result = $ses_client->getIdentityVerificationAttributes(
-					array(
-						'Identities' => $identities,
-					)
+
+			if ( $xml && isset( $xml->ListIdentitiesResult->Identities->member ) ) {
+				// Get list of emails first
+				$emails = array();
+				foreach ( $xml->ListIdentitiesResult->Identities->member as $email ) {
+					$emails[] = (string) $email;
+				}
+
+				// Now get verification status for these emails
+				$params = array(
+					'Action'  => 'GetIdentityVerificationAttributes',
+					'Version' => '2010-12-01',
 				);
 
-				$attributes = $result->get( 'VerificationAttributes' );
-				foreach ( $attributes as $email => $attribute ) {
-					$verified_emails[] = array(
-						'email'  => $email,
-						'status' => $attribute['VerificationStatus'],
-					);
+				// Add emails to parameters
+				foreach ( $emails as $index => $email ) {
+					$params[ 'Identities.member.' . ( $index + 1 ) ] = $email;
+				}
+
+				$verification_response = $this->make_request( $params );
+				$verification_xml      = simplexml_load_string( $verification_response );
+
+				if ( $verification_xml && isset( $verification_xml->GetIdentityVerificationAttributesResult->VerificationAttributes ) ) {
+					foreach ( $verification_xml->GetIdentityVerificationAttributesResult->VerificationAttributes->entry as $entry ) {
+						$email  = (string) $entry->key;
+						$status = (string) $entry->value->VerificationStatus;
+
+						$verified_emails[] = array(
+							'email'  => $email,
+							'status' => $status,
+						);
+					}
 				}
 			}
 
@@ -250,32 +267,77 @@ class SesMailer {
 	}
 
 	/**
-	 * Verify SES configuration
+	 * Calculate AWS signature for request authentication
 	 *
-	 * @param array $config AWS SES configuration.
-	 *
-	 * @return bool|string True on success, error message on failure
+	 * @param string $date_stamp The date stamp in YYYYMMDD format.
+	 * @param string $string_to_sign The string to be signed.
+	 * @return string The calculated signature.
 	 */
-	public function verify_ses_config( $config ) {
-		if ( empty( $config ) || ! isset( $config['accessKeyId'] ) || ! isset( $config['secretAccessKey'] ) ) {
-			return $this->json_response( __( 'AWS SES configuration is missing', 'trigger' ), null, 400 );
+	private function get_signature( $date_stamp, $string_to_sign ) {
+		$secret_key = 'AWS4' . $this->secret_key;
+		$date       = hash_hmac( 'sha256', $date_stamp, $secret_key, true );
+		$region     = hash_hmac( 'sha256', $this->region, $date, true );
+		$service    = hash_hmac( 'sha256', $this->service, $region, true );
+		$signing    = hash_hmac( 'sha256', 'aws4_request', $service, true );
+		return hash_hmac( 'sha256', $string_to_sign, $signing );
+	}
+
+	/**
+	 * Make a request to AWS SES API
+	 *
+	 * @param array $params The request parameters.
+	 * @return mixed The response from the API.
+	 */
+	private function make_request( $params ) {
+		$query_string = http_build_query( $params, '', '&', PHP_QUERY_RFC3986 );
+		$amz_date     = gmdate( 'Ymd\THis\Z' );
+		$date_stamp   = gmdate( 'Ymd' );
+		$payload_hash = hash( 'sha256', $query_string );
+
+		$canonical_request = implode(
+			"\n",
+			array(
+				'POST',
+				'/',
+				'',
+				"content-type:application/x-www-form-urlencoded\nhost:{$this->host}\nx-amz-date:$amz_date\n",
+				'content-type;host;x-amz-date',
+				$payload_hash,
+			)
+		);
+
+		$credential_scope = "$date_stamp/{$this->region}/{$this->service}/aws4_request";
+		$string_to_sign   = implode(
+			"\n",
+			array(
+				'AWS4-HMAC-SHA256',
+				$amz_date,
+				$credential_scope,
+				hash( 'sha256', $canonical_request ),
+			)
+		);
+
+		$signature            = $this->get_signature( $date_stamp, $string_to_sign );
+		$authorization_header = "AWS4-HMAC-SHA256 Credential={$this->access_key}/$credential_scope, SignedHeaders=content-type;host;x-amz-date, Signature=$signature";
+
+		$headers = array(
+			'Content-Type'  => 'application/x-www-form-urlencoded',
+			'X-Amz-Date'    => $amz_date,
+			'Authorization' => $authorization_header,
+		);
+
+		$response = wp_remote_post(
+			$this->endpoint,
+			array(
+				'headers' => $headers,
+				'body'    => $query_string,
+			)
+		);
+
+		if ( is_wp_error( $response ) ) {
+			return array( 'error' => $response->get_error_message() );
 		}
 
-		try {
-			$ses_client = new SesClient(
-				array(
-					'version'     => 'latest',
-					'region'      => $config['region'] ?? 'us-east-1',
-					'credentials' => array(
-						'key'    => $config['accessKeyId'],
-						'secret' => $config['secretAccessKey'],
-					),
-				)
-			);
-
-			return true;
-		} catch ( AwsException $e ) {
-			return $this->json_response( esc_html( $e->getMessage() ), null, 400 );
-		}
+		return wp_remote_retrieve_body( $response );
 	}
 }

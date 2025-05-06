@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Trigger SMTP, Mail Logs, Deliver Mail
+ * Plugin Name: Trigger SMTP, Mail Logs, Deliver Mails
  * Version: 1.0.0
  * Requires at least: 5.3
  * Requires PHP: 7.4

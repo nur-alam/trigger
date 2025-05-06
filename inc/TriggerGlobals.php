@@ -487,7 +487,7 @@ if ( ! function_exists( 'wp_mail' ) ) :
 			if ( 'ses' === $default_provider['provider'] ) {
 				$headers    = array_merge( $headers, array( 'Content-Type: text/html' ) );
 				$ses_mailer = new SesMailer();
-				$send       = $ses_mailer->send_email( $to, $subject, $message, $headers, $attachments );
+				$send       = $ses_mailer->send_email( $to, $subject, $message, $headers, $attachments, false );
 				if ( false === $send ) {
 					throw new PHPMailer\PHPMailer\Exception( 'Failed to send email using SES' );
 				}

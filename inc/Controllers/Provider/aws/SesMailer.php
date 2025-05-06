@@ -103,7 +103,7 @@ class SesMailer {
 	 *
 	 * @return bool|string True on success, error message on failure
 	 */
-	public function send_email( $to, $subject, $message, $headers = array(), $config = array() ) {
+	public function send_email( $to, $subject, $message, $headers = array(), $config = array(), $is_html = false ) {
 		try {
 			// If no config is provided, get from options
 			if ( empty( $this->provider_config ) ) {
@@ -114,12 +114,23 @@ class SesMailer {
 			// return $this->json_response( __( 'AWS SES configuration is missing', 'trigger' ), null, 400 );
 			// }
 
+			$message_body_format = 'Message.Body.Html.Data';
+			if ( $is_html ) {
+				$message_body_format = 'Message.Body.Html.Data';
+			} else {
+				$message_body_format = 'Message.Body.Text.Data';
+			}
+
+			if ( is_array( $to ) ) {
+				$to = $to[0];
+			}
+
 			$params = array(
 				'Action'                           => 'SendEmail',
 				'Source'                           => $this->provider_config['fromEmail'] ?? '',
-				'Destination.ToAddresses.member.1' => $to ?? $to[0],
+				'Destination.ToAddresses.member.1' => $to,
 				'Message.Subject.Data'             => $subject,
-				'Message.Body.Html.Data'           => $message,
+				$message_body_format               => $message,
 				'Version'                          => '2010-12-01',
 			);
 

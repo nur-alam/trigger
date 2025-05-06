@@ -275,7 +275,7 @@ class EmailLogController {
 		// For SES provider, use SesMailer directly
 		if ( 'ses' === $provider ) {
 			$ses_mailer = new SesMailer();
-			$sent       = $ses_mailer->send_email( $data['sendTo'], $subject, $message, $headers, $config );
+			$sent       = $ses_mailer->send_email( $data['sendTo'], $subject, $message, $headers, $config, true );
 
 			// $sent = wp_mail( $data['sendTo'], $subject, $message, $headers );
 			// todo: need to write custom error log

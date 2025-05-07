@@ -34,6 +34,7 @@ function trigger_get_default_provider() {
 		return false;
 	}
 
+	$trigger_default_provider = $default_provider;
 	return $default_provider;
 }
 
@@ -109,6 +110,7 @@ if ( ! function_exists( 'wp_mail' ) ) :
 	 * @param string|string[] $headers     Optional. Additional headers.
 	 * @param string|string[] $attachments Optional. Paths to files to attach.
 	 * @return bool Whether the email was sent successfully.
+	 * @throws PHPMailer\PHPMailer\Exception When there are issues sending the email.
 	 */
 	function wp_mail( $to, $subject, $message, $headers = '', $attachments = array() ) {
 		// Compact the input, apply the filters, and extract them back out.
@@ -190,7 +192,7 @@ if ( ! function_exists( 'wp_mail' ) ) :
 			require_once ABSPATH . WPINC . '/PHPMailer/PHPMailer.php';
 			require_once ABSPATH . WPINC . '/PHPMailer/SMTP.php';
 			require_once ABSPATH . WPINC . '/PHPMailer/Exception.php';
-			$phpmailer = new PHPMailer\PHPMailer\PHPMailer( true );
+			$phpmailer = new PHPMailer\PHPMailer\PHPMailer( true ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 
 			$phpmailer::$validator = static function ( $email ) {
 				return (bool) is_email( $email );

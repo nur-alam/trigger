@@ -100,6 +100,7 @@ class SesMailer {
 	 * @param string $message Email body (HTML).
 	 * @param array  $headers Email headers.
 	 * @param array  $config AWS SES configuration.
+	 * @param bool   $is_html Whether the message is in HTML format.
 	 *
 	 * @return bool|string True on success, error message on failure
 	 */
@@ -159,7 +160,7 @@ class SesMailer {
 	 *
 	 * @return array{success: bool, message: string} Result with success status and message
 	 */
-	public function verify_email_address( $email_address, $config = array() ) {
+	public function verify_email_address( $email_address, $config = array() ) {  // phpcs:ignore
 		try {
 			$params = array(
 				'Action'       => 'VerifyEmailIdentity',
@@ -230,10 +231,12 @@ class SesMailer {
 			$xml             = simplexml_load_string( $body );
 			$verified_emails = array();
 
+			// Get list of emails first
+			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 			if ( $xml && isset( $xml->ListIdentitiesResult->Identities->member ) ) {
 				// Get list of emails first
 				$emails = array();
-				foreach ( $xml->ListIdentitiesResult->Identities->member as $email ) {
+				foreach ( $xml->ListIdentitiesResult->Identities->member as $email ) { // phpcs:ignore
 					$emails[] = (string) $email;
 				}
 
@@ -251,8 +254,8 @@ class SesMailer {
 				$verification_response = $this->make_request( $params );
 				$verification_xml      = simplexml_load_string( $verification_response );
 
-				if ( $verification_xml && isset( $verification_xml->GetIdentityVerificationAttributesResult->VerificationAttributes ) ) {
-					foreach ( $verification_xml->GetIdentityVerificationAttributesResult->VerificationAttributes->entry as $entry ) {
+				if ( $verification_xml && isset( $verification_xml->GetIdentityVerificationAttributesResult->VerificationAttributes ) ) { // phpcs:ignore
+					foreach ( $verification_xml->GetIdentityVerificationAttributesResult->VerificationAttributes->entry as $entry ) { // phpcs:ignore
 						$email  = (string) $entry->key;
 						$status = (string) $entry->value->VerificationStatus;
 

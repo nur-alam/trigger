@@ -10,8 +10,6 @@
 
 namespace Trigger\Controllers\Provider\aws;
 
-use Aws\Ses\SesClient;
-use Aws\Exception\AwsException;
 use Trigger\Traits\JsonResponse;
 use Exception;
 
@@ -142,7 +140,7 @@ class SesMailer {
 			}
 
 			return false;
-		} catch ( AwsException $e ) {
+		} catch ( Exception $e ) {
 			// error_log( 'AWS SES Error: ' . $e->getMessage() );
 			// Check if this is an email verification error
 			// if ( strpos( $e->getMessage(), 'Email address is not verified' ) !== false ) {
@@ -183,7 +181,9 @@ class SesMailer {
 			}
 
 			return $this->json_response( __( 'Failed to verify email address', 'trigger' ), null, 400 );
-		} catch ( AwsException $e ) {
+		} catch ( Exception $e ) {
+			// error_log( 'AWS SES Error: '. $e->getMessage() );
+			// Check if this is an email verification error
 			return $this->json_response( __( 'Failed to verify email address, please provide valid email address', 'trigger' ), null, 400 );
 		}
 	}
@@ -196,7 +196,6 @@ class SesMailer {
 	 * @return array{success: bool, message: string, data?: array} Result with success status, message and data
 	 */
 	public function get_verified_emails( $config = array() ) {
-		// if no config is provided, get from options
 		if ( empty( $config ) ) {
 			$config = get_option( TRIGGER_DEFAULT_EMAIL_PROVIDER, array() );
 		}
@@ -272,7 +271,7 @@ class SesMailer {
 				'message' => __( 'Verified email addresses retrieved successfully', 'trigger' ),
 				'data'    => $verified_emails,
 			);
-		} catch ( AwsException $e ) {
+		} catch ( Exception $e ) {
 			return array(
 				'success' => false,
 				'message' => __( 'Failed to retrieve verified email addresses', 'trigger' ),

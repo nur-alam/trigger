@@ -17,11 +17,10 @@ import { AwsSesRegionOptionsType, AwsSesRegionAssociatedOptions } from "@/utils/
 import { ConnectionType } from "..";
 import { ResponseType } from "@/utils/trigger-declaration";
 import { Loader2 } from "lucide-react";
+import { useUpdateProvider } from "@/services/gmail-services";
 
 const AwsSesForm = ({ selectedProvider }: { selectedProvider: EmailProviderOptionsType }) => {
-	console.log('selectedProvider', selectedProvider);
 	const navigate = useNavigate();
-	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [connections, setConnections] = useState<ConnectionType[]>([]);
 	const [connectionIsLoading, setConnectionIsLoading] = useState(true);
 	const form = useForm<SesConfigFormValues>({
@@ -36,38 +35,17 @@ const AwsSesForm = ({ selectedProvider }: { selectedProvider: EmailProviderOptio
 		},
 	});
 
+	const updateProviderMutation = useUpdateProvider();
+
 	const onSubmit = async (values: SesConfigFormValues) => {
-		setIsSubmitting(true);
-		try {
-			const formData = new FormData();
-			formData.append('action', 'update_email_config');
-			formData.append('trigger_nonce', config.nonce_value);
-			formData.append('data', JSON.stringify({
-				provider: selectedProvider,
-				fromName: values.fromName,
-				fromEmail: values.fromEmail,
-				accessKeyId: values.accessKeyId,
-				secretAccessKey: values.secretAccessKey,
-				region: values.region,
-			}));
-
-			const response = await fetch(config.ajax_url, {
-				method: 'POST',
-				body: formData,
-			});
-
-			const data = await response.json();
-
-			if (data.status_code === 200) {
-				toast.success(__('Email configuration saved successfully!', 'trigger'));
-				navigate('/connections');
-			} else {
-				toast.error(data.message || __('Failed to save email configuration', 'trigger'));
-			}
-		} catch (error) {
+		const newValues = { ...values, provider: selectedProvider };
+		console.log('newValues', newValues);
+		const { status_code }: ResponseType = await updateProviderMutation.mutateAsync(newValues);
+		if (status_code === 200) {
+			toast.success(__("Email configuration saved successfully!", "trigger"));
+			// navigate("/connections");
+		} else {
 			toast.error(__('Failed to save email configuration', 'trigger'));
-		} finally {
-			setIsSubmitting(false);
 		}
 	};
 
@@ -230,8 +208,8 @@ const AwsSesForm = ({ selectedProvider }: { selectedProvider: EmailProviderOptio
 								</div>
 
 								<div className="flex gap-2 justify-end">
-									<Button type="submit" disabled={isSubmitting}>
-										{isSubmitting ? __("Saving...", "trigger") : __("Save Changes", "trigger")}
+									<Button type="submit" disabled={updateProviderMutation.isPending}>
+										{updateProviderMutation.isPending ? __("Saving...", "trigger") : __("Save Changes", "trigger")}
 									</Button>
 								</div>
 							</form>

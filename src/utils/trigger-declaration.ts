@@ -1,8 +1,9 @@
-export type EmailProviderOptionsType = 'smtp' | 'ses';
-export const emailProviderOptions: EmailProviderOptionsType[] = ['smtp', 'ses'];
+export type EmailProviderOptionsType = 'smtp' | 'ses' | 'gmail';
+export const emailProviderOptions: EmailProviderOptionsType[] = ['smtp', 'ses', 'gmail'];
 export const emailProviderAssociatedOptions: { label: string; value: EmailProviderOptionsType }[] = [
 	{ label: 'SMTP', value: 'smtp' },
 	{ label: 'Amazon SES', value: 'ses' },
+	{ label: 'Gmail', value: 'gmail' },
 ];
 // smtp security options
 export type SmtpSecurityOptionsType = 'none' | 'ssl' | 'tls';

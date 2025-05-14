@@ -46,37 +46,45 @@ class SmtpConfig {
 		}
 
 		$params = $verify['data'];
-		$data   = json_decode( $params['data'], true );
+		// $data   = json_decode( $params['data'], true );
 
 		// Get existing config
 		$existing_config = get_option( TRIGGER_EMAIL_CONFIG, array() );
 		$config          = $existing_config;
 
-		if ( 'smtp' === $data['provider'] ) {
+		if ( 'smtp' === $params['provider'] ) {
 			$config['smtp'] = array(
-				'provider'     => sanitize_text_field( $data['provider'] ),
-				'fromName'     => sanitize_text_field( $data['fromName'] ),
-				'fromEmail'    => sanitize_email( $data['fromEmail'] ),
-				'smtpHost'     => sanitize_text_field( $data['smtpHost'] ),
-				'smtpPort'     => sanitize_text_field( $data['smtpPort'] ),
-				'smtpSecurity' => sanitize_text_field( $data['smtpSecurity'] ),
-				'smtpUsername' => sanitize_text_field( $data['smtpUsername'] ),
-				'smtpPassword' => sanitize_text_field( $data['smtpPassword'] ),
+				'provider'     => sanitize_text_field( $params['provider'] ),
+				'fromName'     => sanitize_text_field( $params['fromName'] ),
+				'fromEmail'    => sanitize_email( $params['fromEmail'] ),
+				'smtpHost'     => sanitize_text_field( $params['smtpHost'] ),
+				'smtpPort'     => sanitize_text_field( $params['smtpPort'] ),
+				'smtpSecurity' => sanitize_text_field( $params['smtpSecurity'] ),
+				'smtpUsername' => sanitize_text_field( $params['smtpUsername'] ),
+				'smtpPassword' => sanitize_text_field( $params['smtpPassword'] ),
 			);
-		} elseif ( 'ses' === $data['provider'] ) {
+		} elseif ( 'ses' === $params['provider'] ) {
 			$config['ses'] = array(
-				'provider'        => sanitize_text_field( $data['provider'] ),
-				'fromName'        => sanitize_text_field( $data['fromName'] ),
-				'fromEmail'       => sanitize_email( $data['fromEmail'] ),
-				'accessKeyId'     => sanitize_text_field( $data['accessKeyId'] ),
-				'secretAccessKey' => sanitize_text_field( $data['secretAccessKey'] ),
-				'region'          => sanitize_text_field( $data['region'] ),
+				'provider'        => sanitize_text_field( $params['provider'] ),
+				'fromName'        => sanitize_text_field( $params['fromName'] ),
+				'fromEmail'       => sanitize_email( $params['fromEmail'] ),
+				'accessKeyId'     => sanitize_text_field( $params['accessKeyId'] ),
+				'secretAccessKey' => sanitize_text_field( $params['secretAccessKey'] ),
+				'region'          => sanitize_text_field( $params['region'] ),
+			);
+		} elseif ( 'gmail' === $params['provider'] ) {
+			$config['gmail'] = array(
+				'provider'     => sanitize_text_field( $params['provider'] ),
+				'fromName'     => sanitize_text_field( $params['fromName'] ),
+				'fromEmail'    => sanitize_email( $params['fromEmail'] ),
+				'clientId'     => sanitize_text_field( $params['clientId'] ),
+				'clientSecret' => sanitize_text_field( $params['clientSecret'] ),
 			);
 		} else {
 			return $this->json_response( __( 'Invalid provider', 'trigger' ), null, 400 );
 		}
 
-		$config[ $data['provider'] ]['createdAt'] = current_time( 'mysql' );
+		$config[ $params['provider'] ]['createdAt'] = current_time( 'mysql' );
 
 		update_option( TRIGGER_EMAIL_CONFIG, $config );
 

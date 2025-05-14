@@ -8,48 +8,53 @@ import TriggerDashboard from '@/pages/trigger';
 import EmailLogs from '@/pages/email-logs';
 import Settings from '@/pages/settings';
 import { Toaster } from 'react-hot-toast';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 const root = ReactDOM.createRoot(document.getElementById('trigger-root') as HTMLElement);
 
-root.render(
-	<HashRouter>
-		<Header />
-		<Routes>
-			<Route path="/" element={<TriggerDashboard />} />
-			<Route path="/dashboard" element={<TriggerDashboard />} />
-			<Route path="/email_logs" element={<EmailLogs />} />
-			<Route path="/settings" element={<Settings />} />
-			<Route path="/connections" element={<Connections />} />
-			<Route path="/general" element={<GeneralSettings />} />
-			<Route path="/add-connection" element={<AddConnection />} />
-		</Routes>
+const queryClient = new QueryClient(); // Create a new QueryClient instance`
 
-		<Toaster
-			position="bottom-right"
-			// position="bottom-center"
-			containerClassName="!z-[9999999]"
-			toastOptions={{
-				duration: 5000,
-				style: {
-					background: '#fff',
-					color: '#333',
-					border: '1px solid #e5e7eb',
-					padding: '16px',
-					borderRadius: '8px',
-					boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
-				},
-				success: {
+root.render(
+	<QueryClientProvider client={queryClient}>
+		<HashRouter>
+			<Header />
+			<Routes>
+				<Route path="/" element={<TriggerDashboard />} />
+				<Route path="/dashboard" element={<TriggerDashboard />} />
+				<Route path="/email_logs" element={<EmailLogs />} />
+				<Route path="/settings" element={<Settings />} />
+				<Route path="/connections" element={<Connections />} />
+				<Route path="/general" element={<GeneralSettings />} />
+				<Route path="/add-connection" element={<AddConnection />} />
+			</Routes>
+
+			<Toaster
+				position="bottom-right"
+				// position="bottom-center"
+				containerClassName="!z-[9999999]"
+				toastOptions={{
+					duration: 5000,
 					style: {
-						background: '#f0fdf4',
-						borderColor: '#86efac',
+						background: '#fff',
+						color: '#333',
+						border: '1px solid #e5e7eb',
+						padding: '16px',
+						borderRadius: '8px',
+						boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
 					},
-				},
-				error: {
-					style: {
-						background: '#fef2f2',
-						borderColor: '#fecaca',
+					success: {
+						style: {
+							background: '#f0fdf4',
+							borderColor: '#86efac',
+						},
 					},
-				},
-			}}
-		/>
-	</HashRouter>
+					error: {
+						style: {
+							background: '#fef2f2',
+							borderColor: '#fecaca',
+						},
+					},
+				}}
+			/>
+		</HashRouter>
+	</QueryClientProvider>
 );

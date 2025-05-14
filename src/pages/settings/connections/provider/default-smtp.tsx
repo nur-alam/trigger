@@ -16,6 +16,7 @@ import { emailProviderAssociatedOptions, smtpSecurityAssociatedOptions, smtpSecu
 import { EmailProviderOptionsType, ResponseType, SmtpSecurityOptionsType } from "@/utils/trigger-declaration";
 import { ConnectionType } from "..";
 import { Loader2 } from "lucide-react";
+import { useUpdateProvider } from "@/services/gmail-services";
 
 export interface EmailSettingsResponse {
 	status_code: number;
@@ -57,37 +58,17 @@ const DefaultSmtp = ({ selectedProvider }: { selectedProvider: EmailProviderOpti
 		},
 	});
 
+	const updateProviderMutation = useUpdateProvider();
+
 	const onSubmit = async (values: SmtpConfigFormValues) => {
-		setIsSubmitting(true);
-		try {
-			const formData = new FormData();
-			formData.append('action', 'update_email_config');
-			formData.append('trigger_nonce', config.nonce_value);
-			formData.append('data', JSON.stringify(values));
-
-			const response = await fetch(config.ajax_url, {
-				method: 'POST',
-				body: formData,
-			});
-
-			const responseData = await response.json() as ResponseType;
-
-			// Check for proper JSON response with status code
-			if (responseData.status_code === 200) {
-				toast.success(responseData?.message || __('Email configuration saved successfully!', 'trigger'));
-				navigate('/connections');
-			} else {
-				if (responseData?.errors) {
-					const errors = responseData.errors;
-					toast((t) => <ErrorToast errors={errors} />, {});
-				} else {
-					toast.error(responseData?.message || __('Failed to save email configuration', 'trigger'));
-				}
-			}
-		} catch (error) {
+		const newValues = { ...values, provider: selectedProvider };
+		console.log('newValues', newValues);
+		const { status_code }: ResponseType = await updateProviderMutation.mutateAsync(newValues);
+		if (status_code === 200) {
+			toast.success(__("Email configuration saved successfully!", "trigger"));
+			// navigate("/connections");
+		} else {
 			toast.error(__('Failed to save email configuration', 'trigger'));
-		} finally {
-			setIsSubmitting(false);
 		}
 	};
 

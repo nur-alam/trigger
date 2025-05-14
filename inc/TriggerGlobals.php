@@ -33,10 +33,20 @@ function trigger_get_default_provider() {
 	if ( empty( $default_provider ) ) {
 		return false;
 	}
-
-	$trigger_default_provider = $default_provider;
 	return $default_provider;
 }
+
+/**
+ * Get plugin data
+ *
+ * @return array
+ */
+function trigger_get_plugin_data() {
+	define( 'TRIGGER_PLUGIN_INFO', Trigger::plugin_data() );
+	return Trigger::plugin_data();
+}
+
+trigger_get_plugin_data();
 
 /**
  * Verify nonce and authentication.

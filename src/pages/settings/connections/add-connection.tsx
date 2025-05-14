@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import DefaultSmtp from "./provider/default-smtp";
 import AwsSes from "./provider/aws-ses";
 import { EmailProviderOptionsType } from "@/utils/trigger-declaration";
+import GmailForm from "./provider/gmail";
 
 const AddConnection = () => {
 	const navigate = useNavigate();
@@ -24,49 +25,13 @@ const AddConnection = () => {
 								<MoveLeft className="w-4 h-4 mr-2" />
 								{__("Back", "trigger")}
 							</Button>
-							{/* <h2 className="text-xl font-semibold">{__("Email Settings", "trigger")}</h2> */}
 						</div>
-						{/* <Sheet open={open} onOpenChange={setOpen}>
-							<SheetTrigger asChild>
-								<Button variant="outline">{__("Send Test Email", "trigger")}</Button>
-							</SheetTrigger>
-							<SheetContent className="z-[99999]">
-								<SheetTitle>{__("Send Test Email", "trigger")}</SheetTitle>
-								<SheetDescription>
-									{__("Send a test email to verify your email configuration.", "trigger")}
-								</SheetDescription> */}
-						{/* <div className="mt-6 space-y-4">
-									<div className="space-y-2">
-										<Label>{__("From Email", "trigger")}</Label>
-										<Input
-											value={form.watch('fromEmail')}
-											className="border-black-900 text-black-900 opacity-100 disabled:opacity-100 disabled:cursor-not-allowed"
-											disabled
-										/>
-									</div>
-									<div className="space-y-2">
-										<Label>{__("To Email", "trigger")}</Label>
-										<Input
-											placeholder="Enter recipient email"
-											className="border-gray-500"
-											autoFocus
-											value={toEmail}
-											onChange={(e) => setToEmail(e.target.value)}
-										/>
-									</div>
-									<div className="flex justify-end">
-										<Button variant="default" onClick={handleTestEmail} disabled={isTestingEmail || !toEmail}>
-											{isTestingEmail ? "Sending..." : "Send Test Email"}
-										</Button>
-									</div>
-								</div> */}
-						{/* </SheetContent>
-						</Sheet> */}
 					</div>
 					<Tabs
 						defaultValue="smtp"
 						className="flex gap-6"
 						onValueChange={(value) => {
+							console.log('onTabChange', value);
 							setSelectedProvider(value as EmailProviderOptionsType);
 						}}
 					>
@@ -96,6 +61,13 @@ const AddConnection = () => {
 								</svg>
 								{__('Amazon SES', 'trigger')}
 							</TabsTrigger>
+							<TabsTrigger value="gmail" className="w-full justify-start gap-2 p-2.5">
+								<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+									<rect width="20" height="16" x="2" y="4" rx="2" />
+									<path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+								</svg>
+								{__('Google Gmail', 'trigger')}
+							</TabsTrigger>
 						</TabsList>
 
 						<div className="flex-1 border-l pl-6">
@@ -105,6 +77,9 @@ const AddConnection = () => {
 
 							<TabsContent value="ses">
 								<AwsSes selectedProvider={selectedProvider} />
+							</TabsContent>
+							<TabsContent value="gmail">
+								<GmailForm selectedProvider={selectedProvider} />
 							</TabsContent>
 						</div>
 					</Tabs>

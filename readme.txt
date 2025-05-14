@@ -1,4 +1,4 @@
-=== Trigger ===
+=== Trigger - SMTP, Mail Logs, Deliver Mails ===
 Contributors: nurwp
 Tags: SMTP configuration, Email delivery, Email logs, Email tracking, WordPress email
 Requires at least: 5.3

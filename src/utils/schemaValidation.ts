@@ -50,6 +50,16 @@ export const sesConfigSchema = z.object({
 
 export type SesConfigFormValues = z.infer<typeof sesConfigSchema>;
 
+export const gmailConfigSchema = z.object({
+	provider: emailProviderSchema,
+	fromName: z.string().min(1, { message: 'From Name is required' }),
+	fromEmail: z.string().email({ message: 'Invalid email address' }),
+	clientId: z.string().min(1, { message: 'Client ID is required' }),
+	clientSecret: z.string().min(1, { message: 'Client Secret is required' }),
+});
+
+export type GmailConfigFormValues = z.infer<typeof gmailConfigSchema>;
+
 export const testEmailSchema = z.object({
 	provider: emailProviderSchema,
 	fromEmail: z.string().email({ message: 'Invalid From-email address' }),

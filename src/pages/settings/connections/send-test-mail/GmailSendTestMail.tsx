@@ -25,7 +25,10 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { z } from "zod";
-
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AwsSesVerifiedEmailType } from "@/utils/trigger-declaration";
+import { ResponseType } from "@/utils/trigger-declaration";
+import { useSearchParams } from "react-router-dom";
 
 interface TestEmailSheetProps {
 	open: boolean;
@@ -44,9 +47,11 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export function SmtpSendTestMail({ open, onOpenChange, connection }: TestEmailSheetProps) {
+export function GmailSendTestMail({ open, onOpenChange, connection }: TestEmailSheetProps) {
 
 	const [isLoading, setIsLoading] = useState(false);
+
+	const [authUrl, setAuthUrl] = useState('');
 
 	const form = useForm<FormValues>({
 		resolver: zodResolver(formSchema),
@@ -55,6 +60,11 @@ export function SmtpSendTestMail({ open, onOpenChange, connection }: TestEmailSh
 			fromEmail: connection.fromEmail,
 		},
 	});
+
+	// Update form value when verified emails are loaded
+	useEffect(() => {
+		connectWithGmail();
+	}, []);
 
 	const handleSendTestEmail = async (values: FormValues) => {
 		setIsLoading(true);
@@ -73,16 +83,16 @@ export function SmtpSendTestMail({ open, onOpenChange, connection }: TestEmailSh
 
 			formData.append("data", JSON.stringify(data));
 
-			console.log("Sending test email with SMTP:", Object.fromEntries(formData));
+			// console.log("Sending test email with Gmail:", Object.fromEntries(formData));
 
-			return;
+			// return;
 
 			const response = await fetch(config.ajax_url, {
 				method: "POST",
 				body: formData,
 			});
 
-			const result = await response.json();
+			const result = await response.json() as ResponseType;
 
 			if (result.status_code === 200) {
 				toast.success(result.message || __("Test email sent successfully!", "trigger"));
@@ -98,6 +108,28 @@ export function SmtpSendTestMail({ open, onOpenChange, connection }: TestEmailSh
 		}
 	};
 
+	const connectWithGmail = async () => {
+		try {
+			const formData = new FormData();
+			formData.append("action", "trigger_connect_with_gmail");
+			formData.append("trigger_nonce", config.nonce_value);
+			const response = await fetch(config.ajax_url, {
+				method: "POST",
+				body: formData,
+			})
+			const result = await response.json() as ResponseType;
+
+			if (result.status_code === 200) {
+				setAuthUrl(result.data.auth_url);
+				// toast.success(result.message || __("Connected with Gmail successfully!", "trigger"));
+			} else {
+				toast.error(result.message || __("Failed to connect with Gmail. Please try again.", "trigger"));
+			}
+		} catch (error) {
+			toast.error(__("An unexpected error occurred. Please try again.", "trigger"));
+		}
+	}
+
 	return (
 		<Sheet open={open} onOpenChange={onOpenChange}>
 			<SheetContent style={{ zIndex: 999999 }}>
@@ -111,24 +143,45 @@ export function SmtpSendTestMail({ open, onOpenChange, connection }: TestEmailSh
 				<div className="pt-4">
 					<div className="mb-4">
 						<p className="text-sm font-medium mb-1">{__("Provider", "trigger")}</p>
-						<Input
-							className="text-sm [&:disabled]:opacity-100"
-							value={connection.provider}
-							disabled
-						/>
+						<Input className="text-sm [&:disabled]:opacity-100" value={connection.provider} disabled />
 					</div>
 				</div>
+
+				{
+					<>
+						{/* <Button type="submit" disabled={isLoading}>
+							{isLoading ? (
+								<>
+									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+									{__("Sending...", "trigger")}
+								</>
+							) : (
+								__("Connect With Gmail", "trigger")
+							)}
+						</Button> */}
+						{/* {authUrl ? <a href={`${authUrl ?? ''}`}>{__('Connect With Gmail', 'trigger')}</a> : ''} */}
+
+					</>
+				}
 
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(handleSendTestEmail)} className="space-y-4">
 						<div className="mb-4">
 							<p className="text-sm font-medium mb-1">{__("From", "trigger")}</p>
-							<Input
-								className="text-sm [&:disabled]:opacity-100"
-								value={connection.fromEmail}
-								disabled
-							/>
 						</div>
+						<FormField
+							control={form.control}
+							name="fromEmail"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>{__("From Email", "trigger")}</FormLabel>
+									<FormControl>
+										<Input placeholder="example@example.com" {...field} autoFocus />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 						<FormField
 							control={form.control}
 							name="sendTo"
@@ -136,11 +189,7 @@ export function SmtpSendTestMail({ open, onOpenChange, connection }: TestEmailSh
 								<FormItem>
 									<FormLabel>{__("Send To", "trigger")}</FormLabel>
 									<FormControl>
-										<Input
-											placeholder="example@example.com"
-											{...field}
-											autoFocus
-										/>
+										<Input placeholder="example@example.com" {...field} autoFocus />
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -151,20 +200,25 @@ export function SmtpSendTestMail({ open, onOpenChange, connection }: TestEmailSh
 							<SheetClose asChild>
 								<Button variant="outline">{__("Cancel", "trigger")}</Button>
 							</SheetClose>
-							<Button type="submit" disabled={isLoading}>
-								{isLoading ? (
-									<>
-										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-										{__("Sending...", "trigger")}
-									</>
-								) : (
-									__("Send Test Email", "trigger")
-								)}
-							</Button>
+
+							{authUrl ?
+								<a className="btn bg-primary" href={`${authUrl ?? ''}`}>{__('Connect With Gmail', 'trigger')}</a>
+								:
+								<Button type="submit" disabled={isLoading}>
+									{isLoading ? (
+										<>
+											<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+											{__("Sending...", "trigger")}
+										</>
+									) : (
+										__("Send Test Email", "trigger")
+									)}
+								</Button>
+							}
 						</div>
 					</form>
 				</Form>
 			</SheetContent>
 		</Sheet>
 	);
-}
+} 

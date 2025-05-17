@@ -10,10 +10,7 @@
 
 namespace Trigger\Controllers;
 
-use Trigger\Helpers\ValidationHelper;
 use Trigger\Traits\JsonResponse;
-use Trigger\Controllers\Provider\aws\SesMailer;
-use Exception;
 
 /**
  * SmtpConfig class

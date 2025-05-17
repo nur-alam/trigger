@@ -2,8 +2,7 @@
 /**
  * AWS SES Mailer Implementation
  *
- * @package Trigger\Core
- * @subpackage Trigger\Core\SesMailer
+ * @package Trigger\Controllers
  * @author  Trigger<trigger@gmail.com>
  * @since 1.0.0
  */

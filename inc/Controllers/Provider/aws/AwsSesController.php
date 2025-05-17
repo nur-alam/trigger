@@ -12,7 +12,6 @@ namespace Trigger\Controllers\Provider\aws;
 
 use Trigger\Traits\JsonResponse;
 use Trigger\Controllers\Provider\aws\SesMailer;
-use Exception;
 use Trigger\Helpers\ValidationHelper;
 
 /**

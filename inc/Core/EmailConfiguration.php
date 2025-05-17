@@ -12,8 +12,6 @@ namespace Trigger\Core;
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-use Aws\Exception\AwsException;
-use Trigger\Controllers\Provider\aws\SesMailer;
 /**
  * Email configuration class
  */
@@ -31,6 +29,7 @@ class EmailConfiguration {
 	public function __construct() {
 		$this->config = get_option( TRIGGER_DEFAULT_EMAIL_PROVIDER, array() );
 		add_action( 'phpmailer_init', array( $this, 'configure_email' ), 10, 1 );
+		add_action( 'trigger_phpmailer_init', array( $this, 'config_smtp_for_test_ail' ), 10, 1 );
 	}
 
 	/**
@@ -97,28 +96,34 @@ class EmailConfiguration {
 	 * @return void
 	 * @throws Exception If there's an error configuring SES.
 	 */
-	private function configure_ses( PHPMailer $phpmailer ) {
-		$provider = $this->config ?? array();
-
+	public function config_smtp_for_test_ail( PHPMailer $phpmailer ) {
+		$provider = trigger_get_provider( 'smtp' );
 		if ( empty( $provider ) ) {
 			return;
 		}
-		$host = 'email-smtp.' . $provider['region'] ?? '';
-		try {
-			// Get credentials to use in PHPMailer
-			// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
-			$phpmailer->isSMTP();
-			$phpmailer->Host       = $host;
-			$phpmailer->SMTPAuth   = true;
-			$phpmailer->Username   = $provider['accessKeyId'] ?? '';
-			$phpmailer->Password   = $provider['secretAccessKey'] ?? '';
-			$phpmailer->SMTPSecure = 'tls';
-			$phpmailer->Port       = 587;
-			// phpcs:enable
-			$phpmailer->setFrom( $provider['fromEmail'] ?? '', $provider['fromName'] ?? '' );
 
-		} catch ( AwsException $e ) {
-			throw new Exception( esc_html( $e->getMessage() ) );
+		$from_name  = $provider['fromName'] ?? '';
+		$from_email = $provider['fromEmail'] ?? '';
+
+		if ( '' !== $from_name ) {
+			// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+			$phpmailer->FromName = $from_name;
+			// phpcs:enable
 		}
+		if ( '' !== $from_email ) {
+			// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+			$phpmailer->From = $from_email;
+			// phpcs:enable
+		}
+
+		$phpmailer->isSMTP();
+		// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+		$phpmailer->Host       = $provider['smtpHost'] ?? '';
+		$phpmailer->Port       = $provider['smtpPort'] ?? '';
+		$phpmailer->SMTPSecure = $provider['smtpSecurity'] ?? 'ssl';
+		$phpmailer->SMTPAuth   = true;
+		$phpmailer->Username   = $provider['smtpUsername'];
+		$phpmailer->Password   = $provider['smtpPassword'];
+		// phpcs:enable
 	}
 }

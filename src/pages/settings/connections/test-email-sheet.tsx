@@ -1,6 +1,7 @@
 import { ConnectionType } from "@/pages/settings/connections/index";
 import { SmtpSendTestMail } from "./send-test-mail/SmtpSendTestMail";
 import { AwsSendTestMail } from "./send-test-mail/AwsSendTestMail";
+import { GmailSendTestMail } from "./send-test-mail/GmailSendTestMail";
 
 interface TestEmailSheetProps {
 	open: boolean;
@@ -23,6 +24,13 @@ export function TestEmailSheet({ open, onOpenChange, connection }: TestEmailShee
 			)}
 			{connection.provider === "ses" && (
 				<AwsSendTestMail
+					open={open}
+					onOpenChange={onOpenChange}
+					connection={connection}
+				/>
+			)}
+			{connection.provider === "gmail" && (
+				<GmailSendTestMail
 					open={open}
 					onOpenChange={onOpenChange}
 					connection={connection}

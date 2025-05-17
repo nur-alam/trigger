@@ -11,13 +11,15 @@ import { CheckCircle, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ConnectionType } from "@/pages/settings/connections/index";
 import { __ } from "@wordpress/i18n";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { SetStateAction, Dispatch, useState } from "react";
 import { TestEmailSheet } from "@/pages/settings/connections/test-email-sheet";
 import { EditConnectionSheet } from "@/pages/settings/connections/edit-connection";
 import { DeleteConnectionSheet } from "@/pages/settings/connections/delete-connection";
 import { VerifySesEmailSheet } from "./verify-ses-email";
 import { getProviderFullName } from "@/utils/utils";
+import toast from "react-hot-toast";
+import config from "@/config";
 const ConnectionList = ({ initialConnections, setInitialConnections }: { initialConnections: ConnectionType[], setInitialConnections: Dispatch<SetStateAction<ConnectionType[]>> }) => {
 	const navigate = useNavigate();
 	const [selectedConnection, setSelectedConnection] = useState<ConnectionType | null>(null);
@@ -45,6 +47,22 @@ const ConnectionList = ({ initialConnections, setInitialConnections }: { initial
 		// Reload the page or fetch connections again
 		window.location.reload();
 	};
+
+	const [searchParams] = useSearchParams();
+	const isGmailRedirect = searchParams.get('google_gmail_redirect') === 'true';
+	if (isGmailRedirect) {
+		toast.success('Gmail connected successfully!');
+		setTimeout(() => {
+			window.location.assign(`${config.site_url}/wp-admin/admin.php?page=trigger#/connections`);
+		}, 500);
+	}
+	const isGmailRedirectFailed = searchParams.get('google_gmail_redirect_failed') === 'true';
+	if (isGmailRedirectFailed) {
+		toast.error('Gmail connection failed!');
+		setTimeout(() => {
+			window.location.assign(`${config.site_url}/wp-admin/admin.php?page=trigger#/connections`);
+		}, 500);
+	}
 
 	return (
 		<div className="rounded-md border mt-10 p-4">

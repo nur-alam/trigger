@@ -19,6 +19,7 @@ use Trigger\Controllers\SmtpConfig;
 use Trigger\Core\Enqueue;
 use Trigger\Core\EmailConfiguration;
 use Trigger\Controllers\EmailLogController;
+use Trigger\Controllers\Provider\InitProvider;
 use Trigger\Frontend\CustomTemplate;
 use Trigger\RestAPI\Routes;
 
@@ -41,5 +42,6 @@ class Init {
 		new EmailConfiguration();
 		new SmtpConfig();
 		new EmailLogController();
+		new InitProvider();
 	}
 }

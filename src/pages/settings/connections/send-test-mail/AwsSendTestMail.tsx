@@ -125,6 +125,10 @@ export function AwsSendTestMail({ open, onOpenChange, connection }: TestEmailShe
 
 			formData.append("data", JSON.stringify(data));
 
+			console.log("Sending test email with AWS:", Object.fromEntries(formData));
+
+			return;
+
 			const response = await fetch(config.ajax_url, {
 				method: "POST",
 				body: formData,

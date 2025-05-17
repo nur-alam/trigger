@@ -14,8 +14,8 @@ use Exception;
 use Trigger\Models\EmailLogModel;
 use Trigger\Traits\JsonResponse;
 use Trigger\Traits\RestResponse;
-use Trigger\Controllers\Provider\aws\AwsSesController;
 use Trigger\Controllers\Provider\aws\SesMailer;
+use Trigger\Controllers\Provider\gmail\GMailer;
 use Trigger\Helpers\ValidationHelper;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -57,8 +57,6 @@ class EmailLogController {
 	 */
 	public function __construct() {
 		$this->email_log_model = new EmailLogModel();
-		new AwsSesController();
-		new LogRetention();
 		add_filter( 'wp_mail_succeeded', array( $this, 'create_email_log' ) );
 		add_filter( 'wp_mail_failed', array( $this, 'create_failed_email_log' ) );
 		add_action( 'wp_ajax_get_email_stats', array( $this, 'get_email_stats' ) );
@@ -66,6 +64,36 @@ class EmailLogController {
 		add_action( 'wp_ajax_trigger_delete_email_log', array( $this, 'delete_email_log' ) );
 		add_action( 'wp_ajax_trigger_bulk_delete_email_logs', array( $this, 'bulk_delete_email_logs' ) );
 		add_action( 'wp_ajax_trigger_send_test_email', array( $this, 'send_test_email' ) );
+		add_action( 'admin_init', array( $this, 'handle_google_oauth_callback' ) );
+	}
+
+	/**
+	 * Handle Gmail Mailer callback
+	 */
+	public function handle_google_oauth_callback() {
+		$provider = trigger_get_provider( 'gmail' );
+		// Handle OAuth Callback
+		if ( isset( $_GET['code'] ) ) {
+			$response = wp_remote_post(
+				'https://oauth2.googleapis.com/token',
+				array(
+					'body' => array(
+						'code'          => $_GET['code'], // phpcs:ignore
+						'client_id'     => $provider['clientId'],
+						'client_secret' => $provider['clientSecret'],
+						'redirect_uri'  => TRIGGER_REDIRECT_URI,
+						'grant_type'    => 'authorization_code',
+					),
+				)
+			);
+			$body     = json_decode( wp_remote_retrieve_body( $response ), true );
+			if ( isset( $body['access_token'] ) ) {
+				update_option( GMAIL_AUTH_CREDENTIALS, $body );
+				wp_safe_redirect( admin_url( 'admin.php?page=trigger#/connections?google_gmail_redirect=true' ) );
+			} else {
+				wp_safe_redirect( admin_url( 'admin.php?page=trigger#/connections?google_gmail_redirect_failed=true' ) );
+			}
+		}
 	}
 
 	/**
@@ -94,9 +122,11 @@ class EmailLogController {
 			);
 
 			$email_log_created = $email_log_model->create_email_log( $log_data );
-			// if ( ! $email_log_created['success'] ) {
-			// error_log( 'Failed to log email: ' . $email_log_created['message'] );
-			// }
+			if ( ! $email_log_created['success'] ) {
+				return false;
+			} else {
+				return true;
+			}
 		} catch ( \Throwable $th ) {
 			// error_log( 'Failed to log email: ' . $th->getMessage() );
 			return true;
@@ -131,14 +161,15 @@ class EmailLogController {
 			);
 
 			$email_log_created = $email_log_model->create_email_log( $log_data );
-			// if ( ! $email_log_created['success'] ) {
-			// error_log( 'Failed to log email: ' . $email_log_created['message'] );
-			// }
+			if ( ! $email_log_created['success'] ) {
+				return false;
+			} else {
+				return true;
+			}
 		} catch ( \Throwable $th ) {
 			// error_log( 'Failed to log email: ' . $th->getMessage() );
 			return true;
 		}
-		return true;
 	}
 
 	/**
@@ -272,17 +303,19 @@ class EmailLogController {
 
 		$config = $email_config[ $provider ];
 
-		// For SES provider, use SesMailer directly
 		if ( 'ses' === $provider ) {
 			$ses_mailer = new SesMailer();
 			$sent       = $ses_mailer->send_email( $data['sendTo'], $subject, $message, $headers, $config, true );
+		} elseif ( 'gmail' === $provider ) {
+			$gmailer = new GMailer();
+			$sent    = $gmailer->send_email( $data );
+		} else {
+			// For all other providers, use wp_mail
+			$sent = trigger_wp_mail( $data['sendTo'], $subject, $message, $headers );
+		}
 
-			// $sent = wp_mail( $data['sendTo'], $subject, $message, $headers );
-			// todo: need to write custom error log
-			// file can be handleProviderTestMail.php
-
-			if ( true === $sent ) {
-				// $this->create_email_log( $data['sendTo'], $subject, $message, $headers );
+		if ( $sent ) {
+			if ( 'smtp' !== $provider ) {
 				do_action(
 					'wp_mail_succeeded',
 					array(
@@ -292,26 +325,25 @@ class EmailLogController {
 						'headers' => $headers,
 					)
 				);
-				return $this->json_response( __( 'Test email sent successfully', 'trigger' ), null, 200 );
-			} else {
-				// translators: %s is the error message returned from the AWS SES API
-				return $this->json_response( __( 'Failed to send test email', 'trigger' ), null, 400 );
 			}
+			return $this->json_response( __( 'Test email sent successfully', 'trigger' ), null, 200 );
 		} else {
-			// For all other providers, use wp_mail
-			$sent = wp_mail( $data['sendTo'], $subject, $message, $headers );
-
-			if ( $sent ) {
-				return $this->json_response( __( 'Test email sent successfully', 'trigger' ), null, 200 );
-			} else {
-				return $this->json_response( __( 'Failed to send test email', 'trigger' ), null, 400 );
+			if ( 'smtp' !== $provider ) {
+				do_action(
+					'wp_mail_failed',
+					new \WP_Error(
+						'wp_mail_failed',
+						__( 'Failed to send test email', 'trigger' ),
+						array(
+							'to'      => $data['sendTo'],
+							'subject' => $subject,
+							'message' => $message,
+							'headers' => $headers,
+						)
+					)
+				);
 			}
+			return $this->json_response( __( 'Failed to send test email', 'trigger' ), null, 400 );
 		}
-		// try {
-		// } catch ( Exception $e ) {
-		// $message = $e->getMessage();
-		// return throw new Exception($e->getMessage());
-		// return $this->json_response( __( 'Failed to send test email, please check your email credentials', 'trigger' ), null, 400 );
-		// }
 	}
 }

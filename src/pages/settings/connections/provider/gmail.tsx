@@ -8,18 +8,21 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { GmailConfigFormValues, gmailConfigSchema } from "@/utils/schemaValidation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import config from "@/config";
 import { ResponseType } from "@/utils/trigger-declaration";
 import { AnyObject, fetchUtil, triggerKeyValue } from "@/utils/utils";
 import { triggerFormData } from "@/utils/utils";
 import { useUpdateProvider } from "@/services/gmail-services";
+import { ConnectionType } from "..";
 
 
 const GmailForm = ({ selectedProvider }: { selectedProvider: EmailProviderOptionsType }) => {
 	const navigate = useNavigate();
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [connections, setConnections] = useState<ConnectionType[]>([]);
+	const [connectionIsLoading, setConnectionIsLoading] = useState(true);
 
 	const gmailForm = useForm<GmailConfigFormValues>({
 		resolver: zodResolver(gmailConfigSchema),
@@ -45,6 +48,43 @@ const GmailForm = ({ selectedProvider }: { selectedProvider: EmailProviderOption
 		}
 	}
 
+	useEffect(() => {
+		fetchConnections();
+	}, [])
+
+	const fetchConnections = async () => {
+		try {
+			const formData = new FormData();
+			formData.append('action', 'get_email_connections');
+			formData.append('trigger_nonce', config.nonce_value);
+			const response = await fetch(config.ajax_url, {
+				method: 'POST',
+				body: formData,
+			});
+			const responseData = await response.json() as ResponseType;
+			const gmailConnection = responseData.data || [];
+
+			setConnections(responseData.data || []);
+
+			if (gmailConnection.length > 0) {
+				// Find and set the connection data immediately
+				const connection = gmailConnection.find((conn: ConnectionType) => {
+					return conn.provider === 'gmail';
+				});
+				if (connection) {
+					gmailForm.setValue('fromName', connection.fromName);
+					gmailForm.setValue('fromEmail', connection.fromEmail);
+					gmailForm.setValue('clientId', connection.clientId || '');
+					gmailForm.setValue('clientSecret', connection.clientSecret || '');
+				}
+			}
+		} catch (error) {
+			console.error('Error fetching connections:', error);
+		} finally {
+			setConnectionIsLoading(false);
+		}
+	};
+
 	return (
 		<div className="flex justify-center">
 			<Card className="w-full max-w-[1000px] shadow-lg">
@@ -59,11 +99,10 @@ const GmailForm = ({ selectedProvider }: { selectedProvider: EmailProviderOption
 							onSubmit={
 								gmailForm.handleSubmit((values) => {
 									onSubmit(values);
-								}, (errors) => {
-									console.log('Form validation failed:', errors);
-								})
+								}, (errors) => { })
 							}
-							className="space-y-6">
+							className="space-y-6"
+						>
 							<div className="grid gap-6">
 								<div className="grid gap-4">
 									<FormField

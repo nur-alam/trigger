@@ -9,6 +9,7 @@ import { __ } from "@wordpress/i18n";
 import { ConnectionType } from "./index";
 import EditSmtpConfig from "./provider/edit-smtp-config";
 import EditSesConfig from "./provider/edit-ses-config";
+import EditGmailConfig from "./provider/edit-gmail-config";
 
 interface EditConnectionSheetProps {
 	open: boolean;
@@ -43,6 +44,11 @@ export function EditConnectionSheet({
 						<EditSesConfig connection={connection} />
 					</>
 				)}
+
+				{connection.provider === "gmail" && (
+					<EditGmailConfig connection={connection} />
+				)}
+
 			</SheetContent>
 		</Sheet >
 	);

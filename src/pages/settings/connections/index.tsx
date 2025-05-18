@@ -19,6 +19,8 @@ export interface ConnectionType {
 	accessKeyId?: string;
 	secretAccessKey?: string;
 	region?: string;
+	clientId?: string;
+	clientSecret?: string;
 	createdAt: string;
 }
 

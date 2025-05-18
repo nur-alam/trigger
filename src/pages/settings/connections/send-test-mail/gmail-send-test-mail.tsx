@@ -50,7 +50,7 @@ type FormValues = z.infer<typeof formSchema>;
 export function GmailSendTestMail({ open, onOpenChange, connection }: TestEmailSheetProps) {
 
 	const [isLoading, setIsLoading] = useState(false);
-
+	const redirectUrl = `${config.site_url}/wp-admin/admin.php?page=trigger`;
 	const [authUrl, setAuthUrl] = useState('');
 
 	const form = useForm<FormValues>({
@@ -60,11 +60,6 @@ export function GmailSendTestMail({ open, onOpenChange, connection }: TestEmailS
 			fromEmail: connection.fromEmail,
 		},
 	});
-
-	// Update form value when verified emails are loaded
-	useEffect(() => {
-		connectWithGmail();
-	}, []);
 
 	const handleSendTestEmail = async (values: FormValues) => {
 		setIsLoading(true);
@@ -108,6 +103,11 @@ export function GmailSendTestMail({ open, onOpenChange, connection }: TestEmailS
 		}
 	};
 
+	// Update form value when verified emails are loaded
+	useEffect(() => {
+		connectWithGmail();
+	}, []);
+
 	const connectWithGmail = async () => {
 		try {
 			const formData = new FormData();
@@ -116,7 +116,7 @@ export function GmailSendTestMail({ open, onOpenChange, connection }: TestEmailS
 			const response = await fetch(config.ajax_url, {
 				method: "POST",
 				body: formData,
-			})
+			});
 			const result = await response.json() as ResponseType;
 
 			if (result.status_code === 200) {
@@ -127,97 +127,109 @@ export function GmailSendTestMail({ open, onOpenChange, connection }: TestEmailS
 			}
 		} catch (error) {
 			toast.error(__("An unexpected error occurred. Please try again.", "trigger"));
+		} finally {
+			// setIsLoading(false);
 		}
 	}
 
 	return (
 		<Sheet open={open} onOpenChange={onOpenChange}>
-			<SheetContent style={{ zIndex: 999999 }}>
-				<SheetHeader>
-					<SheetTitle>{__("Send Test Email", "trigger")}</SheetTitle>
-					<SheetDescription>
-						{__("Send a test email to verify your connection is working properly.", "trigger")}
-					</SheetDescription>
-				</SheetHeader>
-
-				<div className="pt-4">
-					<div className="mb-4">
-						<p className="text-sm font-medium mb-1">{__("Provider", "trigger")}</p>
-						<Input className="text-sm [&:disabled]:opacity-100" value={connection.provider} disabled />
-					</div>
-				</div>
-
-				{
+			<SheetContent style={{ zIndex: 999999, maxWidth: '550px' }}>
+				{authUrl ?
 					<>
-						{/* <Button type="submit" disabled={isLoading}>
-							{isLoading ? (
-								<>
-									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-									{__("Sending...", "trigger")}
-								</>
-							) : (
-								__("Connect With Gmail", "trigger")
-							)}
-						</Button> */}
-						{/* {authUrl ? <a href={`${authUrl ?? ''}`}>{__('Connect With Gmail', 'trigger')}</a> : ''} */}
+						<SheetHeader>
+							<SheetTitle>{__("Set this redirect uri into your google console", "trigger")}</SheetTitle>
+							{/* <SheetDescription>
+								{__("Send a test email to verify your connection is working properly.", "trigger")}
+							</SheetDescription> */}
+						</SheetHeader>
+						<div className="mt-4">
+							<div className="flex items-center gap-2 p-3 bg-muted rounded-md mb-4">
+								<Input
+									value={redirectUrl}
+									readOnly
+									className="flex-1"
+								/>
+								<Button
+									variant="outline"
+									size="icon"
+									onClick={() => {
+										navigator.clipboard.writeText(redirectUrl);
+										toast.success(__('Copied to clipboard', 'trigger'));
+									}}
+								>
+									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2" /><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></svg>
+								</Button>
+							</div>
+							<a className="button button-primary pt-3 mt-2 w-full text-center" href={`${authUrl ?? ''}`}>{__('Connect With Gmail', 'trigger')}</a>
+						</div>
+					</>
+					:
+					<>
+						<SheetHeader>
+							<SheetTitle>{__("Send Test Email", "trigger")}</SheetTitle>
+							<SheetDescription>
+								{__("Send a test email to verify your connection is working properly.", "trigger")}
+							</SheetDescription>
+						</SheetHeader>
 
+						<div className="pt-4">
+							<div className="mb-4">
+								<p className="text-sm font-medium mb-1">{__("Provider", "trigger")}</p>
+								<Input className="text-sm [&:disabled]:opacity-100" value={connection.provider} disabled />
+							</div>
+						</div>
+						<Form {...form}>
+							<form onSubmit={form.handleSubmit(handleSendTestEmail)} className="space-y-4">
+								<div className="mb-4">
+									<p className="text-sm font-medium mb-1">{__("From", "trigger")}</p>
+								</div>
+								<FormField
+									control={form.control}
+									name="fromEmail"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>{__("From Email", "trigger")}</FormLabel>
+											<FormControl>
+												<Input placeholder="example@example.com" {...field} autoFocus />
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+								<FormField
+									control={form.control}
+									name="sendTo"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>{__("Send To", "trigger")}</FormLabel>
+											<FormControl>
+												<Input placeholder="example@example.com" {...field} autoFocus />
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+
+								<div className="flex justify-end gap-2 mt-6">
+									<SheetClose asChild>
+										<Button variant="outline">{__("Cancel", "trigger")}</Button>
+									</SheetClose>
+									<Button type="submit" disabled={isLoading}>
+										{isLoading ? (
+											<>
+												<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+												{__("Sending...", "trigger")}
+											</>
+										) : (
+											__("Send Test Email", "trigger")
+										)}
+									</Button>
+								</div>
+							</form>
+						</Form>
 					</>
 				}
-
-				<Form {...form}>
-					<form onSubmit={form.handleSubmit(handleSendTestEmail)} className="space-y-4">
-						<div className="mb-4">
-							<p className="text-sm font-medium mb-1">{__("From", "trigger")}</p>
-						</div>
-						<FormField
-							control={form.control}
-							name="fromEmail"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>{__("From Email", "trigger")}</FormLabel>
-									<FormControl>
-										<Input placeholder="example@example.com" {...field} autoFocus />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name="sendTo"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>{__("Send To", "trigger")}</FormLabel>
-									<FormControl>
-										<Input placeholder="example@example.com" {...field} autoFocus />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-
-						<div className="flex justify-end gap-2 mt-6">
-							<SheetClose asChild>
-								<Button variant="outline">{__("Cancel", "trigger")}</Button>
-							</SheetClose>
-
-							{authUrl ?
-								<a className="btn bg-primary" href={`${authUrl ?? ''}`}>{__('Connect With Gmail', 'trigger')}</a>
-								:
-								<Button type="submit" disabled={isLoading}>
-									{isLoading ? (
-										<>
-											<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-											{__("Sending...", "trigger")}
-										</>
-									) : (
-										__("Send Test Email", "trigger")
-									)}
-								</Button>
-							}
-						</div>
-					</form>
-				</Form>
 			</SheetContent>
 		</Sheet>
 	);

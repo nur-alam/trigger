@@ -54,7 +54,6 @@ const EditSmtpConfig = ({ connection }: { connection: ConnectionType }) => {
 	}, [connection, form]);
 
 	const onSubmit = async (values: SmtpConfigFormValues) => {
-		console.log('smtp values', values);
 		try {
 			const data = {
 				provider: values.provider,
@@ -78,7 +77,6 @@ const EditSmtpConfig = ({ connection }: { connection: ConnectionType }) => {
 			});
 
 			const responseData = await response.json() as ResponseType;
-			console.log('responseData', responseData);
 			if (responseData.status_code === 200) {
 				toast.success(__("Connection updated successfully!", "trigger"));
 				window.location.reload();
@@ -87,7 +85,6 @@ const EditSmtpConfig = ({ connection }: { connection: ConnectionType }) => {
 			}
 		} catch (error) {
 			toast.error(__("An unexpected error occurred. Please try again.", "trigger"));
-			console.error("Error updating connection:", error);
 		}
 	};
 

@@ -110,7 +110,8 @@ const AwsSesForm = ({ selectedProvider }: { selectedProvider: EmailProviderOptio
 										console.log('Form validation failed:', errors);
 									})
 								}
-								className="space-y-6">
+								className="space-y-6"
+							>
 								<div className="grid gap-6">
 									<div className="grid gap-4">
 										<FormField

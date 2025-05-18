@@ -142,6 +142,7 @@ class SmtpConfig {
 			return $this->json_response( __( 'No email connections found', 'trigger' ), array(), 200 );
 		}
 
+		// should be delete this commented code later
 		// Transform config object into array format
 		$connections = array();
 		foreach ( $config as $provider => $settings ) {

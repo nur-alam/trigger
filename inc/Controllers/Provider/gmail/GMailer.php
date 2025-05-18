@@ -116,7 +116,7 @@ class GMailer {
 	/**
 	 * Page content for the Gmail Mailer Manual page
 	 */
-	public function gmail_mailer_authentication() {
+	public function gmail_authentication() {
 		$gmail_credentials = get_option( GMAIL_AUTH_CREDENTIALS );
 
 		// Refresh token if expired
@@ -150,6 +150,35 @@ class GMailer {
 			),
 			200,
 		);
+	}
+
+
+	/**
+	 * Page content for the Gmail Mailer Manual page
+	 */
+	public function gmail_re_authentication() {
+		try {
+			$auth_url = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_query(
+				array(
+					// 'client_id'     => 'sadf737022802575-th58sa7cfl265udpaeotj3omn8nnrpaa.apps.googleusercontent.com',
+					// 'redirect_uri'  => 'localhost:8000/wp-admin/admin.php?page=trigger',
+					'client_id'     => $this->client_id,
+					'redirect_uri'  => TRIGGER_REDIRECT_URI,
+					'response_type' => 'code',
+					'scope'         => 'https://www.googleapis.com/auth/gmail.send',
+					'access_type'   => 'offline',
+					'prompt'        => 'consent',
+				)
+			);
+			wp_safe_redirect( $auth_url );
+			die();
+		} catch ( \Throwable $th ) {
+			$this->json_response(
+				'Gmail connection failed!!, check your credentials',
+				array(),
+				400,
+			);
+		}
 	}
 
 	/**

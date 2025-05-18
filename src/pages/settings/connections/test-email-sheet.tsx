@@ -1,7 +1,7 @@
 import { ConnectionType } from "@/pages/settings/connections/index";
-import { SmtpSendTestMail } from "./send-test-mail/SmtpSendTestMail";
-import { AwsSendTestMail } from "./send-test-mail/AwsSendTestMail";
-import { GmailSendTestMail } from "./send-test-mail/GmailSendTestMail";
+import { SmtpSendTestMail } from "./send-test-mail/smtp-send-test-mail";
+import { AwsSendTestMail } from "./send-test-mail/aws-send-test-mail";
+import { GmailSendTestMail } from "./send-test-mail/gmail-send-test-mail";
 
 interface TestEmailSheetProps {
 	open: boolean;
@@ -10,8 +10,6 @@ interface TestEmailSheetProps {
 }
 
 export function TestEmailSheet({ open, onOpenChange, connection }: TestEmailSheetProps) {
-	// Log the connection data to debug
-	console.log('TestEmailSheet connection:', connection);
 
 	return (
 		<>

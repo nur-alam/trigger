@@ -31,7 +31,6 @@ const AddConnection = () => {
 						defaultValue="smtp"
 						className="flex gap-6"
 						onValueChange={(value) => {
-							console.log('onTabChange', value);
 							setSelectedProvider(value as EmailProviderOptionsType);
 						}}
 					>

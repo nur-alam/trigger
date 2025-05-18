@@ -61,12 +61,6 @@ trait JsonResponse {
 	 * @return void
 	 */
 	protected function json_response( $message, $data = null, $code = 200, $errors = null ) {
-		// return array(
-		// 'status_code' => $code,
-		// 'message'     => $message,
-		// 'data'        => $data,
-		// 'errors'      => $errors,
-		// );
 		wp_send_json(
 			array(
 				'status_code' => $code,

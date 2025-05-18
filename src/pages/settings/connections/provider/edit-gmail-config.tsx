@@ -25,7 +25,7 @@ import { SheetHeader, SheetTitle } from "@/components/ui/sheet";
 const EditGmailConfig = ({ connection }: { connection: ConnectionType }) => {
 
 	const redirectUrl = `${config.site_url}/wp-admin/admin.php?page=trigger`;
-	const [authUrl, setAuthUrl] = useState('');
+	const [isGmailConnected, setIsGmailConnected] = useState(false);
 
 	const form = useForm<GmailConfigFormValues>({
 		resolver: zodResolver(gmailConfigSchema),
@@ -85,15 +85,41 @@ const EditGmailConfig = ({ connection }: { connection: ConnectionType }) => {
 	};
 
 	// Update form value when verified emails are loaded
-	// useEffect(() => {
-	// 	reConnectWithGmail();
-	// }, []);
+	useEffect(() => {
+		gmailConnectedOrNot();
+	}, []);
 
-	const reConnectWithGmail = async (e: React.MouseEvent) => {
+	const gmailConnectedOrNot = async () => {
+		try {
+			const formData = new FormData();
+			formData.append("action", "trigger_is_gmail_connected");
+			formData.append("trigger_nonce", config.nonce_value);
+			const response = await fetch(config.ajax_url, {
+				method: "POST",
+				body: formData,
+			});
+			const result = await response.json();
+
+			if (result.status_code === 200) {
+				setIsGmailConnected(true);
+				// setAuthUrl(result.data.auth_url);
+				// toast.success(result.message || __("Connected with Gmail successfully!", "trigger"));
+			} else {
+				setIsGmailConnected(false);
+				// toast.error(result.message || __("Failed to connect with Gmail. check your credentials.", "trigger"));
+			}
+		} catch (error) {
+			toast.error(__("An unexpected error occurred. Please try again.", "trigger"));
+		} finally {
+			// setIsLoading(false);
+		}
+	}
+
+	const connectWithGmail = async (e: React.MouseEvent) => {
 		e.preventDefault();
 		try {
 			const formData = new FormData();
-			formData.append("action", "trigger_re_connect_with_gmail");
+			formData.append("action", "trigger_connect_with_gmail");
 			formData.append("trigger_nonce", config.nonce_value);
 			const response = await fetch(config.ajax_url, {
 				method: "POST",
@@ -102,7 +128,7 @@ const EditGmailConfig = ({ connection }: { connection: ConnectionType }) => {
 			const result = await response.json() as ResponseType;
 
 			if (result.status_code === 200) {
-				setAuthUrl(result.data.auth_url);
+				window.location.href = result.data.auth_url;
 				// toast.success(result.message || __("Connected with Gmail successfully!", "trigger"));
 			} else {
 				toast.error(result.message || __("Failed to connect with Gmail. Please try again.", "trigger"));
@@ -217,11 +243,29 @@ const EditGmailConfig = ({ connection }: { connection: ConnectionType }) => {
 						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2" /><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></svg>
 					</Button>
 				</div>
-				<a className="button button-primary pt-3 mt-2 w-full text-center" href={`${authUrl ?? ''}`}
-					onClick={(e: React.MouseEvent) => reConnectWithGmail(e)}
-				>
-					{__('Reconnect With Gmail', 'trigger')}
-				</a>
+				{
+					isGmailConnected ?
+						<>
+							<Button
+								variant="destructive"
+								size="icon"
+								onClick={(e: React.MouseEvent) => connectWithGmail(e)}
+								className="w-full"
+							>
+								{__('Reconnect With Gmail', 'trigger')}
+							</Button>
+						</> :
+						<>
+							<Button
+								variant="default"
+								size="icon"
+								onClick={(e: React.MouseEvent) => connectWithGmail(e)}
+								className="w-full"
+							>
+								{__('Connect With Gmail', 'trigger')}
+							</Button>
+						</>
+				}
 			</div>
 		</>
 	);

@@ -48,10 +48,10 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export function GmailSendTestMail({ open, onOpenChange, connection }: TestEmailSheetProps) {
-
 	const [isLoading, setIsLoading] = useState(false);
 	const redirectUrl = `${config.site_url}/wp-admin/admin.php?page=trigger`;
 	const [authUrl, setAuthUrl] = useState('');
+	const [isGmailConnected, setIsGmailConnected] = useState(false);
 
 	const form = useForm<FormValues>({
 		resolver: zodResolver(formSchema),
@@ -63,7 +63,6 @@ export function GmailSendTestMail({ open, onOpenChange, connection }: TestEmailS
 
 	const handleSendTestEmail = async (values: FormValues) => {
 		setIsLoading(true);
-
 		try {
 			const formData = new FormData();
 			formData.append("action", "trigger_send_test_email");
@@ -77,10 +76,6 @@ export function GmailSendTestMail({ open, onOpenChange, connection }: TestEmailS
 			};
 
 			formData.append("data", JSON.stringify(data));
-
-			// console.log("Sending test email with Gmail:", Object.fromEntries(formData));
-
-			// return;
 
 			const response = await fetch(config.ajax_url, {
 				method: "POST",
@@ -103,12 +98,8 @@ export function GmailSendTestMail({ open, onOpenChange, connection }: TestEmailS
 		}
 	};
 
-	// Update form value when verified emails are loaded
-	useEffect(() => {
-		connectWithGmail();
-	}, []);
-
-	const connectWithGmail = async () => {
+	const connectWithGmail = async (e: React.MouseEvent) => {
+		e.preventDefault();
 		try {
 			const formData = new FormData();
 			formData.append("action", "trigger_connect_with_gmail");
@@ -120,7 +111,7 @@ export function GmailSendTestMail({ open, onOpenChange, connection }: TestEmailS
 			const result = await response.json() as ResponseType;
 
 			if (result.status_code === 200) {
-				setAuthUrl(result.data.auth_url);
+				window.location.href = result.data.auth_url;
 				// toast.success(result.message || __("Connected with Gmail successfully!", "trigger"));
 			} else {
 				toast.error(result.message || __("Failed to connect with Gmail. Please try again.", "trigger"));
@@ -132,12 +123,45 @@ export function GmailSendTestMail({ open, onOpenChange, connection }: TestEmailS
 		}
 	}
 
+	// Update form value when verified emails are loaded
+	useEffect(() => {
+		if (open) {
+			gmailConnectedOrNot();
+		}
+	}, [open]);
+
+	const gmailConnectedOrNot = async () => {
+		try {
+			const formData = new FormData();
+			formData.append("action", "trigger_is_gmail_connected");
+			formData.append("trigger_nonce", config.nonce_value);
+			const response = await fetch(config.ajax_url, {
+				method: "POST",
+				body: formData,
+			});
+			const result = await response.json();
+
+			if (result.status_code === 200) {
+				setIsGmailConnected(true);
+				// setAuthUrl(result.data.auth_url);
+				// toast.success(result.message || __("Connected with Gmail successfully!", "trigger"));
+			} else {
+				setIsGmailConnected(false);
+				// toast.error(result.message || __("Failed to connect with Gmail. check your credentials.", "trigger"));
+			}
+		} catch (error) {
+			// toast.error(__("An unexpected error occurred. Please try again.", "trigger"));
+		} finally {
+			// setIsLoading(false);
+		}
+	}
+
 	return (
 		<Sheet open={open} onOpenChange={onOpenChange}>
 			<SheetContent style={{ zIndex: 999999, maxWidth: '550px' }}>
-				{authUrl ?
+				{!isGmailConnected ?
 					<>
-						<SheetHeader>
+						<SheetHeader className="mt-10">
 							<SheetTitle>{__("Set this redirect uri into your google console", "trigger")}</SheetTitle>
 							{/* <SheetDescription>
 								{__("Send a test email to verify your connection is working properly.", "trigger")}
@@ -161,7 +185,14 @@ export function GmailSendTestMail({ open, onOpenChange, connection }: TestEmailS
 									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2" /><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></svg>
 								</Button>
 							</div>
-							<a className="button button-primary pt-3 mt-2 w-full text-center" href={`${authUrl ?? ''}`}>{__('Connect With Gmail', 'trigger')}</a>
+							<Button
+								variant="default"
+								size="icon"
+								onClick={(e: React.MouseEvent) => connectWithGmail(e)}
+								className="w-full"
+							>
+								{__('Connect With Gmail', 'trigger')}
+							</Button>
 						</div>
 					</>
 					:

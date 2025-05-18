@@ -73,10 +73,6 @@ export function SmtpSendTestMail({ open, onOpenChange, connection }: TestEmailSh
 
 			formData.append("data", JSON.stringify(data));
 
-			console.log("Sending test email with SMTP:", Object.fromEntries(formData));
-
-			return;
-
 			const response = await fetch(config.ajax_url, {
 				method: "POST",
 				body: formData,

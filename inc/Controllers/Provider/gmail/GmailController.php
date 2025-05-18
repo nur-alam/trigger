@@ -16,12 +16,15 @@ use Trigger\Traits\JsonResponse;
  */
 class GmailController {
 
+	use JsonResponse;
+
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
 		add_action( 'wp_ajax_trigger_connect_with_gmail', array( $this, 'trigger_connect_with_gmail' ) );
-		add_action( 'wp_ajax_trigger_re_connect_with_gmail', array( $this, 'trigger_re_connect_with_gmail' ) );
+		// add_action( 'wp_ajax_trigger_re_connect_with_gmail', array( $this, 'trigger_re_connect_with_gmail' ) );
+		add_action( 'wp_ajax_trigger_is_gmail_connected', array( $this, 'trigger_is_gmail_connected' ) );
 	}
 
 	/**
@@ -35,8 +38,21 @@ class GmailController {
 	/**
 	 * Page content for the Gmail Mailer Manual page
 	 */
-	public function trigger_re_connect_with_gmail() {
-		$gmailer = new GMailer();
-		$gmailer->gmail_re_authentication();
+	public function trigger_is_gmail_connected() {
+		$gmailer      = new GMailer();
+		$is_connected = $gmailer->is_gmail_connected();
+		if ( $is_connected ) {
+			return $this->json_response( 'Gmail is connected!', null, 200 );
+		} else {
+			$this->json_response( 'Gmail connection failed!!, check your credentials', null, 400, );
+		}
 	}
+
+	/**
+	 * Page content for the Gmail Mailer Manual page
+	 */
+	// public function trigger_re_connect_with_gmail() {
+	// $gmailer = new GMailer();
+	// $gmailer->gmail_re_authentication();
+	// }
 }

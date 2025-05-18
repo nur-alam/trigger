@@ -112,19 +112,39 @@ class GMailer {
 		return false;
 	}
 
+	/**
+	 * Handle Gmail Mailer callback
+	 */
+	public function handle_google_oauth_callback() {
+		if ( isset( $_GET['code'] ) ) {
+			$response = wp_remote_post(
+				'https://oauth2.googleapis.com/token',
+				array(
+					'body' => array(
+						'code'          => $_GET['code'], // phpcs:ignore
+						'client_id'     => $this->client_id,
+						'client_secret' => $this->client_secret,
+						'redirect_uri'  => TRIGGER_REDIRECT_URI,
+						'grant_type'    => 'authorization_code',
+					),
+				)
+			);
+			$body     = json_decode( wp_remote_retrieve_body( $response ), true );
+			if ( isset( $body['access_token'] ) ) {
+				update_option( GMAIL_AUTH_CREDENTIALS, $body );
+				wp_safe_redirect( admin_url( 'admin.php?page=trigger#/connections?google_gmail_redirect=true' ) );
+			} else {
+				wp_safe_redirect( admin_url( 'admin.php?page=trigger#/connections?google_gmail_redirect_failed=true' ) );
+			}
+		}
+	}
+
 
 	/**
 	 * Page content for the Gmail Mailer Manual page
 	 */
 	public function gmail_authentication() {
-		$gmail_credentials = get_option( GMAIL_AUTH_CREDENTIALS );
-
-		// Refresh token if expired
-		if ( $gmail_credentials && isset( $gmail_credentials['refresh_token'] ) ) {
-			$gmail_credentials = $this->gmail_refresh_token_if_needed( $gmail_credentials );
-		}
-
-		if ( ! $gmail_credentials ) {
+		try {
 			$auth_url = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_query(
 				array(
 					'client_id'     => $this->client_id,
@@ -142,43 +162,28 @@ class GMailer {
 				),
 				200
 			);
-		}
-		return $this->json_response(
-			'Gmail is already connected',
-			array(
-				'auth_url' => '',
-			),
-			200,
-		);
-	}
-
-
-	/**
-	 * Page content for the Gmail Mailer Manual page
-	 */
-	public function gmail_re_authentication() {
-		try {
-			$auth_url = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_query(
-				array(
-					// 'client_id'     => 'sadf737022802575-th58sa7cfl265udpaeotj3omn8nnrpaa.apps.googleusercontent.com',
-					// 'redirect_uri'  => 'localhost:8000/wp-admin/admin.php?page=trigger',
-					'client_id'     => $this->client_id,
-					'redirect_uri'  => TRIGGER_REDIRECT_URI,
-					'response_type' => 'code',
-					'scope'         => 'https://www.googleapis.com/auth/gmail.send',
-					'access_type'   => 'offline',
-					'prompt'        => 'consent',
-				)
-			);
-			wp_safe_redirect( $auth_url );
-			die();
 		} catch ( \Throwable $th ) {
 			$this->json_response(
 				'Gmail connection failed!!, check your credentials',
-				array(),
+				array(
+					'auth_url' => '',
+				),
 				400,
 			);
 		}
+	}
+
+	/**
+	 * Get access token
+	 *
+	 * @return string
+	 */
+	public function is_gmail_connected() {
+		$gmail_credentials = get_option( GMAIL_AUTH_CREDENTIALS );
+		if ( $gmail_credentials ) {
+			return true;
+		}
+		return false;
 	}
 
 	/**

@@ -10,7 +10,6 @@ interface TestEmailSheetProps {
 }
 
 export function TestEmailSheet({ open, onOpenChange, connection }: TestEmailSheetProps) {
-
 	return (
 		<>
 			{connection.provider === "smtp" && (

@@ -42,17 +42,9 @@ class GmailController {
 		$gmailer      = new GMailer();
 		$is_connected = $gmailer->is_gmail_connected();
 		if ( $is_connected ) {
-			return $this->json_response( 'Gmail is connected!', null, 200 );
+			return $this->json_response( 'Gmail is connected!', true, 200 );
 		} else {
-			$this->json_response( 'Gmail connection failed!!, check your credentials', null, 400, );
+			$this->json_response( 'Gmail connection failed!!, check your credentials', false, 400, );
 		}
 	}
-
-	/**
-	 * Page content for the Gmail Mailer Manual page
-	 */
-	// public function trigger_re_connect_with_gmail() {
-	// $gmailer = new GMailer();
-	// $gmailer->gmail_re_authentication();
-	// }
 }

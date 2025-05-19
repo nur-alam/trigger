@@ -6,21 +6,15 @@ import { EmailProviderOptionsType } from "@/utils/trigger-declaration";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
 import { GmailConfigFormValues, gmailConfigSchema } from "@/utils/schemaValidation";
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
 import config from "@/config";
 import { ResponseType } from "@/utils/trigger-declaration";
-import { AnyObject, fetchUtil, triggerKeyValue } from "@/utils/utils";
-import { triggerFormData } from "@/utils/utils";
-import { useUpdateProvider } from "@/services/gmail-services";
+import { useUpdateProvider } from "@/services/connection-services";
 import { ConnectionType } from "..";
 
 
 const GmailForm = ({ selectedProvider }: { selectedProvider: EmailProviderOptionsType }) => {
-	const navigate = useNavigate();
-	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [connections, setConnections] = useState<ConnectionType[]>([]);
 	const [connectionIsLoading, setConnectionIsLoading] = useState(true);
 
@@ -39,13 +33,7 @@ const GmailForm = ({ selectedProvider }: { selectedProvider: EmailProviderOption
 
 	const onSubmit = async (values: GmailConfigFormValues) => {
 		const newValues = { ...values, provider: selectedProvider };
-		const { status_code }: ResponseType = await updateProviderMutation.mutateAsync(newValues);
-		if (status_code === 200) {
-			toast.success(__("Email configuration saved successfully!", "trigger"));
-			// navigate("/connections");
-		} else {
-			toast.error(__('Failed to save email configuration', 'trigger'));
-		}
+		await updateProviderMutation.mutateAsync(newValues);
 	}
 
 	useEffect(() => {
@@ -110,7 +98,7 @@ const GmailForm = ({ selectedProvider }: { selectedProvider: EmailProviderOption
 										name="clientId"
 										render={({ field }) => (
 											<FormItem>
-												<FormLabel>{__("Access Key ID", "trigger")}</FormLabel>
+												<FormLabel>{__("Client ID", "trigger")}</FormLabel>
 												<FormControl>
 													<Input placeholder="AKIA..." {...field} />
 												</FormControl>
@@ -124,7 +112,7 @@ const GmailForm = ({ selectedProvider }: { selectedProvider: EmailProviderOption
 										name="clientSecret"
 										render={({ field }) => (
 											<FormItem>
-												<FormLabel>{__("Secret Access Key", "trigger")}</FormLabel>
+												<FormLabel>{__("Client Secret", "trigger")}</FormLabel>
 												<FormControl>
 													<Input type="password" placeholder="••••••••" {...field} />
 												</FormControl>

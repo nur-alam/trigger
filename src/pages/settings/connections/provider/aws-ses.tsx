@@ -17,7 +17,7 @@ import { AwsSesRegionOptionsType, AwsSesRegionAssociatedOptions } from "@/utils/
 import { ConnectionType } from "..";
 import { ResponseType } from "@/utils/trigger-declaration";
 import { Loader2 } from "lucide-react";
-import { useUpdateProvider } from "@/services/gmail-services";
+import { useUpdateProvider } from "@/services/connection-services";
 
 const AwsSesForm = ({ selectedProvider }: { selectedProvider: EmailProviderOptionsType }) => {
 	const navigate = useNavigate();
@@ -39,15 +39,8 @@ const AwsSesForm = ({ selectedProvider }: { selectedProvider: EmailProviderOptio
 
 	const onSubmit = async (values: SesConfigFormValues) => {
 		const newValues = { ...values, provider: selectedProvider };
-		console.log('newValues', newValues);
-		const { status_code }: ResponseType = await updateProviderMutation.mutateAsync(newValues);
-		if (status_code === 200) {
-			toast.success(__("Email configuration saved successfully!", "trigger"));
-			// navigate("/connections");
-		} else {
-			toast.error(__('Failed to save email configuration', 'trigger'));
-		}
-	};
+		await updateProviderMutation.mutateAsync(newValues);
+	}
 
 	const fetchConnections = async () => {
 		try {

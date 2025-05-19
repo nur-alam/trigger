@@ -21,7 +21,7 @@ import { ConnectionType } from "@/pages/settings/connections/index";
 import { GmailConfigFormValues, gmailConfigSchema } from "@/utils/schemaValidation";
 import { ResponseType } from "@/utils/trigger-declaration";
 import { SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { useConnectGmail } from "@/services/gmail-services";
+import { useConnectGmail, useIsGmailConnected, useUpdateProvider } from "@/services/connection-services";
 
 const EditGmailConfig = ({ connection }: { connection: ConnectionType }) => {
 
@@ -53,74 +53,34 @@ const EditGmailConfig = ({ connection }: { connection: ConnectionType }) => {
 		}
 	}, [connection, form]);
 
+	const updateProviderMutation = useUpdateProvider();
+
 	const onSubmit = async (values: GmailConfigFormValues) => {
-		try {
-			const data = {
-				provider: values.provider,
-				fromName: values.fromName,
-				fromEmail: values.fromEmail,
-				clientId: values.clientId,
-				clientSecret: values.clientSecret,
-			};
-
-			const formData = new FormData();
-			formData.append("action", "edit_email_config");
-			formData.append("trigger_nonce", config.nonce_value);
-			formData.append("data", JSON.stringify(data));
-
-			const response = await fetch(config.ajax_url, {
-				method: "POST",
-				body: formData,
-			});
-
-			const responseData = await response.json() as ResponseType;
-
-			if (responseData.status_code === 200) {
-				toast.success(__("Connection updated successfully!", "trigger"));
-			} else {
-				toast.error(responseData.message || __("Failed to update connection. Please try again.", "trigger"));
-			}
-		} catch (error) {
-			toast.error(__("An unexpected error occurred. Please try again.", "trigger"));
-		}
-	};
-
-	// Update form value when verified emails are loaded
-	useEffect(() => {
-		gmailConnectedOrNot();
-	}, []);
-
-	const gmailConnectedOrNot = async () => {
-		try {
-			const formData = new FormData();
-			formData.append("action", "trigger_is_gmail_connected");
-			formData.append("trigger_nonce", config.nonce_value);
-			const response = await fetch(config.ajax_url, {
-				method: "POST",
-				body: formData,
-			});
-			const result = await response.json();
-
-			if (result.status_code === 200) {
-				setIsGmailConnected(true);
-				// setAuthUrl(result.data.auth_url);
-				// toast.success(result.message || __("Connected with Gmail successfully!", "trigger"));
-			} else {
-				setIsGmailConnected(false);
-				// toast.error(result.message || __("Failed to connect with Gmail. check your credentials.", "trigger"));
-			}
-		} catch (error) {
-			toast.error(__("An unexpected error occurred. Please try again.", "trigger"));
-		} finally {
-			// setIsLoading(false);
-		}
+		const newValues = { ...values };
+		await updateProviderMutation.mutateAsync(newValues);
 	}
 
 	const connectGmailMutation = useConnectGmail();
 
 	const connectWithGmail = async (e: React.MouseEvent) => {
 		e.preventDefault();
-		const { status_code } = await connectGmailMutation.mutateAsync();
+		await connectGmailMutation.mutateAsync();
+	}
+
+	const isGmailConnectedMutation = useIsGmailConnected();
+
+	useEffect(() => {
+		gmailConnectedOrNot();
+	}, []);
+
+
+	const gmailConnectedOrNot = async () => {
+		const { status_code } = await isGmailConnectedMutation.mutateAsync() as ResponseType;
+		if (200 === status_code) {
+			setIsGmailConnected(true);
+		} else {
+			setIsGmailConnected(false);
+		}
 	}
 
 	return (
@@ -165,7 +125,7 @@ const EditGmailConfig = ({ connection }: { connection: ConnectionType }) => {
 						name="clientId"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>{__("Access Key ID", "trigger")}</FormLabel>
+								<FormLabel>{__("Client ID", "trigger")}</FormLabel>
 								<FormControl>
 									<Input placeholder="AKIAXXXXXXXXXXXXXXXX" {...field} />
 								</FormControl>
@@ -179,7 +139,7 @@ const EditGmailConfig = ({ connection }: { connection: ConnectionType }) => {
 						name="clientSecret"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>{__("Secret Access Key", "trigger")}</FormLabel>
+								<FormLabel>{__("Client Secret", "trigger")}</FormLabel>
 								<FormControl>
 									<Input type="password" placeholder="••••••••••••••••••••••••••••••••" {...field} />
 								</FormControl>
@@ -227,29 +187,31 @@ const EditGmailConfig = ({ connection }: { connection: ConnectionType }) => {
 					</Button>
 				</div>
 				{
-					isGmailConnected ?
-						<>
-							<Button
-								variant="destructive"
-								size="icon"
-								onClick={(e: React.MouseEvent) => connectWithGmail(e)}
-								className="w-full"
-							>
-								{connectGmailMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-								{__('Reconnect With Gmail', 'trigger')}
-							</Button>
-						</> :
-						<>
-							<Button
-								variant="default"
-								size="icon"
-								onClick={(e: React.MouseEvent) => connectWithGmail(e)}
-								className="w-full"
-							>
-								{connectGmailMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-								{__('Connect With Gmail', 'trigger')}
-							</Button>
-						</>
+					isGmailConnectedMutation.isPending ?
+						<Loader2 className="h-4 w-4 animate-spin mx-auto" /> :
+						isGmailConnected ?
+							<>
+								<Button
+									variant="destructive"
+									size="icon"
+									onClick={(e: React.MouseEvent) => connectWithGmail(e)}
+									className="w-full"
+								>
+									{connectGmailMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+									{__('Reconnect With Gmail', 'trigger')}
+								</Button>
+							</> :
+							<>
+								<Button
+									variant="default"
+									size="icon"
+									onClick={(e: React.MouseEvent) => connectWithGmail(e)}
+									className="w-full"
+								>
+									{connectGmailMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+									{__('Connect With Gmail', 'trigger')}
+								</Button>
+							</>
 				}
 			</div>
 		</>

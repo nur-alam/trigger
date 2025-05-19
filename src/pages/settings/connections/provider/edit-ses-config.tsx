@@ -20,6 +20,7 @@ import config from "@/config";
 import { ConnectionType } from "@/pages/settings/connections/index";
 import { SesConfigFormValues, sesConfigSchema } from "@/utils/schemaValidation";
 import { AwsSesRegionAssociatedOptions, ResponseType } from "@/utils/trigger-declaration";
+import { useUpdateProvider } from "@/services/connection-services";
 
 const EditSesConfig = ({ connection }: { connection: ConnectionType }) => {
 	const form = useForm<SesConfigFormValues>({
@@ -49,39 +50,12 @@ const EditSesConfig = ({ connection }: { connection: ConnectionType }) => {
 		}
 	}, [connection, form]);
 
+	const updateProviderMutation = useUpdateProvider();
+
 	const onSubmit = async (values: SesConfigFormValues) => {
-		try {
-			const data = {
-				provider: values.provider,
-				fromName: values.fromName,
-				fromEmail: values.fromEmail,
-				accessKeyId: values.accessKeyId,
-				secretAccessKey: values.secretAccessKey,
-				region: values.region,
-			};
-
-			const formData = new FormData();
-			formData.append("action", "edit_email_config");
-			formData.append("trigger_nonce", config.nonce_value);
-			formData.append("data", JSON.stringify(data));
-
-			const response = await fetch(config.ajax_url, {
-				method: "POST",
-				body: formData,
-			});
-
-			const responseData = await response.json() as ResponseType;
-
-			if (responseData.status_code === 200) {
-				toast.success(__("Connection updated successfully!", "trigger"));
-			} else {
-				toast.error(responseData.message || __("Failed to update connection. Please try again.", "trigger"));
-			}
-		} catch (error) {
-			toast.error(__("An unexpected error occurred. Please try again.", "trigger"));
-			console.error("Error updating connection:", error);
-		}
-	};
+		const newValues = { ...values };
+		await updateProviderMutation.mutateAsync(newValues);
+	}
 
 	return (
 		<Form {...form}>

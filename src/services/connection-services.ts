@@ -14,8 +14,11 @@ const updateProvider = async (payload: AnyObject) => {
 export const useUpdateProvider = () => {
 	return useMutation({
 		mutationFn: updateProvider,
+		onSuccess: (response: ResponseType) => {
+			toast.success(response.message ?? __('Email configuration saved successfully!', 'trigger'));
+		},
 		onError: (error: any) => {
-			console.log('mutation error', error);
+			toast.error(error.message ?? __('Failed to save email configuration', 'trigger'));
 		},
 	});
 };
@@ -37,6 +40,25 @@ export const useConnectGmail = () => {
 		},
 		onError: (error: any) => {
 			toast.error(error.message || __('Failed to connect with Gmail. Please try again.', 'trigger'));
+		},
+	});
+};
+
+const isGmailConnected = async () => {
+	const payload = {
+		action: 'trigger_is_gmail_connected',
+	};
+	const res = await fetchUtil(config.ajax_url, { body: payload });
+	return res;
+};
+
+export const useIsGmailConnected = () => {
+	return useMutation({
+		mutationFn: isGmailConnected,
+		onSuccess: (response: ResponseType) => {},
+		onError: (error: any) => {
+			console.log('useIsGmailConnected', error);
+			toast.error(error.message || __('Failed to check connection. Please try again.', 'trigger'));
 		},
 	});
 };

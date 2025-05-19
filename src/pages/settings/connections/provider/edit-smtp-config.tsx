@@ -19,6 +19,7 @@ import { ConnectionType } from "@/pages/settings/connections/index";
 import { SmtpPortOptionsType, SmtpSecurityOptionsType, ResponseType } from "@/utils/trigger-declaration";
 import { SmtpConfigFormValues, smtpConfigSchema } from "@/utils/schemaValidation";
 import config from "@/config";
+import { useUpdateProvider } from "@/services/connection-services";
 
 
 const EditSmtpConfig = ({ connection }: { connection: ConnectionType }) => {
@@ -53,40 +54,12 @@ const EditSmtpConfig = ({ connection }: { connection: ConnectionType }) => {
 		}
 	}, [connection, form]);
 
+	const updateProviderMutation = useUpdateProvider();
+
 	const onSubmit = async (values: SmtpConfigFormValues) => {
-		try {
-			const data = {
-				provider: values.provider,
-				fromName: values.fromName,
-				fromEmail: values.fromEmail,
-				smtpHost: values.smtpHost,
-				smtpPort: values.smtpPort,
-				smtpSecurity: values.smtpSecurity,
-				smtpUsername: values.smtpUsername,
-				smtpPassword: values.smtpPassword,
-			};
-
-			const formData = new FormData();
-			formData.append("action", "edit_email_config");
-			formData.append("trigger_nonce", config.nonce_value);
-			formData.append("data", JSON.stringify(data));
-
-			const response = await fetch(config.ajax_url, {
-				method: "POST",
-				body: formData,
-			});
-
-			const responseData = await response.json() as ResponseType;
-			if (responseData.status_code === 200) {
-				toast.success(__("Connection updated successfully!", "trigger"));
-				window.location.reload();
-			} else {
-				toast.error(responseData.message || __("Failed to update connection. Please try again.", "trigger"));
-			}
-		} catch (error) {
-			toast.error(__("An unexpected error occurred. Please try again.", "trigger"));
-		}
-	};
+		const newValues = { ...values };
+		await updateProviderMutation.mutateAsync(newValues);
+	}
 
 	return (
 		<Form {...form}>

@@ -158,7 +158,7 @@ const ConnectionList = ({ initialConnections, setInitialConnections }: { initial
 										size="icon"
 										onClick={() => handleDeleteConnection(connection)}
 									>
-										<Trash2Icon className="h-4 w-4" />
+										<Trash2Icon className="h-4 w-4 text-red-500" />
 									</Button>
 								</div>
 							</TableCell>

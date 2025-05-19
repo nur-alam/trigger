@@ -25,7 +25,7 @@ export function EditConnectionSheet({
 
 	return (
 		<Sheet open={open} onOpenChange={onOpenChange}>
-			<SheetContent className="sm:max-w-md overflow-y-auto" style={{ zIndex: 999999 }}>
+			<SheetContent className="sm:max-w-md overflow-y-auto" style={{ zIndex: 999999, maxWidth: '550px' }}>
 				<SheetHeader>
 					<SheetTitle>{__("Edit Connection", "trigger")}</SheetTitle>
 					<SheetDescription>

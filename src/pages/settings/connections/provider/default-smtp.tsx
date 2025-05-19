@@ -16,7 +16,7 @@ import { emailProviderAssociatedOptions, smtpSecurityAssociatedOptions, smtpSecu
 import { EmailProviderOptionsType, ResponseType, SmtpSecurityOptionsType } from "@/utils/trigger-declaration";
 import { ConnectionType } from "..";
 import { Loader2 } from "lucide-react";
-import { useUpdateProvider } from "@/services/gmail-services";
+import { useUpdateProvider } from "@/services/connection-services";
 
 export interface EmailSettingsResponse {
 	status_code: number;

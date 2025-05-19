@@ -40,7 +40,7 @@ export async function fetchUtil(
 		formData.append(nonce_key, nonce_value);
 		fetchOptions.body = formData;
 	}
-	console.log('fetchOptions', fetchOptions);
+	// console.log('fetchOptions', fetchOptions);
 	try {
 
 		const apiResponse = await fetch(url, fetchOptions);

@@ -1,3 +1,19 @@
+export interface EmailSettingsResponse {
+	status_code: number;
+	message?: string;
+	data?: {
+		provider?: EmailProviderOptionsType;
+		from_name?: string;
+		from_email?: string;
+		smtp_host?: string;
+		smtp_port?: string;
+		smtp_security?: SmtpSecurityOptionsType;
+		smtp_username?: string;
+		smtp_password?: string;
+	};
+	errors?: Record<string, string[]>;
+}
+
 export type EmailProviderOptionsType = 'smtp' | 'ses' | 'gmail';
 export const emailProviderOptions: EmailProviderOptionsType[] = ['smtp', 'ses', 'gmail'];
 export const emailProviderAssociatedOptions: { label: string; value: EmailProviderOptionsType }[] = [
@@ -48,7 +64,7 @@ export const AwsSesRegionAssociatedOptions: AwsSesRegionAssociatedOptionsType[] 
 ];
 
 // Response Type
-export type ResponseType = {
+export type TriggerResponseType = {
 	status_code: number;
 	message: string;
 	data: any;

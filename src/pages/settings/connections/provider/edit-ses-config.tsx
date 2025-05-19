@@ -13,13 +13,11 @@ import {
 	FormMessage,
 	FormDescription,
 } from "@/components/ui/form";
-import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
 import { __ } from "@wordpress/i18n";
-import config from "@/config";
 import { ConnectionType } from "@/pages/settings/connections/index";
 import { SesConfigFormValues, sesConfigSchema } from "@/utils/schemaValidation";
-import { AwsSesRegionAssociatedOptions, ResponseType } from "@/utils/trigger-declaration";
+import { AwsSesRegionAssociatedOptions } from "@/utils/trigger-declaration";
 import { useUpdateProvider } from "@/services/connection-services";
 
 const EditSesConfig = ({ connection }: { connection: ConnectionType }) => {

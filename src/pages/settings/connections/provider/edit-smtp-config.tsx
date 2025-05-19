@@ -12,13 +12,11 @@ import {
 	FormLabel,
 	FormMessage,
 } from "@/components/ui/form";
-import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
 import { __ } from "@wordpress/i18n";
 import { ConnectionType } from "@/pages/settings/connections/index";
-import { SmtpPortOptionsType, SmtpSecurityOptionsType, ResponseType } from "@/utils/trigger-declaration";
+import { SmtpPortOptionsType, SmtpSecurityOptionsType } from "@/utils/trigger-declaration";
 import { SmtpConfigFormValues, smtpConfigSchema } from "@/utils/schemaValidation";
-import config from "@/config";
 import { useUpdateProvider } from "@/services/connection-services";
 
 

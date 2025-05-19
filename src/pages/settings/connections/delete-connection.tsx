@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 import config from "@/config";
 import { ConnectionType } from "./index";
 import { SetStateAction, Dispatch } from "react";
-import { ResponseType } from "@/utils/trigger-declaration";
+import { TriggerResponseType } from "@/utils/trigger-declaration";
 interface DeleteConnectionSheetProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
@@ -37,7 +37,7 @@ export function DeleteConnectionSheet({
 				body: formData,
 			});
 
-			const responseData = await response.json() as ResponseType;
+			const responseData = await response.json() as TriggerResponseType;
 			if (responseData?.status_code === 200) {
 				if (setInitialConnections && Array.isArray(responseData.data)) {
 					setInitialConnections(responseData.data);

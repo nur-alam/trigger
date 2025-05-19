@@ -4,7 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { HelpCircle, Loader2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import config from "@/config";
-import { ResponseType } from "@/utils/trigger-declaration";
+import { TriggerResponseType } from "@/utils/trigger-declaration";
 import { toast } from "react-hot-toast";
 import { ConnectionType } from "./connections/index";
 
@@ -26,7 +26,7 @@ const GeneralSettings = () => {
 				method: 'POST',
 				body: formData,
 			});
-			const responseData = await response.json() as ResponseType;
+			const responseData = await response.json() as TriggerResponseType;
 			setDefaultConnection(responseData.data);
 
 			// Set the selected provider based on the default connection
@@ -47,7 +47,7 @@ const GeneralSettings = () => {
 				method: 'POST',
 				body: formData,
 			});
-			const responseData = await response.json() as ResponseType;
+			const responseData = await response.json() as TriggerResponseType;
 			setConnections(responseData.data || []);
 		} catch (error) {
 			console.error('Error fetching connections:', error);
@@ -71,7 +71,7 @@ const GeneralSettings = () => {
 				body: formData,
 			});
 
-			const responseData = await response.json() as ResponseType;
+			const responseData = await response.json() as TriggerResponseType;
 
 			if (responseData.status_code === 200) {
 				toast.success(__('Default connection updated successfully', 'trigger'));
@@ -97,7 +97,7 @@ const GeneralSettings = () => {
 				method: 'POST',
 				body: formData,
 			});
-			const responseData = await response.json() as ResponseType;
+			const responseData = await response.json() as TriggerResponseType;
 
 			if (responseData.status_code === 200 && responseData.data) {
 				// Ensure we're dealing with a string value
@@ -125,7 +125,7 @@ const GeneralSettings = () => {
 				body: formData,
 			});
 
-			const responseData = await response.json() as ResponseType;
+			const responseData = await response.json() as TriggerResponseType;
 
 			if (responseData.status_code === 200) {
 				setLogRetention(responseData.data);
@@ -156,6 +156,8 @@ const GeneralSettings = () => {
 			return `SMTP: ${connection.fromEmail} (${connection.smtpHost})`;
 		} else if (connection.provider === 'ses') {
 			return `SES: ${connection.fromEmail} (${connection.region})`;
+		} else if (connection.provider === 'gmail') {
+			return `GMAIL: ${connection.fromEmail}`;
 		}
 		return connection.provider;
 	};

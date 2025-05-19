@@ -9,18 +9,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import config from "@/config";
 import { useEffect, useState } from "react";
 import { sesConfigSchema, SesConfigFormValues } from "@/utils/schemaValidation";
-import { useNavigate } from "react-router-dom";
 import { emailProviderAssociatedOptions } from "@/utils/trigger-declaration";
 import { EmailProviderOptionsType } from "@/utils/trigger-declaration";
-import toast from "react-hot-toast";
 import { AwsSesRegionOptionsType, AwsSesRegionAssociatedOptions } from "@/utils/trigger-declaration";
 import { ConnectionType } from "..";
-import { ResponseType } from "@/utils/trigger-declaration";
+import { TriggerResponseType } from "@/utils/trigger-declaration";
 import { Loader2 } from "lucide-react";
 import { useUpdateProvider } from "@/services/connection-services";
 
 const AwsSesForm = ({ selectedProvider }: { selectedProvider: EmailProviderOptionsType }) => {
-	const navigate = useNavigate();
 	const [connections, setConnections] = useState<ConnectionType[]>([]);
 	const [connectionIsLoading, setConnectionIsLoading] = useState(true);
 	const form = useForm<SesConfigFormValues>({
@@ -51,7 +48,7 @@ const AwsSesForm = ({ selectedProvider }: { selectedProvider: EmailProviderOptio
 				method: 'POST',
 				body: formData,
 			});
-			const responseData = await response.json() as ResponseType;
+			const responseData = await response.json() as TriggerResponseType;
 			const connections = responseData.data || [];
 			if (connections.length > 0) {
 				setConnections(connections);

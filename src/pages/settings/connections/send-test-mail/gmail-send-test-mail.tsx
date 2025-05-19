@@ -25,10 +25,7 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { z } from "zod";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AwsSesVerifiedEmailType } from "@/utils/trigger-declaration";
-import { ResponseType } from "@/utils/trigger-declaration";
-import { useSearchParams } from "react-router-dom";
+import { TriggerResponseType } from "@/utils/trigger-declaration";
 import { useConnectGmail, useIsGmailConnected } from "@/services/connection-services";
 
 interface TestEmailSheetProps {
@@ -83,7 +80,7 @@ export function GmailSendTestMail({ open, onOpenChange, connection }: TestEmailS
 				body: formData,
 			});
 
-			const result = await response.json() as ResponseType;
+			const result = await response.json() as TriggerResponseType;
 
 			if (result.status_code === 200) {
 				toast.success(result.message || __("Test email sent successfully!", "trigger"));
@@ -117,7 +114,7 @@ export function GmailSendTestMail({ open, onOpenChange, connection }: TestEmailS
 
 
 	const gmailConnectedOrNot = async () => {
-		const { status_code } = await isGmailConnectedMutation.mutateAsync() as ResponseType;
+		const { status_code } = await isGmailConnectedMutation.mutateAsync() as TriggerResponseType;
 		if (200 === status_code) {
 			setIsGmailConnected(true);
 		} else {

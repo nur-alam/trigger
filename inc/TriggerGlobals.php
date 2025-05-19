@@ -507,7 +507,6 @@ if ( ! function_exists( 'wp_mail' ) ) :
 
 		$mail_data = compact( 'to', 'subject', 'message', 'headers', 'attachments' );
 
-		// Send!
 		try {
 			$default_provider = trigger_get_default_provider();
 			$send             = false;
@@ -564,7 +563,19 @@ endif;
 
 
 
-
+/**
+ * Sends an email.
+ *
+ * @since 2.2.0
+ *
+ * @param string|string[] $to          Array or comma-separated list of email addresses to send message.
+ * @param string          $subject     Email subject.
+ * @param string          $message     Message contents.
+ * @param string|string[] $headers     Additional headers.
+ * @param string|string[] $attachments Paths to files to attach.
+ *
+ * @return bool True if the email was sent successfully, false otherwise.
+ */
 function trigger_wp_mail( $to, $subject, $message, $headers = '', $attachments = array() ) {
 	// Compact the input, apply the filters, and extract them back out.
 
@@ -937,7 +948,6 @@ function trigger_wp_mail( $to, $subject, $message, $headers = '', $attachments =
 
 	$mail_data = compact( 'to', 'subject', 'message', 'headers', 'attachments' );
 
-	// Send!
 	try {
 
 		$send = $phpmailer->send();

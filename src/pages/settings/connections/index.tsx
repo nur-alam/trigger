@@ -5,7 +5,7 @@ import ConnectionList from "./connection-list";
 import { __ } from "@wordpress/i18n";
 import { useNavigate } from "react-router-dom";
 import config from "@/config";
-import { EmailProviderOptionsType, ResponseType } from "@/utils/trigger-declaration";
+import { EmailProviderOptionsType, TriggerResponseType } from "@/utils/trigger-declaration";
 
 export interface ConnectionType {
 	fromEmail: string;
@@ -108,7 +108,7 @@ const Connections = () => {
 					body: formData,
 				});
 
-				const responseData = await response.json() as ResponseType;
+				const responseData = await response.json() as TriggerResponseType;
 				setConnections(responseData.data);
 			} catch (error) {
 				console.error('Error fetching connections:', error);

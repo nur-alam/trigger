@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { GmailConfigFormValues, gmailConfigSchema } from "@/utils/schemaValidation";
 import { useEffect, useState } from "react";
 import config from "@/config";
-import { ResponseType } from "@/utils/trigger-declaration";
+import { TriggerResponseType } from "@/utils/trigger-declaration";
 import { useUpdateProvider } from "@/services/connection-services";
 import { ConnectionType } from "..";
 
@@ -49,7 +49,7 @@ const GmailForm = ({ selectedProvider }: { selectedProvider: EmailProviderOption
 				method: 'POST',
 				body: formData,
 			});
-			const responseData = await response.json() as ResponseType;
+			const responseData = await response.json() as TriggerResponseType;
 			const gmailConnection = responseData.data || [];
 
 			setConnections(responseData.data || []);

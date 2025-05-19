@@ -3,7 +3,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
 	Form,
 	FormControl,
@@ -19,8 +18,7 @@ import { __ } from "@wordpress/i18n";
 import config from "@/config";
 import { ConnectionType } from "@/pages/settings/connections/index";
 import { GmailConfigFormValues, gmailConfigSchema } from "@/utils/schemaValidation";
-import { ResponseType } from "@/utils/trigger-declaration";
-import { SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { TriggerResponseType } from "@/utils/trigger-declaration";
 import { useConnectGmail, useIsGmailConnected, useUpdateProvider } from "@/services/connection-services";
 
 const EditGmailConfig = ({ connection }: { connection: ConnectionType }) => {
@@ -75,7 +73,7 @@ const EditGmailConfig = ({ connection }: { connection: ConnectionType }) => {
 
 
 	const gmailConnectedOrNot = async () => {
-		const { status_code } = await isGmailConnectedMutation.mutateAsync() as ResponseType;
+		const { status_code } = await isGmailConnectedMutation.mutateAsync() as TriggerResponseType;
 		if (200 === status_code) {
 			setIsGmailConnected(true);
 		} else {

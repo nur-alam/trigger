@@ -10,37 +10,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import config from "@/config";
 import toast from "react-hot-toast";
 import { SmtpConfigFormValues, smtpConfigSchema } from "@/utils/schemaValidation";
-import ErrorToast from "@/components/ErrorToast";
-import { useNavigate } from "react-router-dom";
 import { emailProviderAssociatedOptions, smtpSecurityAssociatedOptions, smtpSecurityOptions } from "@/utils/trigger-declaration";
-import { EmailProviderOptionsType, ResponseType, SmtpSecurityOptionsType } from "@/utils/trigger-declaration";
+import { EmailProviderOptionsType, TriggerResponseType, SmtpSecurityOptionsType } from "@/utils/trigger-declaration";
 import { ConnectionType } from "..";
 import { Loader2 } from "lucide-react";
 import { useUpdateProvider } from "@/services/connection-services";
 
-export interface EmailSettingsResponse {
-	status_code: number;
-	message?: string;
-	data?: {
-		provider?: EmailProviderOptionsType;
-		from_name?: string;
-		from_email?: string;
-		smtp_host?: string;
-		smtp_port?: string;
-		smtp_security?: SmtpSecurityOptionsType;
-		smtp_username?: string;
-		smtp_password?: string;
-	};
-	errors?: Record<string, string[]>;
-};
-
 
 const DefaultSmtp = ({ selectedProvider }: { selectedProvider: EmailProviderOptionsType }) => {
-	const navigate = useNavigate();
-	const [isSubmitting, setIsSubmitting] = useState(false);
-	const [isTestingEmail, setIsTestingEmail] = useState(false);
-	const [toEmail, setToEmail] = useState('');
-	const [open, setOpen] = useState(false);
 	const [connections, setConnections] = useState<ConnectionType[]>([]);
 	const [connectionIsLoading, setConnectionIsLoading] = useState(true);
 
@@ -62,15 +39,8 @@ const DefaultSmtp = ({ selectedProvider }: { selectedProvider: EmailProviderOpti
 
 	const onSubmit = async (values: SmtpConfigFormValues) => {
 		const newValues = { ...values, provider: selectedProvider };
-		console.log('newValues', newValues);
-		const { status_code }: ResponseType = await updateProviderMutation.mutateAsync(newValues);
-		if (status_code === 200) {
-			toast.success(__("Email configuration saved successfully!", "trigger"));
-			// navigate("/connections");
-		} else {
-			toast.error(__('Failed to save email configuration', 'trigger'));
-		}
-	};
+		await updateProviderMutation.mutateAsync(newValues);
+	}
 
 	const fetchConnections = async () => {
 		try {
@@ -81,7 +51,7 @@ const DefaultSmtp = ({ selectedProvider }: { selectedProvider: EmailProviderOpti
 				method: 'POST',
 				body: formData,
 			});
-			const responseData = await response.json() as ResponseType;
+			const responseData = await response.json() as TriggerResponseType;
 			const connections = responseData.data || [];
 			setConnections(connections);
 
@@ -260,9 +230,9 @@ const DefaultSmtp = ({ selectedProvider }: { selectedProvider: EmailProviderOpti
 								<div className="flex gap-2 justify-end">
 									<Button
 										type="submit"
-										disabled={isSubmitting}
+										disabled={updateProviderMutation.isPending}
 									>
-										{isSubmitting ? __("Saving...", "trigger") : __("Save Changes", "trigger")}
+										{updateProviderMutation.isPending ? __("Saving...", "trigger") : __("Save Changes", "trigger")}
 									</Button>
 								</div>
 							</form>

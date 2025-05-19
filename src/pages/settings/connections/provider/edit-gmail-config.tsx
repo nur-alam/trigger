@@ -21,6 +21,7 @@ import { ConnectionType } from "@/pages/settings/connections/index";
 import { GmailConfigFormValues, gmailConfigSchema } from "@/utils/schemaValidation";
 import { ResponseType } from "@/utils/trigger-declaration";
 import { SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { useConnectGmail } from "@/services/gmail-services";
 
 const EditGmailConfig = ({ connection }: { connection: ConnectionType }) => {
 
@@ -115,29 +116,11 @@ const EditGmailConfig = ({ connection }: { connection: ConnectionType }) => {
 		}
 	}
 
+	const connectGmailMutation = useConnectGmail();
+
 	const connectWithGmail = async (e: React.MouseEvent) => {
 		e.preventDefault();
-		try {
-			const formData = new FormData();
-			formData.append("action", "trigger_connect_with_gmail");
-			formData.append("trigger_nonce", config.nonce_value);
-			const response = await fetch(config.ajax_url, {
-				method: "POST",
-				body: formData,
-			});
-			const result = await response.json() as ResponseType;
-
-			if (result.status_code === 200) {
-				window.location.href = result.data.auth_url;
-				// toast.success(result.message || __("Connected with Gmail successfully!", "trigger"));
-			} else {
-				toast.error(result.message || __("Failed to connect with Gmail. Please try again.", "trigger"));
-			}
-		} catch (error) {
-			toast.error(__("An unexpected error occurred. Please try again.", "trigger"));
-		} finally {
-			// setIsLoading(false);
-		}
+		const { status_code } = await connectGmailMutation.mutateAsync();
 	}
 
 	return (
@@ -252,6 +235,7 @@ const EditGmailConfig = ({ connection }: { connection: ConnectionType }) => {
 								onClick={(e: React.MouseEvent) => connectWithGmail(e)}
 								className="w-full"
 							>
+								{connectGmailMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
 								{__('Reconnect With Gmail', 'trigger')}
 							</Button>
 						</> :
@@ -262,6 +246,7 @@ const EditGmailConfig = ({ connection }: { connection: ConnectionType }) => {
 								onClick={(e: React.MouseEvent) => connectWithGmail(e)}
 								className="w-full"
 							>
+								{connectGmailMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
 								{__('Connect With Gmail', 'trigger')}
 							</Button>
 						</>

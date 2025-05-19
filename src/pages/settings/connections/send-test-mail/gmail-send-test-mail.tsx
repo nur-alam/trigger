@@ -29,6 +29,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AwsSesVerifiedEmailType } from "@/utils/trigger-declaration";
 import { ResponseType } from "@/utils/trigger-declaration";
 import { useSearchParams } from "react-router-dom";
+import { useConnectGmail } from "@/services/gmail-services";
 
 interface TestEmailSheetProps {
 	open: boolean;
@@ -98,29 +99,11 @@ export function GmailSendTestMail({ open, onOpenChange, connection }: TestEmailS
 		}
 	};
 
+	const connectGmailMutation = useConnectGmail();
+
 	const connectWithGmail = async (e: React.MouseEvent) => {
 		e.preventDefault();
-		try {
-			const formData = new FormData();
-			formData.append("action", "trigger_connect_with_gmail");
-			formData.append("trigger_nonce", config.nonce_value);
-			const response = await fetch(config.ajax_url, {
-				method: "POST",
-				body: formData,
-			});
-			const result = await response.json() as ResponseType;
-
-			if (result.status_code === 200) {
-				window.location.href = result.data.auth_url;
-				// toast.success(result.message || __("Connected with Gmail successfully!", "trigger"));
-			} else {
-				toast.error(result.message || __("Failed to connect with Gmail. Please try again.", "trigger"));
-			}
-		} catch (error) {
-			toast.error(__("An unexpected error occurred. Please try again.", "trigger"));
-		} finally {
-			// setIsLoading(false);
-		}
+		const { status_code } = await connectGmailMutation.mutateAsync();
 	}
 
 	// Update form value when verified emails are loaded
@@ -191,7 +174,13 @@ export function GmailSendTestMail({ open, onOpenChange, connection }: TestEmailS
 								onClick={(e: React.MouseEvent) => connectWithGmail(e)}
 								className="w-full"
 							>
-								{__('Connect With Gmail', 'trigger')}
+								{connectGmailMutation.isPending ?
+									<>
+										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+										{__('Connecting...', 'trigger')}
+									</> :
+									<>{__('Connect With Gmail', 'trigger')}</>
+								}
 							</Button>
 						</div>
 					</>

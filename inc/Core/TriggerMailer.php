@@ -1,143 +1,37 @@
 <?php
 /**
- * Global constants
+ * Email configuration class
  *
- * @package Trigger
- * @subpackage Trigger\Globals
+ * @package Trigger\Core
+ * @subpackage Trigger\Core\EmailConfiguration
+ * @author  Trigger<trigger@gmail.com>
  * @since 1.0.0
  */
 
-use Trigger\Helpers\UtilityHelper;
-use Trigger\Controllers\Provider\aws\SesMailer;
+namespace Trigger\Core;
 
+// use PHPMailer\PHPMailer\PHPMailer;
+// use PHPMailer\PHPMailer\Exception;
 /**
- * Authentication checking.
- *
- * @return  boolean
+ * Email configuration class
  */
-function trigger_auth_check() {
-	if ( ! is_user_logged_in() ) {
-		return false;
-	}
-	return true;
-}
+class TriggerMailer {
 
-/**
- * Get default email connection
- *
- * @return  array|boolean
- */
-function trigger_get_default_provider() {
-	$default_provider = get_option( TRIGGER_DEFAULT_EMAIL_PROVIDER, array() );
 
-	if ( empty( $default_provider ) ) {
-		return false;
-	}
-	return $default_provider;
-}
-
-/**
- * [trigger_get_provider description]
- *
- * @param provider $provider description.
- *
- * @return return description
- */
-function trigger_get_provider( $provider ) {
-	$trigger_email_config = get_option( TRIGGER_EMAIL_CONFIG, array() );
-	if ( empty( $provider ) ) {
-		return false;
-	}
-	return $trigger_email_config[ $provider ];
-}
-
-/**
- * Get plugin data
- *
- * @return array
- */
-function trigger_get_plugin_data() {
-	define( 'TRIGGER_PLUGIN_INFO', Trigger::plugin_data() );
-	return Trigger::plugin_data();
-}
-
-trigger_get_plugin_data();
-
-/**
- * Verify nonce and authentication.
- *
- * @param string $nonce_key The nonce key from POST/GET request.
- * @param string $action The nonce action to verify against.
- * @param bool   $check_auth Whether to check user authentication (default: true).
- * @return array{success: bool, message: string, code: int, data?: array} Returns array with verification result and sanitized data.
- */
-function trigger_verify_request( $nonce_key = 'trigger_nonce', $action = '', $check_auth = true ) {
-	// Check authentication if required
-	if ( $check_auth && ! is_user_logged_in() ) {
-		return array(
-			'success' => false,
-			'message' => __( 'Access denied! Please login to access this feature.', 'trigger' ),
-			'code'    => 403,
-		);
-	}
-
-	// Get the nonce action
-	if ( empty( $action ) ) {
-		$plugin_info = Trigger::plugin_data();
-		$action      = $plugin_info['nonce_action'];
-	}
-
-	// Verify nonce
-	if ( ! isset( $_REQUEST[ $nonce_key ] ) || ! wp_verify_nonce(
-		sanitize_text_field( wp_unslash( $_REQUEST[ $nonce_key ] ) ),
-		$action
-	) ) {
-		return array(
-			'success' => false,
-			'message' => __( 'Invalid security token! Please refresh the page and try again.', 'trigger' ),
-			'code'    => 400,
-		);
-	}
-
-	// Return success with sanitized POST data
-	return array(
-		'success' => true,
-		'message' => __( 'Verification successful.', 'trigger' ),
-		'code'    => 200,
-		'data'    => UtilityHelper::sanitize_array( $_POST ),
-	);
-}
-
-if ( ! function_exists( 'wp_mail' ) ) :
 	/**
-	 * Sends an email, similar to PHP's mail function.
+	 * Sends an email.
 	 *
-	 * A true return value does not automatically mean that the user received the
-	 * email successfully. It just only means that the method used was able to
-	 * process the request without any errors.
-	 *
-	 * The default content type is `text/plain` which does not allow using HTML.
-	 * However, you can set the content type of the email by using the
-	 * {@see 'wp_mail_content_type'} filter.
-	 *
-	 * The default charset is based on the charset used on the blog. The charset can
-	 * be set using the {@see 'wp_mail_charset'} filter.
-	 *
-	 * @since 1.2.1
-	 * @since 5.5.0 is_email() is used for email validation,
-	 *              instead of PHPMailer's default validator.
-	 *
-	 * @global PHPMailer\PHPMailer\PHPMailer $phpmailer
+	 * @since 2.2.0
 	 *
 	 * @param string|string[] $to          Array or comma-separated list of email addresses to send message.
 	 * @param string          $subject     Email subject.
 	 * @param string          $message     Message contents.
-	 * @param string|string[] $headers     Optional. Additional headers.
-	 * @param string|string[] $attachments Optional. Paths to files to attach.
-	 * @return bool Whether the email was sent successfully.
-	 * @throws PHPMailer\PHPMailer\Exception When there are issues sending the email.
+	 * @param string|string[] $headers     Additional headers.
+	 * @param string|string[] $attachments Paths to files to attach.
+	 *
+	 * @return bool True if the email was sent successfully, false otherwise.
 	 */
-	function wp_mail( $to, $subject, $message, $headers = '', $attachments = array() ) {
+	public function trigger_wp_mail( $to, $subject, $message, $headers = '', $attachments = array() ) {
 		// Compact the input, apply the filters, and extract them back out.
 
 		/**
@@ -213,11 +107,11 @@ if ( ! function_exists( 'wp_mail' ) ) :
 		global $phpmailer;
 
 		// (Re)create it, if it's gone missing.
-		if ( ! ( $phpmailer instanceof PHPMailer\PHPMailer\PHPMailer ) ) {
+		if ( ! ( $phpmailer instanceof \PHPMailer\PHPMailer\PHPMailer ) ) {
 			require_once ABSPATH . WPINC . '/PHPMailer/PHPMailer.php';
 			require_once ABSPATH . WPINC . '/PHPMailer/SMTP.php';
 			require_once ABSPATH . WPINC . '/PHPMailer/Exception.php';
-			$phpmailer = new PHPMailer\PHPMailer\PHPMailer( true ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+			$phpmailer = new \PHPMailer\PHPMailer\PHPMailer( true ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 
 			$phpmailer::$validator = static function ( $email ) {
 				return (bool) is_email( $email );
@@ -372,12 +266,12 @@ if ( ! function_exists( 'wp_mail' ) ) :
 
 		try {
 			$phpmailer->setFrom( $from_email, $from_name, false );
-		} catch ( PHPMailer\PHPMailer\Exception $e ) {
+		} catch ( \PHPMailer\PHPMailer\Exception $e ) {
 			$mail_error_data                             = compact( 'to', 'subject', 'message', 'headers', 'attachments' );
 			$mail_error_data['phpmailer_exception_code'] = $e->getCode();
 
 			/** This filter is documented in wp-includes/pluggable.php */
-			do_action( 'wp_mail_failed', new WP_Error( 'wp_mail_failed', $e->getMessage(), $mail_error_data ) );
+			do_action( 'wp_mail_failed', new \WP_Error( 'wp_mail_failed', $e->getMessage(), $mail_error_data ) );
 
 			return false;
 		}
@@ -420,7 +314,7 @@ if ( ! function_exists( 'wp_mail' ) ) :
 							$phpmailer->addReplyTo( $address, $recipient_name );
 							break;
 					}
-				} catch ( PHPMailer\PHPMailer\Exception $e ) {
+				} catch ( \PHPMailer\PHPMailer\Exception $e ) {
 					continue;
 				}
 			}
@@ -473,7 +367,7 @@ if ( ! function_exists( 'wp_mail' ) ) :
 				if ( ! in_array( $name, array( 'MIME-Version', 'X-Mailer' ), true ) ) {
 					try {
 						$phpmailer->addCustomHeader( sprintf( '%1$s: %2$s', $name, $content ) );
-					} catch ( PHPMailer\PHPMailer\Exception $e ) {
+					} catch ( \PHPMailer\PHPMailer\Exception $e ) {
 						continue;
 					}
 				}
@@ -490,7 +384,7 @@ if ( ! function_exists( 'wp_mail' ) ) :
 
 				try {
 					$phpmailer->addAttachment( $attachment, $filename );
-				} catch ( PHPMailer\PHPMailer\Exception $e ) {
+				} catch ( \PHPMailer\PHPMailer\Exception $e ) {
 					continue;
 				}
 			}
@@ -505,21 +399,13 @@ if ( ! function_exists( 'wp_mail' ) ) :
 		 */
 		do_action_ref_array( 'phpmailer_init', array( &$phpmailer ) );
 
+		do_action_ref_array( 'trigger_phpmailer_init', array( &$phpmailer ) );
+
 		$mail_data = compact( 'to', 'subject', 'message', 'headers', 'attachments' );
 
 		try {
-			$default_provider = trigger_get_default_provider();
-			$send             = false;
-			if ( 'ses' === $default_provider['provider'] ) {
-				$headers    = array_merge( $headers, array( 'Content-Type: text/html' ) );
-				$ses_mailer = new SesMailer();
-				$send       = $ses_mailer->send_email( $to, $subject, $message, $headers, $attachments, false );
-				if ( false === $send ) {
-					throw new PHPMailer\PHPMailer\Exception( 'Failed to send email using SES' );
-				}
-			} else {
-				$send = $phpmailer->send();
-			}
+
+			$send = $phpmailer->send();
 
 			/**
 			 * Fires after PHPMailer has successfully sent an email.
@@ -543,7 +429,7 @@ if ( ! function_exists( 'wp_mail' ) ) :
 			do_action( 'wp_mail_succeeded', $mail_data );
 
 			return $send;
-		} catch ( PHPMailer\PHPMailer\Exception $e ) {
+		} catch ( \PHPMailer\PHPMailer\Exception $e ) {
 			$mail_data['phpmailer_exception_code'] = $e->getCode();
 
 			/**
@@ -554,9 +440,9 @@ if ( ! function_exists( 'wp_mail' ) ) :
 			 * @param WP_Error $error A WP_Error object with the PHPMailer\PHPMailer\Exception message, and an array
 			 *                        containing the mail recipient, subject, message, headers, and attachments.
 			 */
-			do_action( 'wp_mail_failed', new WP_Error( 'wp_mail_failed', $e->getMessage(), $mail_data ) );
+			do_action( 'wp_mail_failed', new \WP_Error( 'wp_mail_failed', $e->getMessage(), $mail_data ) );
 
 			return false;
 		}
 	}
-endif;
+}

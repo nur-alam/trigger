@@ -16,6 +16,7 @@ use Trigger\Traits\JsonResponse;
 use Trigger\Traits\RestResponse;
 use Trigger\Controllers\Provider\aws\SesMailer;
 use Trigger\Controllers\Provider\gmail\GMailer;
+use Trigger\Core\TriggerMailer;
 use Trigger\Helpers\ValidationHelper;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -311,7 +312,7 @@ class EmailLogController {
 			$sent    = $gmailer->send_email( $data );
 		} else {
 			// For all other providers, use wp_mail
-			$sent = trigger_wp_mail( $data['sendTo'], $subject, $message, $headers );
+			$sent = ( new TriggerMailer() )->trigger_wp_mail( $data['sendTo'], $subject, $message, $headers );
 		}
 
 		if ( $sent ) {

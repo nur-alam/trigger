@@ -1,6 +1,3 @@
-import { HashRouter, Routes, Route } from "react-router-dom";
-import SettingHeader from "@pages/settings/setting-header";
-import Connections from "./connections";
 import GeneralSettings from "./general-settings";
 
 

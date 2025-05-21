@@ -43,7 +43,6 @@ const TriggerDashboard = () => {
 			});
 
 			const responseData = await response.json();
-			console.log(responseData);
 			if (responseData.status_code === 200) {
 				setStats(responseData.data);
 			}

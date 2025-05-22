@@ -10,14 +10,13 @@ import { GmailConfigFormValues, gmailConfigSchema } from "@/utils/schemaValidati
 import { useEffect, useState } from "react";
 import config from "@/config";
 import { TriggerResponseType } from "@/utils/trigger-declaration";
-import { useUpdateProvider } from "@/services/connection-services";
+import { useGetAllProviders, useUpdateProvider } from "@/services/connection-services";
 import { ConnectionType } from "..";
+import { Loader2 } from "lucide-react";
+import { wait } from "@/utils/utils";
 
 
 const GmailForm = ({ selectedProvider }: { selectedProvider: EmailProviderOptionsType }) => {
-	const [connections, setConnections] = useState<ConnectionType[]>([]);
-	const [connectionIsLoading, setConnectionIsLoading] = useState(true);
-
 	const gmailForm = useForm<GmailConfigFormValues>({
 		resolver: zodResolver(gmailConfigSchema),
 		defaultValues: {
@@ -36,27 +35,11 @@ const GmailForm = ({ selectedProvider }: { selectedProvider: EmailProviderOption
 		await updateProviderMutation.mutateAsync(newValues);
 	}
 
+	const { data: allProviders, isLoading } = useGetAllProviders();
 	useEffect(() => {
-		fetchConnections();
-	}, [])
-
-	const fetchConnections = async () => {
-		try {
-			const formData = new FormData();
-			formData.append('action', 'get_email_connections');
-			formData.append('trigger_nonce', config.nonce_value);
-			const response = await fetch(config.ajax_url, {
-				method: 'POST',
-				body: formData,
-			});
-			const responseData = await response.json() as TriggerResponseType;
-			const gmailConnection = responseData.data || [];
-
-			setConnections(responseData.data || []);
-
-			if (gmailConnection.length > 0) {
-				// Find and set the connection data immediately
-				const connection = gmailConnection.find((conn: ConnectionType) => {
+		if (allProviders) {
+			if (allProviders?.data.length > 0) {
+				const connection = allProviders?.data.find((conn: ConnectionType) => {
 					return conn.provider === 'gmail';
 				});
 				if (connection) {
@@ -66,12 +49,8 @@ const GmailForm = ({ selectedProvider }: { selectedProvider: EmailProviderOption
 					gmailForm.setValue('clientSecret', connection.clientSecret || '');
 				}
 			}
-		} catch (error) {
-			console.error('Error fetching connections:', error);
-		} finally {
-			setConnectionIsLoading(false);
 		}
-	};
+	}, [allProviders]);
 
 	return (
 		<div className="flex justify-center">
@@ -82,88 +61,96 @@ const GmailForm = ({ selectedProvider }: { selectedProvider: EmailProviderOption
 							{__("Google Gmail Configuration", "trigger")}
 						</h2>
 					</div>
-					<Form {...gmailForm}>
-						<form
-							onSubmit={
-								gmailForm.handleSubmit((values) => {
-									onSubmit(values);
-								}, (errors) => { })
-							}
-							className="space-y-6"
-						>
-							<div className="grid gap-6">
-								<div className="grid gap-4">
-									<FormField
-										control={gmailForm.control}
-										name="clientId"
-										render={({ field }) => (
-											<FormItem>
-												<FormLabel>{__("Client ID", "trigger")}</FormLabel>
-												<FormControl>
-													<Input placeholder="AKIA..." {...field} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
+					{isLoading ? (
+						<div className="flex justify-center items-center h-[500px]">
+							<Loader2 className="w-4 h-4 animate-spin" />
+						</div>
+					) :
+						(
+							<Form {...gmailForm}>
+								<form
+									onSubmit={
+										gmailForm.handleSubmit((values) => {
+											onSubmit(values);
+										}, (errors) => { })
+									}
+									className="space-y-6"
+								>
+									<div className="grid gap-6">
+										<div className="grid gap-4">
+											<FormField
+												control={gmailForm.control}
+												name="clientId"
+												render={({ field }) => (
+													<FormItem>
+														<FormLabel>{__("Client ID", "trigger")}</FormLabel>
+														<FormControl>
+															<Input placeholder="AKIA..." {...field} />
+														</FormControl>
+														<FormMessage />
+													</FormItem>
+												)}
+											/>
 
-									<FormField
-										control={gmailForm.control}
-										name="clientSecret"
-										render={({ field }) => (
-											<FormItem>
-												<FormLabel>{__("Client Secret", "trigger")}</FormLabel>
-												<FormControl>
-													<Input type="password" placeholder="••••••••" {...field} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
+											<FormField
+												control={gmailForm.control}
+												name="clientSecret"
+												render={({ field }) => (
+													<FormItem>
+														<FormLabel>{__("Client Secret", "trigger")}</FormLabel>
+														<FormControl>
+															<Input type="password" placeholder="••••••••" {...field} />
+														</FormControl>
+														<FormMessage />
+													</FormItem>
+												)}
+											/>
 
-								</div>
+										</div>
 
-								{/* General Settings */}
-								<div className="space-y-4 border-t pt-6">
-									<div className="grid grid-cols-2 gap-4">
-										<FormField
-											control={gmailForm.control}
-											name="fromName"
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel>{__("From Name", "trigger")}</FormLabel>
-													<FormControl>
-														<Input placeholder="WordPress" {...field} />
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
+										{/* General Settings */}
+										<div className="space-y-4 border-t pt-6">
+											<div className="grid grid-cols-2 gap-4">
+												<FormField
+													control={gmailForm.control}
+													name="fromName"
+													render={({ field }) => (
+														<FormItem>
+															<FormLabel>{__("From Name", "trigger")}</FormLabel>
+															<FormControl>
+																<Input placeholder="WordPress" {...field} />
+															</FormControl>
+															<FormMessage />
+														</FormItem>
+													)}
+												/>
 
-										<FormField
-											control={gmailForm.control}
-											name="fromEmail"
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel>{__("From Email", "trigger")}</FormLabel>
-													<FormControl>
-														<Input placeholder="wordpress@example.com" {...field} />
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
+												<FormField
+													control={gmailForm.control}
+													name="fromEmail"
+													render={({ field }) => (
+														<FormItem>
+															<FormLabel>{__("From Email", "trigger")}</FormLabel>
+															<FormControl>
+																<Input placeholder="wordpress@example.com" {...field} />
+															</FormControl>
+															<FormMessage />
+														</FormItem>
+													)}
+												/>
+											</div>
+										</div>
 									</div>
-								</div>
-							</div>
 
-							<div className="flex gap-2 justify-end">
-								<Button type="submit" disabled={updateProviderMutation.isPending}>
-									{updateProviderMutation.isPending ? __("Saving...", "trigger") : __("Save Changes", "trigger")}
-								</Button>
-							</div>
-						</form>
-					</Form>
+									<div className="flex gap-2 justify-end">
+										<Button type="submit" disabled={updateProviderMutation.isPending}>
+											{updateProviderMutation.isPending ? __("Saving...", "trigger") : __("Save Changes", "trigger")}
+										</Button>
+									</div>
+								</form>
+							</Form>
+						)
+					}
 				</CardContent>
 			</Card>
 		</div>

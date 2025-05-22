@@ -1,9 +1,39 @@
 import config from '@/config';
-import { AnyObject, convertToFormData, fetchUtil, triggerFormData, triggerKeyValue } from '@/utils/utils';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { TriggerResponseType } from '@/utils/trigger-declaration';
+import { fetchPostUtil, fetchUtil } from '@/utils/requestUtils';
 import toast from 'react-hot-toast';
 import { __ } from '@wordpress/i18n';
+import { AnyObject } from '@/utils/utils';
+
+export const useGetAllProviders = () => {
+	return useQuery<TriggerResponseType, Error>({
+		queryKey: ['getAllProviders'],
+		queryFn: async () => {
+			const payload = {
+				action: 'get_all_providers',
+			};
+			const res = await fetchUtil(`${config.rest_url}/connections`, {
+				method: 'GET',
+			});
+			return res;
+		},
+		staleTime: 5000,
+	});
+};
+
+export const useGetDefaultProvider = () => {
+	return useQuery<TriggerResponseType, Error>({
+		queryKey: ['getDefaultProvider'],
+		queryFn: async () => {
+			const res = await fetchUtil(`${config.rest_url}/get-default-connections`, {
+				method: 'GET',
+			});
+			return res;
+		},
+		staleTime: 5000,
+	});
+};
 
 const updateProvider = async (payload: AnyObject) => {
 	payload.action = 'update_email_config';
@@ -19,6 +49,22 @@ export const useUpdateProvider = () => {
 		},
 		onError: (error: any) => {
 			toast.error(error.message ?? __('Failed to save email configuration', 'trigger'));
+		},
+	});
+};
+
+export const useSendTestEmail = () => {
+	return useMutation({
+		mutationFn: async (payload: AnyObject) => {
+			payload = { action: 'trigger_send_test_email', ...payload };
+			const res = await fetchUtil(config.ajax_url, { body: payload });
+			return res;
+		},
+		onSuccess: (response: TriggerResponseType) => {
+			toast.success(response.message ?? __('Test email sent successfully!', 'trigger'));
+		},
+		onError: (error: any) => {
+			toast.error(`asdkf ${error.message}` || __('asfd Failed to send test email', 'trigger'));
 		},
 	});
 };
@@ -57,7 +103,6 @@ export const useIsGmailConnected = () => {
 		mutationFn: isGmailConnected,
 		onSuccess: (response: TriggerResponseType) => {},
 		onError: (error: any) => {
-			console.log('useIsGmailConnected', error);
 			toast.error(error.message || __('Failed to check connection. Please try again.', 'trigger'));
 		},
 	});

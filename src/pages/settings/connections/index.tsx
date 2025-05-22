@@ -6,6 +6,8 @@ import { __ } from "@wordpress/i18n";
 import { useNavigate } from "react-router-dom";
 import config from "@/config";
 import { EmailProviderOptionsType, TriggerResponseType } from "@/utils/trigger-declaration";
+import { useGetAllProviders } from "@/services/connection-services";
+// import { useGetAllProviders } from "@/services/connection-services";
 
 export interface ConnectionType {
 	fromEmail: string;
@@ -94,30 +96,14 @@ const LoadingState = () => (
 
 const Connections = () => {
 	const [connections, setConnections] = useState<ConnectionType[]>([]);
-	const [isLoading, setIsLoading] = useState(true);
 	const navigate = useNavigate();
 
+	const { data: allProviders, isLoading } = useGetAllProviders();
 	useEffect(() => {
-		const fetchConnections = async () => {
-			try {
-				const formData = new FormData();
-				formData.append('action', 'get_email_connections');
-				formData.append('trigger_nonce', config.nonce_value);
-				const response = await fetch(config.ajax_url, {
-					method: 'POST',
-					body: formData,
-				});
-
-				const responseData = await response.json() as TriggerResponseType;
-				setConnections(responseData.data);
-			} catch (error) {
-				console.error('Error fetching connections:', error);
-			} finally {
-				setIsLoading(false);
-			}
-		};
-		fetchConnections();
-	}, []);
+		if (allProviders) {
+			setConnections(allProviders.data);
+		}
+	}, [allProviders]);
 
 	return (
 		<div className="min-h-[600px] pr-4">

@@ -180,7 +180,6 @@
 // 			if (responseData?.status_code === 200) {
 // 				setData(data.filter(email => email.id !== id))
 // 				toast.success(responseData?.message || __('Email log deleted successfully', 'trigger'))
-// 				console.log('delete response', responseData)
 // 			} else {
 // 				toast.error(responseData?.message || __('Failed to delete email log', 'trigger'))
 // 			}

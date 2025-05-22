@@ -10,7 +10,7 @@
 
 namespace Trigger\RestAPI;
 
-use Trigger\Controllers\WordsController;
+use Trigger\Controllers\SmtpConfig;
 use WP_REST_Server;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -29,7 +29,6 @@ class Routes {
 	 * @var string
 	 */
 	public static $route_namespace = 'trigger/v1';
-
 	/**
 	 * Register hooks
 	 *
@@ -59,35 +58,6 @@ class Routes {
 				)
 			);
 		}
-		// register_rest_route(
-		// self::$route_namespace,
-		// 'words',
-		// array(
-		// 'methods'             => WP_REST_Server::READABLE,
-		// 'callback'            => array( ( new WordsController() ), 'get_words' ),
-		// 'permission_callback' => '',
-		// 'args'                => array(
-		// 'search' => array(
-		// 'required'          => false,
-		// 'validate_callback' => function ( $param ) {
-		// return is_string( $param );
-		// },
-		// ),
-		// 'offset' => array(
-		// 'required'          => false,
-		// 'validate_callback' => function ( $param ) {
-		// return is_numeric( $param );
-		// },
-		// ),
-		// 'limit'  => array(
-		// 'required'          => false,
-		// 'validate_callback' => function ( $param ) {
-		// return is_numeric( $param );
-		// },
-		// ),
-		// ),
-		// )
-		// );
 	}
 
 	/**
@@ -99,7 +69,23 @@ class Routes {
 	 */
 	public static function endpoints() {
 
-		// Trigger routes.
-		return array();
+		$smtp_controller = new SmtpConfig();
+
+		return array(
+			array(
+				'endpoint'            => '/connections',
+				'url_params'          => '',
+				'method'              => WP_REST_Server::READABLE,
+				'callback'            => array( $smtp_controller, 'get_email_connections' ),
+				'permission_callback' => '',
+			),
+			array(
+				'endpoint'            => '/get-default-connections',
+				'url_params'          => '',
+				'method'              => WP_REST_Server::READABLE,
+				'callback'            => array( $smtp_controller, 'get_default_email_connection' ),
+				'permission_callback' => '',
+			),
+		);
 	}
 }

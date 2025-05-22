@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/form";
 import { z } from "zod";
 import { TriggerResponseType } from "@/utils/trigger-declaration";
-import { useConnectGmail, useIsGmailConnected } from "@/services/connection-services";
+import { useConnectGmail, useIsGmailConnected, useSendTestEmail } from "@/services/connection-services";
 
 interface TestEmailSheetProps {
 	open: boolean;
@@ -46,9 +46,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export function GmailSendTestMail({ open, onOpenChange, connection }: TestEmailSheetProps) {
-	const [isLoading, setIsLoading] = useState(false);
 	const redirectUrl = `${config.site_url}/wp-admin/admin.php?page=trigger`;
-	const [authUrl, setAuthUrl] = useState('');
 	const [isGmailConnected, setIsGmailConnected] = useState(false);
 
 	const form = useForm<FormValues>({
@@ -59,41 +57,15 @@ export function GmailSendTestMail({ open, onOpenChange, connection }: TestEmailS
 		},
 	});
 
+	const { mutateAsync: sendTestMailMutation, isPending } = useSendTestEmail();
+
 	const handleSendTestEmail = async (values: FormValues) => {
-		setIsLoading(true);
-		try {
-			const formData = new FormData();
-			formData.append("action", "trigger_send_test_email");
-			formData.append("trigger_nonce", config.nonce_value);
-
-			// Include both sendTo email and provider in the data
-			const data = {
-				provider: connection.provider,
-				sendTo: values.sendTo,
-				fromEmail: values.fromEmail || connection.fromEmail
-			};
-
-			formData.append("data", JSON.stringify(data));
-
-			const response = await fetch(config.ajax_url, {
-				method: "POST",
-				body: formData,
-			});
-
-			const result = await response.json() as TriggerResponseType;
-
-			if (result.status_code === 200) {
-				toast.success(result.message || __("Test email sent successfully!", "trigger"));
-				onOpenChange(false); // Close the sheet after success
-			} else {
-				toast.error(result.message || __("Failed to send test email. Please try again.", "trigger"));
-			}
-		} catch (error) {
-			console.error("Error sending test email:", error);
-			toast.error(__("An unexpected error occurred. Please try again.", "trigger"));
-		} finally {
-			setIsLoading(false);
-		}
+		const payload = {
+			provider: connection.provider,
+			sendTo: values.sendTo,
+			fromEmail: values.fromEmail || connection.fromEmail
+		};
+		await sendTestMailMutation(payload);
 	};
 
 	const connectGmailMutation = useConnectGmail();
@@ -219,8 +191,8 @@ export function GmailSendTestMail({ open, onOpenChange, connection }: TestEmailS
 											<SheetClose asChild>
 												<Button variant="outline">{__("Cancel", "trigger")}</Button>
 											</SheetClose>
-											<Button type="submit" disabled={isLoading}>
-												{isLoading ? (
+											<Button type="submit" disabled={isPending}>
+												{isPending ? (
 													<>
 														<Loader2 className="mr-2 h-4 w-4 animate-spin" />
 														{__("Sending...", "trigger")}
@@ -237,4 +209,4 @@ export function GmailSendTestMail({ open, onOpenChange, connection }: TestEmailS
 			</SheetContent>
 		</Sheet>
 	);
-} 
+}

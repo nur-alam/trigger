@@ -9,49 +9,8 @@ export function getSlugFromUrl(url: string = '', slug: string = 'page'): string 
 	return '';
 }
 
-type FetchUtilOptions = {
-	body?: AnyObject;
-	headers?: Record<string, string>;
-	method?: 'POST' | 'GET' | 'PUT' | 'DELETE' | 'PATCH';
-};
-
-export async function fetchUtil(
-	endpoint: string,
-	options: FetchUtilOptions = {}
-): Promise<TriggerResponseType> {
-	const { wp_rest_nonce, nonce_key, nonce_value } = config;
-	const url = `${endpoint}`;
-
-	// Create a new options object that matches RequestInit
-	const fetchOptions: RequestInit = {
-		method: options.method || 'POST',
-		headers: {
-			'X-WP-Nonce': wp_rest_nonce,
-			...(options.headers || {})
-		},
-		body: options.body ? JSON.stringify(options.body) : undefined
-	};
-
-	if (options.body) {
-		const formData = convertToFormData(options.body);
-		formData.append(nonce_key, nonce_value);
-		fetchOptions.body = formData;
-	}
-
-	try {
-		const apiResponse = await fetch(url, fetchOptions);
-
-		const response = await apiResponse.json() as TriggerResponseType;
-
-		if (response.status_code === 200) {
-			return response;
-		} else {
-			throw new Error(response.message);
-		}
-	} catch (error: any) {
-		throw new Error(error?.message || 'Unknown fetch error');
-	}
-}
+// Useful for mock api call
+export const wait = (ms = 0) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export interface AnyObject {
 	[x: string]: any;
@@ -74,7 +33,7 @@ export const convertToFormData = (values: AnyObject) => {
 	const formData = new FormData();
 
 	for (const key of Object.keys(values)) {
-		const value = values[key];
+		const value = (values as AnyObject)[key];
 
 		if (Array.isArray(value)) {
 			value.forEach((item, index) => {
@@ -106,21 +65,6 @@ export const convertToFormData = (values: AnyObject) => {
 	return formData;
 };
 
-export const triggerFormData = (data: Object) => {
-	const formData = new FormData();
-	for (const [key, value] of Object.entries(data)) {
-		formData.append(key, value);
-	}
-	return formData;
-}
-
-export const triggerKeyValue = (data: Object) => {
-	const obj: Record<string, string> = {};
-	for (const [key, value] of Object.entries(data)) {
-		obj[key] = value;
-	}
-	return obj;
-}
 
 export const getProviderFullName = (provider: string): string => {
 	const providerMap: { [key: string]: string } = {
@@ -138,4 +82,30 @@ export const getProviderFullName = (provider: string): string => {
 	};
 
 	return providerMap[provider.toLowerCase()] || provider;
+};
+
+export const copyToClipboard = (text: string) => {
+	return new Promise<void>((resolve, reject) => {
+		if (navigator.clipboard && window.isSecureContext) {
+			navigator.clipboard
+				.writeText(text)
+				.then(() => resolve())
+				.catch((error) => reject(error));
+		} else {
+			const textarea = document.createElement('textarea');
+			textarea.value = text;
+			document.body.appendChild(textarea);
+			textarea.select();
+
+			try {
+				// if navigator.clipboard is not available, use document.execCommand('copy')
+				document.execCommand('copy');
+				resolve();
+			} catch (error) {
+				reject(error);
+			} finally {
+				document.body.removeChild(textarea); // Clean up
+			}
+		}
+	});
 };

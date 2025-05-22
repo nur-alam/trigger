@@ -15,7 +15,7 @@ import { AwsSesRegionOptionsType, AwsSesRegionAssociatedOptions } from "@/utils/
 import { ConnectionType } from "..";
 import { TriggerResponseType } from "@/utils/trigger-declaration";
 import { Loader2 } from "lucide-react";
-import { useUpdateProvider } from "@/services/connection-services";
+import { useGetAllProviders, useUpdateProvider } from "@/services/connection-services";
 
 const AwsSesForm = ({ selectedProvider }: { selectedProvider: EmailProviderOptionsType }) => {
 	const [connections, setConnections] = useState<ConnectionType[]>([]);
@@ -39,25 +39,14 @@ const AwsSesForm = ({ selectedProvider }: { selectedProvider: EmailProviderOptio
 		await updateProviderMutation.mutateAsync(newValues);
 	}
 
-	const fetchConnections = async () => {
-		try {
-			const formData = new FormData();
-			formData.append('action', 'get_email_connections');
-			formData.append('trigger_nonce', config.nonce_value);
-			const response = await fetch(config.ajax_url, {
-				method: 'POST',
-				body: formData,
-			});
-			const responseData = await response.json() as TriggerResponseType;
-			const connections = responseData.data || [];
-			if (connections.length > 0) {
-				setConnections(connections);
-
-				// Find and set the connection data immediately
-				const connection = connections.find((conn: ConnectionType) => {
+	const { data: allProviders, isLoading } = useGetAllProviders();
+	useEffect(() => {
+		if (allProviders) {
+			// setConnections(allProviders?.data);
+			if (allProviders?.data.length > 0) {
+				const connection = allProviders?.data.find((conn: ConnectionType) => {
 					return conn.provider === 'ses';
 				});
-
 				if (connection) {
 					form.setValue('fromName', connection.fromName);
 					form.setValue('fromEmail', connection.fromEmail);
@@ -66,16 +55,8 @@ const AwsSesForm = ({ selectedProvider }: { selectedProvider: EmailProviderOptio
 					form.setValue('region', connection.region || '');
 				}
 			}
-		} catch (error) {
-			console.error('Error fetching connections:', error);
-		} finally {
-			setConnectionIsLoading(false);
 		}
-	};
-
-	useEffect(() => {
-		fetchConnections();
-	}, []);
+	}, [allProviders]);
 
 	return (
 		<div className="flex justify-center">
@@ -86,7 +67,7 @@ const AwsSesForm = ({ selectedProvider }: { selectedProvider: EmailProviderOptio
 							{emailProviderAssociatedOptions.find(option => option.value === selectedProvider)?.label} {__("Configuration", "trigger")}
 						</h2>
 					</div>
-					{connectionIsLoading ? (
+					{isLoading ? (
 						<div className="flex justify-center items-center h-[500px]">
 							<Loader2 className="w-4 h-4 animate-spin" />
 						</div>
@@ -96,9 +77,7 @@ const AwsSesForm = ({ selectedProvider }: { selectedProvider: EmailProviderOptio
 								onSubmit={
 									form.handleSubmit((values) => {
 										onSubmit(values);
-									}, (errors) => {
-										console.log('Form validation failed:', errors);
-									})
+									}, (errors) => { })
 								}
 								className="space-y-6"
 							>

@@ -279,14 +279,12 @@ class EmailLogController {
 
 		$params = $verify['data'];
 
-		$data = json_decode( $params['data'], true );
-
 		$validation_rules = array(
 			'sendTo'   => 'required|email',
 			'provider' => 'required',
 		);
 
-		$validation_response = ValidationHelper::validate( $validation_rules, $data );
+		$validation_response = ValidationHelper::validate( $validation_rules, $params );
 		if ( ! $validation_response->success ) {
 			return $this->json_response( $validation_response->message, null, 400 );
 		}
@@ -297,7 +295,7 @@ class EmailLogController {
 
 		// Get email configuration
 		$email_config = get_option( TRIGGER_EMAIL_CONFIG, array() );
-		$provider     = $data['provider'];
+		$provider     = $params['provider'];
 		if ( empty( $email_config ) || ! isset( $email_config[ $provider ] ) ) {
 			return $this->json_response( __( 'Email configuration not found', 'trigger' ), null, 404 );
 		}
@@ -306,13 +304,13 @@ class EmailLogController {
 
 		if ( 'ses' === $provider ) {
 			$ses_mailer = new SesMailer();
-			$sent       = $ses_mailer->send_email( $data['sendTo'], $subject, $message, $headers, $config, true );
+			$sent       = $ses_mailer->send_email( $params['sendTo'], $subject, $message, $headers, $config, true );
 		} elseif ( 'gmail' === $provider ) {
 			$gmailer = new GMailer();
-			$sent    = $gmailer->send_email( $data );
+			$sent    = $gmailer->send_email( $params );
 		} else {
 			// For all other providers, use wp_mail
-			$sent = ( new TriggerMailer() )->trigger_wp_mail( $data['sendTo'], $subject, $message, $headers );
+			$sent = ( new TriggerMailer() )->trigger_wp_mail( $params['sendTo'], $subject, $message, $headers );
 		}
 
 		if ( $sent ) {
@@ -320,7 +318,7 @@ class EmailLogController {
 				do_action(
 					'wp_mail_succeeded',
 					array(
-						'to'      => $data['sendTo'],
+						'to'      => $params['sendTo'],
 						'subject' => $subject,
 						'message' => $message,
 						'headers' => $headers,
@@ -336,7 +334,7 @@ class EmailLogController {
 						'wp_mail_failed',
 						__( 'Failed to send test email', 'trigger' ),
 						array(
-							'to'      => $data['sendTo'],
+							'to'      => $params['sendTo'],
 							'subject' => $subject,
 							'message' => $message,
 							'headers' => $headers,

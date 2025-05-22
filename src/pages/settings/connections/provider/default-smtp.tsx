@@ -14,13 +14,10 @@ import { emailProviderAssociatedOptions, smtpSecurityAssociatedOptions, smtpSecu
 import { EmailProviderOptionsType, TriggerResponseType, SmtpSecurityOptionsType } from "@/utils/trigger-declaration";
 import { ConnectionType } from "..";
 import { Loader2 } from "lucide-react";
-import { useUpdateProvider } from "@/services/connection-services";
+import { useGetAllProviders, useUpdateProvider } from "@/services/connection-services";
 
 
 const DefaultSmtp = ({ selectedProvider }: { selectedProvider: EmailProviderOptionsType }) => {
-	const [connections, setConnections] = useState<ConnectionType[]>([]);
-	const [connectionIsLoading, setConnectionIsLoading] = useState(true);
-
 	const form = useForm<SmtpConfigFormValues>({
 		resolver: zodResolver(smtpConfigSchema),
 		defaultValues: {
@@ -42,25 +39,13 @@ const DefaultSmtp = ({ selectedProvider }: { selectedProvider: EmailProviderOpti
 		await updateProviderMutation.mutateAsync(newValues);
 	}
 
-	const fetchConnections = async () => {
-		try {
-			const formData = new FormData();
-			formData.append('action', 'get_email_connections');
-			formData.append('trigger_nonce', config.nonce_value);
-			const response = await fetch(config.ajax_url, {
-				method: 'POST',
-				body: formData,
-			});
-			const responseData = await response.json() as TriggerResponseType;
-			const connections = responseData.data || [];
-			setConnections(connections);
-
-			if (connections.length > 0) {
-				// Find and set the connection data immediately
-				const connection = connections.find((conn: ConnectionType) => {
+	const { data: allProviders, isLoading } = useGetAllProviders();
+	useEffect(() => {
+		if (allProviders) {
+			if (allProviders?.data.length > 0) {
+				const connection = allProviders?.data.find((conn: ConnectionType) => {
 					return conn.provider === 'smtp';
 				});
-
 				if (connection) {
 					form.setValue('fromName', connection.fromName);
 					form.setValue('fromEmail', connection.fromEmail);
@@ -71,16 +56,8 @@ const DefaultSmtp = ({ selectedProvider }: { selectedProvider: EmailProviderOpti
 					form.setValue('smtpPassword', connection.smtpPassword || '');
 				}
 			}
-		} catch (error) {
-			console.error('Error fetching connections:', error);
-		} finally {
-			setConnectionIsLoading(false);
 		}
-	};
-
-	useEffect(() => {
-		fetchConnections();
-	}, []);
+	}, [allProviders]);
 
 	return (
 		<div className="flex justify-center">
@@ -91,7 +68,7 @@ const DefaultSmtp = ({ selectedProvider }: { selectedProvider: EmailProviderOpti
 							{emailProviderAssociatedOptions.find(option => option.value === selectedProvider)?.label} {__("Configuration", "trigger")}
 						</h2>
 					</div>
-					{connectionIsLoading ? (
+					{isLoading ? (
 						<div className="flex justify-center items-center h-[500px]">
 							<Loader2 className="w-4 h-4 animate-spin" />
 						</div>
@@ -101,9 +78,7 @@ const DefaultSmtp = ({ selectedProvider }: { selectedProvider: EmailProviderOpti
 								onSubmit={
 									form.handleSubmit((values) => {
 										onSubmit(values);
-									}, (errors) => {
-										console.log('Form validation failed:', errors);
-									})
+									}, (errors) => { })
 								}
 								className="space-y-6"
 							>

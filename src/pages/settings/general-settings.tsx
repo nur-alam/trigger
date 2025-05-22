@@ -7,9 +7,10 @@ import config from "@/config";
 import { TriggerResponseType } from "@/utils/trigger-declaration";
 import { toast } from "react-hot-toast";
 import { ConnectionType } from "./connections/index";
+import { useGetAllProviders, useGetDefaultProvider } from "@/services/connection-services";
 
 const GeneralSettings = () => {
-	const [connectionIsLoading, setConnectionIsLoading] = useState(true);
+	// const [connectionIsLoading, setConnectionIsLoading] = useSstate(true);
 	const [logRetentionIsLoading, setLogRetentionIsLoading] = useState(true);
 	const [isSaving, setIsSaving] = useState(false);
 	const [connections, setConnections] = useState<ConnectionType[]>([]);
@@ -17,75 +18,36 @@ const GeneralSettings = () => {
 	const [selectedProvider, setSelectedProvider] = useState<string>("none");
 	const [logRetention, setLogRetention] = useState<string>("30");
 
-	const fetchDefaultConnection = async () => {
-		try {
-			const formData = new FormData();
-			formData.append('action', 'get_default_email_connection');
-			formData.append('trigger_nonce', config.nonce_value);
-			const response = await fetch(config.ajax_url, {
-				method: 'POST',
-				body: formData,
-			});
-			const responseData = await response.json() as TriggerResponseType;
-			setDefaultConnection(responseData.data);
+	// const updateDefaultConnection = async (value: string) => {
+	// 	setIsSaving(true);
+	// 	setConnectionIsLoading(true);
+	// 	setSelectedProvider(value);
+	// 	try {
+	// 		const formData = new FormData();
+	// 		formData.append('action', 'update_default_connection');
+	// 		formData.append('trigger_nonce', config.nonce_value);
+	// 		formData.append('data', JSON.stringify({ provider: value }));
 
-			// Set the selected provider based on the default connection
-			if (responseData.data && responseData.data.provider) {
-				setSelectedProvider(responseData.data.provider);
-			}
-		} catch (error) {
-			console.error('Error fetching default connection:', error);
-		}
-	};
+	// 		const response = await fetch(config.ajax_url, {
+	// 			method: 'POST',
+	// 			body: formData,
+	// 		});
 
-	const fetchConnections = async () => {
-		try {
-			const formData = new FormData();
-			formData.append('action', 'get_email_connections');
-			formData.append('trigger_nonce', config.nonce_value);
-			const response = await fetch(config.ajax_url, {
-				method: 'POST',
-				body: formData,
-			});
-			const responseData = await response.json() as TriggerResponseType;
-			setConnections(responseData.data || []);
-		} catch (error) {
-			console.error('Error fetching connections:', error);
-		} finally {
-			setConnectionIsLoading(false);
-		}
-	};
+	// 		const responseData = await response.json() as TriggerResponseType;
 
-	const updateDefaultConnection = async (value: string) => {
-		setIsSaving(true);
-		setConnectionIsLoading(true);
-		setSelectedProvider(value);
-		try {
-			const formData = new FormData();
-			formData.append('action', 'update_default_connection');
-			formData.append('trigger_nonce', config.nonce_value);
-			formData.append('data', JSON.stringify({ provider: value }));
-
-			const response = await fetch(config.ajax_url, {
-				method: 'POST',
-				body: formData,
-			});
-
-			const responseData = await response.json() as TriggerResponseType;
-
-			if (responseData.status_code === 200) {
-				toast.success(__('Default connection updated successfully', 'trigger'));
-			} else {
-				toast.error(responseData.message || __('Failed to update default connection', 'trigger'));
-			}
-		} catch (error) {
-			console.error('Error updating default connection:', error);
-			toast.error(__('Failed to update default connection', 'trigger'));
-		} finally {
-			setIsSaving(false);
-			setConnectionIsLoading(false);
-		}
-	};
+	// 		if (responseData.status_code === 200) {
+	// 			toast.success(__('Default connection updated successfully', 'trigger'));
+	// 		} else {
+	// 			toast.error(responseData.message || __('Failed to update default connection', 'trigger'));
+	// 		}
+	// 	} catch (error) {
+	// 		console.error('Error updating default connection:', error);
+	// 		toast.error(__('Failed to update default connection', 'trigger'));
+	// 	} finally {
+	// 		setIsSaving(false);
+	// 		setConnectionIsLoading(false);
+	// 	}
+	// };
 
 	const fetchLogRetention = async () => {
 		try {
@@ -141,13 +103,22 @@ const GeneralSettings = () => {
 		}
 	};
 
+	const { data: allProviders, isLoading: connectionIsLoading } = useGetAllProviders();
 	useEffect(() => {
-		fetchConnections();
-		fetchDefaultConnection();
-	}, []);
+		if (allProviders) {
+			setConnections(allProviders.data);
+		}
+	}, [allProviders]);
+
+	const { data: theDefaultConnection, isLoading } = useGetDefaultProvider();
 
 	useEffect(() => {
-		fetchLogRetention();
+		setDefaultConnection(theDefaultConnection?.data);
+		setSelectedProvider(theDefaultConnection?.data?.provider || 'none');
+	}, [theDefaultConnection]);
+
+	useEffect(() => {
+		// fetchLogRetention();
 	}, [logRetention]);
 
 	// Get connection display info
@@ -188,7 +159,7 @@ const GeneralSettings = () => {
 						) : (
 							<Select
 								value={selectedProvider}
-								onValueChange={(value) => updateDefaultConnection(value)}
+								// onValueChange={(value) => updateDefaultConnection(value)}
 								disabled={connectionIsLoading || isSaving}
 							>
 								<SelectTrigger className="max-w-fit">

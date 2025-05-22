@@ -27,6 +27,7 @@ import {
 import { z } from "zod";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AwsSesVerifiedEmailType } from "@/utils/trigger-declaration";
+import { useSendTestEmail } from "@/services/connection-services";
 
 interface TestEmailSheetProps {
 	open: boolean;
@@ -108,42 +109,15 @@ export function AwsSendTestMail({ open, onOpenChange, connection }: TestEmailShe
 		}
 	}, [verifiedEmails]);
 
+	const { mutateAsync: sendTestMailMutation, isPending } = useSendTestEmail();
+
 	const handleSendTestEmail = async (values: FormValues) => {
-		setIsLoading(true);
-
-		try {
-			const formData = new FormData();
-			formData.append("action", "trigger_send_test_email");
-			formData.append("trigger_nonce", config.nonce_value);
-
-			// Include both sendTo email and provider in the data
-			const data = {
-				provider: connection.provider,
-				sendTo: values.sendTo,
-				fromEmail: values.fromEmail || connection.fromEmail
-			};
-
-			formData.append("data", JSON.stringify(data));
-
-			const response = await fetch(config.ajax_url, {
-				method: "POST",
-				body: formData,
-			});
-
-			const result = await response.json();
-
-			if (result.status_code === 200) {
-				toast.success(result.message || __("Test email sent successfully!", "trigger"));
-				onOpenChange(false); // Close the sheet after success
-			} else {
-				toast.error(result.message || __("Failed to send test email. Please try again.", "trigger"));
-			}
-		} catch (error) {
-			console.error("Error sending test email:", error);
-			toast.error(__("An unexpected error occurred. Please try again.", "trigger"));
-		} finally {
-			setIsLoading(false);
-		}
+		const payload = {
+			provider: connection.provider,
+			sendTo: values.sendTo,
+			fromEmail: values.fromEmail || connection.fromEmail
+		};
+		await sendTestMailMutation(payload);
 	};
 
 	return (
@@ -216,8 +190,8 @@ export function AwsSendTestMail({ open, onOpenChange, connection }: TestEmailShe
 							<SheetClose asChild>
 								<Button variant="outline">{__("Cancel", "trigger")}</Button>
 							</SheetClose>
-							<Button type="submit" disabled={isLoading}>
-								{isLoading ? (
+							<Button type="submit" disabled={isPending}>
+								{isPending ? (
 									<>
 										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
 										{__("Sending...", "trigger")}

@@ -66,12 +66,10 @@ trigger_get_plugin_data();
 /**
  * Verify nonce and authentication.
  *
- * @param string $nonce_key The nonce key from POST/GET request.
- * @param string $action The nonce action to verify against.
- * @param bool   $check_auth Whether to check user authentication (default: true).
+ * @param bool $check_auth Whether to check user authentication (default: true).
  * @return array{success: bool, message: string, code: int, data?: array} Returns array with verification result and sanitized data.
  */
-function trigger_verify_request( $nonce_key = 'trigger_nonce', $action = '', $check_auth = true ) {
+function trigger_verify_request( $check_auth = true ) {
 	// Check authentication if required
 	if ( $check_auth && ! is_user_logged_in() ) {
 		return array(
@@ -81,20 +79,20 @@ function trigger_verify_request( $nonce_key = 'trigger_nonce', $action = '', $ch
 		);
 	}
 
-	// Get the nonce action
-	if ( empty( $action ) ) {
-		$plugin_info = Trigger::plugin_data();
-		$action      = $plugin_info['nonce_action'];
-	}
+	$plugin_info  = trigger_get_plugin_data();
+	$nonce_key    = $plugin_info['nonce_key'];
+	$nonce_action = $plugin_info['nonce_action'];
 
 	// Verify nonce
-	if ( ! isset( $_REQUEST[ $nonce_key ] ) || ! wp_verify_nonce(
-		sanitize_text_field( wp_unslash( $_REQUEST[ $nonce_key ] ) ),
-		$action
-	) ) {
+	if ( $check_auth && ( ! isset( $_REQUEST[ $nonce_key ] )
+		|| ! wp_verify_nonce(
+			sanitize_text_field( wp_unslash( $_REQUEST[ $nonce_key ] ) ),
+			$nonce_action
+		) )
+	) {
 		return array(
 			'success' => false,
-			'message' => __( 'Invalid security token! Please refresh the page and try again.', 'trigger' ),
+			'message' => __( 'Invalid security token!', 'trigger' ),
 			'code'    => 400,
 		);
 	}

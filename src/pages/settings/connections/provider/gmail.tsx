@@ -8,12 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { GmailConfigFormValues, gmailConfigSchema } from "@/utils/schemaValidation";
 import { useEffect, useState } from "react";
-import config from "@/config";
-import { TriggerResponseType } from "@/utils/trigger-declaration";
 import { useGetAllProviders, useUpdateProvider } from "@/services/connection-services";
 import { ConnectionType } from "..";
 import { Loader2 } from "lucide-react";
-import { wait } from "@/utils/utils";
 
 
 const GmailForm = ({ selectedProvider }: { selectedProvider: EmailProviderOptionsType }) => {

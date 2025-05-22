@@ -41,7 +41,7 @@ class AwsSesController {
 		}
 
 		$params = $verify['data'];
-		$data   = json_decode( $params['data'], true );
+		// $data   = json_decode( $params['data'], true );
 
 		// Validation
 		$validation_rules = array(
@@ -49,14 +49,14 @@ class AwsSesController {
 			'provider' => 'required',
 		);
 
-		$validation_response = ValidationHelper::validate( $validation_rules, $data );
+		$validation_response = ValidationHelper::validate( $validation_rules, $params );
 		if ( ! $validation_response->success ) {
 			return $this->json_response( $validation_response->message, null, 400 );
 		}
 
 		// Get email configuration
 		$email_config = get_option( TRIGGER_EMAIL_CONFIG, array() );
-		$provider     = $data['provider'];
+		$provider     = $params['provider'];
 
 		if ( empty( $email_config ) || ! isset( $email_config[ $provider ] ) ) {
 			return $this->json_response( __( 'Email configuration not found', 'trigger' ), null, 404 );
@@ -70,7 +70,7 @@ class AwsSesController {
 
 		// Use SesMailer to verify email
 		$ses_mailer = new SesMailer();
-		$result     = $ses_mailer->verify_email_address( $data['email'], $config );
+		$result     = $ses_mailer->verify_email_address( $params['email'], $config );
 
 		if ( $result['success'] ) {
 			return $this->json_response( $result['message'], null, 200 );
@@ -85,27 +85,27 @@ class AwsSesController {
 	 * @return object
 	 */
 	public function get_verified_ses_emails() {
-		$verify = trigger_verify_request();
+		$verify = trigger_verify_request( false );
 		if ( ! $verify['success'] ) {
 			return $this->json_response( $verify['message'], null, $verify['code'] );
 		}
 
 		$params = $verify['data'];
-		$data   = json_decode( $params['data'], true );
 
+		// $data   = json_decode( $params['data'], true );
 		// Validation
 		$validation_rules = array(
 			'provider' => 'required',
 		);
 
-		$validation_response = ValidationHelper::validate( $validation_rules, $data );
+		$validation_response = ValidationHelper::validate( $validation_rules, $params );
 		if ( ! $validation_response->success ) {
 			return $this->json_response( $validation_response->message, null, 400 );
 		}
 
 		// Get email configuration
 		$email_config = get_option( TRIGGER_EMAIL_CONFIG, array() );
-		$provider     = $data['provider'];
+		$provider     = $params['provider'];
 
 		if ( empty( $email_config ) || ! isset( $email_config[ $provider ] ) ) {
 			return $this->json_response( __( 'Email configuration not found', 'trigger' ), null, 404 );

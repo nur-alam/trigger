@@ -1,7 +1,7 @@
 import config from '@/config';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { TriggerResponseType } from '@/utils/trigger-declaration';
-import { fetchPostUtil, fetchUtil } from '@/utils/requestUtils';
+import { fetchUtil } from '@/utils/requestUtils';
 import toast from 'react-hot-toast';
 import { __ } from '@wordpress/i18n';
 import { AnyObject } from '@/utils/utils';
@@ -104,6 +104,36 @@ export const useIsGmailConnected = () => {
 		onSuccess: (response: TriggerResponseType) => {},
 		onError: (error: any) => {
 			toast.error(error.message || __('Failed to check connection. Please try again.', 'trigger'));
+		},
+	});
+};
+
+export const useGetSesVerifiedEmails = () => {
+	return useQuery<TriggerResponseType, Error>({
+		queryKey: ['getSesVerifiedEmails'],
+		queryFn: async () => {
+			const res = await fetchUtil(`${config.rest_url}/get-verified-ses-emails`, {
+				method: 'GET',
+				body: { provider: 'ses' },
+			});
+			return res;
+		},
+		staleTime: 0,
+	});
+};
+
+export const useAwsVerifyEmail = () => {
+	return useMutation({
+		mutationFn: async (payload: AnyObject) => {
+			payload = { action: 'verify_ses_email', ...payload };
+			const res = await fetchUtil(config.ajax_url, { body: payload });
+			return res;
+		},
+		onSuccess: (response: TriggerResponseType) => {
+			toast.success(response.message ?? __('Email verified successfully!', 'trigger'));
+		},
+		onError: (error: any) => {
+			toast.error(error.message ?? __('Failed to verify email', 'trigger'));
 		},
 	});
 };

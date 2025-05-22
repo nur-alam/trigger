@@ -26,7 +26,7 @@ export async function fetchUtil(endpoint: string, options: optionsType): Promise
 		headers,
 	};
 
-	if (method === 'GET') {
+	if (['GET', 'DELETE'].includes(method)) {
 		const params = new URLSearchParams(options?.body as Record<string, string>);
 		params.append(nonce_key, nonce_value);
 		url += `?${params.toString()}`;

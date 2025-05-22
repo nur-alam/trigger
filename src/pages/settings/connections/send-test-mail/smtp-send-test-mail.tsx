@@ -9,10 +9,8 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
 import { __ } from "@wordpress/i18n";
-import config from "@/config";
 import { ConnectionType } from "@/pages/settings/connections/index";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -46,8 +44,6 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export function SmtpSendTestMail({ open, onOpenChange, connection }: TestEmailSheetProps) {
-
-	const [isLoading, setIsLoading] = useState(false);
 
 	const form = useForm<FormValues>({
 		resolver: zodResolver(formSchema),

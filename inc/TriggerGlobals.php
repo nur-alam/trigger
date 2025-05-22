@@ -102,7 +102,7 @@ function trigger_verify_request( $check_auth = true ) {
 		'success' => true,
 		'message' => __( 'Verification successful.', 'trigger' ),
 		'code'    => 200,
-		'data'    => UtilityHelper::sanitize_array( $_POST ),
+		'data'    => UtilityHelper::sanitize_array( $_REQUEST ),
 	);
 }
 

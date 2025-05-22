@@ -10,7 +10,6 @@ import { ConnectionType } from "./connections/index";
 import { useGetAllProviders, useGetDefaultProvider } from "@/services/connection-services";
 
 const GeneralSettings = () => {
-	// const [connectionIsLoading, setConnectionIsLoading] = useSstate(true);
 	const [logRetentionIsLoading, setLogRetentionIsLoading] = useState(true);
 	const [isSaving, setIsSaving] = useState(false);
 	const [connections, setConnections] = useState<ConnectionType[]>([]);

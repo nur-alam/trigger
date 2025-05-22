@@ -9,10 +9,8 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
 import { __ } from "@wordpress/i18n";
-import config from "@/config";
 import { ConnectionType } from "@/pages/settings/connections/index";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -27,7 +25,7 @@ import {
 import { z } from "zod";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AwsSesVerifiedEmailType } from "@/utils/trigger-declaration";
-import { useSendTestEmail } from "@/services/connection-services";
+import { useGetSesVerifiedEmails, useSendTestEmail } from "@/services/connection-services";
 
 interface TestEmailSheetProps {
 	open: boolean;
@@ -47,51 +45,16 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export function AwsSendTestMail({ open, onOpenChange, connection }: TestEmailSheetProps) {
-
-	const [isLoading, setIsLoading] = useState(false);
-	const [isVerifying, setIsVerifying] = useState(false);
 	const [verifiedEmails, setVerifiedEmails] = useState<AwsSesVerifiedEmailType[]>([]);
-	const [isLoadingEmails, setIsLoadingEmails] = useState(false);
-	const [selectedEmail, setSelectedEmail] = useState(connection.fromEmail);
 
 	// Load verified emails when the sheet opens
+	const { data: sesVerifiedEmails, isLoading: sesVerifiedEmailsLoading, isError } = useGetSesVerifiedEmails();
+
 	useEffect(() => {
 		if (open) {
-			loadVerifiedEmails();
+			setVerifiedEmails(sesVerifiedEmails?.data || []);
 		}
-	}, [open]);
-
-	const loadVerifiedEmails = async () => {
-		setIsLoadingEmails(true);
-		try {
-			const formData = new FormData();
-			formData.append("action", "get_verified_ses_emails");
-			formData.append("trigger_nonce", config.nonce_value);
-
-			const data = {
-				provider: connection.provider
-			};
-
-			formData.append("data", JSON.stringify(data));
-
-			const response = await fetch(config.ajax_url, {
-				method: "POST",
-				body: formData,
-			});
-
-			const result = await response.json();
-			if (result.status_code === 200) {
-				setVerifiedEmails(result.data || []);
-			} else {
-				toast.error(result.message || __("Failed to load verified emails.", "trigger"));
-			}
-		} catch (error) {
-			console.error("Error loading verified emails:", error);
-			toast.error(__("An unexpected error occurred. Please try again.", "trigger"));
-		} finally {
-			setIsLoadingEmails(false);
-		}
-	};
+	}, [open, sesVerifiedEmails]);
 
 	const form = useForm<FormValues>({
 		resolver: zodResolver(formSchema),
@@ -142,7 +105,7 @@ export function AwsSendTestMail({ open, onOpenChange, connection }: TestEmailShe
 						<div className="mb-4">
 							<p className="text-sm font-medium mb-1">{__("From", "trigger")}</p>
 						</div>
-						{isLoadingEmails ? (
+						{sesVerifiedEmailsLoading ? (
 							<div className="flex justify-left items-center h-[40px]">
 								<Loader2 className="h-4 w-4 animate-spin mr-2" />
 								{__("Loading...", "trigger")}

@@ -7,11 +7,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import config from "@/config";
-import toast from "react-hot-toast";
 import { SmtpConfigFormValues, smtpConfigSchema } from "@/utils/schemaValidation";
-import { emailProviderAssociatedOptions, smtpSecurityAssociatedOptions, smtpSecurityOptions } from "@/utils/trigger-declaration";
-import { EmailProviderOptionsType, TriggerResponseType, SmtpSecurityOptionsType } from "@/utils/trigger-declaration";
+import { emailProviderAssociatedOptions, smtpSecurityAssociatedOptions } from "@/utils/trigger-declaration";
+import { EmailProviderOptionsType } from "@/utils/trigger-declaration";
 import { ConnectionType } from "..";
 import { Loader2 } from "lucide-react";
 import { useGetAllProviders, useUpdateProvider } from "@/services/connection-services";

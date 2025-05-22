@@ -13,7 +13,6 @@ import GmailForm from "./provider/gmail";
 const AddConnection = () => {
 	const navigate = useNavigate();
 	const [selectedProvider, setSelectedProvider] = useState<EmailProviderOptionsType>("smtp");
-	const [open, setOpen] = useState(false);
 	return (
 		<div className="flex justify-center mt-5 p-5">
 			<Card className="w-full max-w-[1000px] shadow-lg">

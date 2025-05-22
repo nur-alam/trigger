@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AwsSesVerifiedEmailType } from "@/utils/trigger-declaration";
+import { useAwsVerifyEmail, useGetSesVerifiedEmails } from "@/services/connection-services";
 
 interface VerifySesEmailSheetProps {
 	open: boolean;
@@ -73,80 +74,30 @@ export function VerifySesEmailSheet({ open, onOpenChange, connection }: VerifySe
 	});
 
 	// Load verified emails when the sheet opens
+	const { data: sesVerifiedEmails, isLoading: sesVerifiedEmailsLoading, isFetching: sesVerifiedEmailsFetching, isError, refetch: refetchVerifiedEmails } = useGetSesVerifiedEmails();
+
 	useEffect(() => {
-		if (open) {
-			loadVerifiedEmails();
+		if (sesVerifiedEmails?.data) {
+			setVerifiedEmails(sesVerifiedEmails?.data || []);
 		}
-	}, [open]);
+	}, [sesVerifiedEmails]);
 
-	const loadVerifiedEmails = async () => {
-		setIsLoadingEmails(true);
-		try {
-			const formData = new FormData();
-			formData.append("action", "get_verified_ses_emails");
-			formData.append("trigger_nonce", config.nonce_value);
-
-			const data = {
-				provider: connection.provider
-			};
-
-			formData.append("data", JSON.stringify(data));
-
-			const response = await fetch(config.ajax_url, {
-				method: "POST",
-				body: formData,
-			});
-
-			const result = await response.json();
-			if (result.status_code === 200) {
-				setVerifiedEmails(result.data || []);
-			} else {
-				toast.error(result.message || __("Failed to load verified emails.", "trigger"));
-			}
-		} catch (error) {
-			console.error("Error loading verified emails:", error);
-			toast.error(__("An unexpected error occurred. Please try again.", "trigger"));
-		} finally {
-			setIsLoadingEmails(false);
-		}
-	};
+	const { mutateAsync: awsVerifyEmailMutate, isPending: awsVerifyEmailMutationPending } = useAwsVerifyEmail();
 
 	const handleVerifyEmail = async (values: VerifyEmailFormValues) => {
-		setIsVerifying(true);
-		try {
-			const formData = new FormData();
-			formData.append("action", "verify_ses_email");
-			formData.append("trigger_nonce", config.nonce_value);
-
-			const data = {
-				email: values.email,
-				provider: connection.provider
-			};
-
-			formData.append("data", JSON.stringify(data));
-
-			const response = await fetch(config.ajax_url, {
-				method: "POST",
-				body: formData,
-			});
-
-			const result = await response.json();
-
-			if (result.status_code === 200) {
-				toast.success(result.message || __("Verification email sent successfully!", "trigger"));
-				form.reset();
-				// Reload the verified emails list after a short delay
-				setTimeout(() => {
-					loadVerifiedEmails();
-				}, 2000);
-			} else {
-				toast.error(result.message || __("Failed to send verification email. Please try again.", "trigger"));
-			}
-		} catch (error) {
-			console.error("Error verifying email:", error);
-			toast.error(__("An unexpected error occurred. Please try again.", "trigger"));
-		} finally {
-			setIsVerifying(false);
+		const payload = {
+			email: values.email,
+			provider: connection.provider
+		}
+		const { status_code } = await awsVerifyEmailMutate(payload);
+		if (status_code === 200) {
+			form.reset();
+			// Reload the verified emails list after a short delay
+			setTimeout(() => {
+				refetchVerifiedEmails();
+			}, 1000);
+		} else {
+			toast.error(__("Failed to send verification email. Please try again.", "trigger"));
 		}
 	};
 
@@ -214,8 +165,8 @@ export function VerifySesEmailSheet({ open, onOpenChange, connection }: VerifySe
 									/>
 
 									<div className="flex justify-end">
-										<Button type="submit" disabled={isVerifying}>
-											{isVerifying ? (
+										<Button type="submit" disabled={awsVerifyEmailMutationPending}>
+											{awsVerifyEmailMutationPending ? (
 												<>
 													<Loader2 className="mr-2 h-4 w-4 animate-spin" />
 													{__("Sending...", "trigger")}
@@ -242,10 +193,12 @@ export function VerifySesEmailSheet({ open, onOpenChange, connection }: VerifySe
 								variant="outline"
 								size="sm"
 								className="gap-1"
-								onClick={loadVerifiedEmails}
-								disabled={isLoadingEmails}
+								onClick={() => {
+									refetchVerifiedEmails()
+								}}
+								disabled={sesVerifiedEmailsLoading || sesVerifiedEmailsFetching}
 							>
-								{isLoadingEmails ? (
+								{sesVerifiedEmailsLoading || sesVerifiedEmailsFetching ? (
 									<Loader2 className="h-4 w-4 animate-spin" />
 								) : (
 									<RefreshCw className="h-4 w-4" />
@@ -254,7 +207,7 @@ export function VerifySesEmailSheet({ open, onOpenChange, connection }: VerifySe
 							</Button>
 						</CardHeader>
 						<CardContent>
-							{isLoadingEmails ? (
+							{sesVerifiedEmailsLoading || sesVerifiedEmailsFetching ? (
 								<div className="flex justify-center py-6">
 									<Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
 								</div>

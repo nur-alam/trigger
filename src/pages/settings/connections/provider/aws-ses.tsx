@@ -18,8 +18,6 @@ import { Loader2 } from "lucide-react";
 import { useGetAllProviders, useUpdateProvider } from "@/services/connection-services";
 
 const AwsSesForm = ({ selectedProvider }: { selectedProvider: EmailProviderOptionsType }) => {
-	const [connections, setConnections] = useState<ConnectionType[]>([]);
-	const [connectionIsLoading, setConnectionIsLoading] = useState(true);
 	const form = useForm<SesConfigFormValues>({
 		resolver: zodResolver(sesConfigSchema),
 		defaultValues: {
@@ -42,7 +40,6 @@ const AwsSesForm = ({ selectedProvider }: { selectedProvider: EmailProviderOptio
 	const { data: allProviders, isLoading } = useGetAllProviders();
 	useEffect(() => {
 		if (allProviders) {
-			// setConnections(allProviders?.data);
 			if (allProviders?.data.length > 0) {
 				const connection = allProviders?.data.find((conn: ConnectionType) => {
 					return conn.provider === 'ses';

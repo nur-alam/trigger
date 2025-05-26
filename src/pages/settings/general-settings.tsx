@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import { __ } from "@wordpress/i18n";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { HelpCircle, Loader2 } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Loader2 } from "lucide-react";
 import config from "@/config";
 import { TriggerResponseType } from "@/utils/trigger-declaration";
 import { toast } from "react-hot-toast";
 import { ConnectionType } from "./connections/index";
-import { useGetAllProviders, useGetDefaultProvider } from "@/services/connection-services";
+import { useGetAllProviders, useGetDefaultProvider, useUpdateDefaultConnection } from "@/services/connection-services";
 
 const GeneralSettings = () => {
 	const [logRetentionIsLoading, setLogRetentionIsLoading] = useState(true);
@@ -17,36 +16,12 @@ const GeneralSettings = () => {
 	const [selectedProvider, setSelectedProvider] = useState<string>("none");
 	const [logRetention, setLogRetention] = useState<string>("30");
 
-	// const updateDefaultConnection = async (value: string) => {
-	// 	setIsSaving(true);
-	// 	setConnectionIsLoading(true);
-	// 	setSelectedProvider(value);
-	// 	try {
-	// 		const formData = new FormData();
-	// 		formData.append('action', 'update_default_connection');
-	// 		formData.append('trigger_nonce', config.nonce_value);
-	// 		formData.append('data', JSON.stringify({ provider: value }));
+	const { mutateAsync: updateDefaultConnectionMutate, isPending: updateConnectionIsPending } = useUpdateDefaultConnection();
 
-	// 		const response = await fetch(config.ajax_url, {
-	// 			method: 'POST',
-	// 			body: formData,
-	// 		});
-
-	// 		const responseData = await response.json() as TriggerResponseType;
-
-	// 		if (responseData.status_code === 200) {
-	// 			toast.success(__('Default connection updated successfully', 'trigger'));
-	// 		} else {
-	// 			toast.error(responseData.message || __('Failed to update default connection', 'trigger'));
-	// 		}
-	// 	} catch (error) {
-	// 		console.error('Error updating default connection:', error);
-	// 		toast.error(__('Failed to update default connection', 'trigger'));
-	// 	} finally {
-	// 		setIsSaving(false);
-	// 		setConnectionIsLoading(false);
-	// 	}
-	// };
+	const updateDefaultConnection = async (value: string) => {
+		updateDefaultConnectionMutate({ provider: value });
+		setSelectedProvider(value);
+	};
 
 	const fetchLogRetention = async () => {
 		try {
@@ -66,7 +41,7 @@ const GeneralSettings = () => {
 				setLogRetention(retentionValue);
 			}
 		} catch (error) {
-			console.error('Error fetching log retention setting:', error);
+
 		} finally {
 			setLogRetentionIsLoading(false);
 		}
@@ -158,8 +133,8 @@ const GeneralSettings = () => {
 						) : (
 							<Select
 								value={selectedProvider}
-								// onValueChange={(value) => updateDefaultConnection(value)}
-								disabled={connectionIsLoading || isSaving}
+								onValueChange={(value) => updateDefaultConnection(value)}
+								disabled={connectionIsLoading || updateConnectionIsPending}
 							>
 								<SelectTrigger className="max-w-fit">
 									<SelectValue placeholder={__('Select connection', 'trigger')} />

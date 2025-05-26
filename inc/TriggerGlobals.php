@@ -45,7 +45,7 @@ function trigger_get_default_provider() {
  */
 function trigger_get_provider( $provider ) {
 	$trigger_email_config = get_option( TRIGGER_EMAIL_CONFIG, array() );
-	if ( empty( $provider ) ) {
+	if ( empty( $trigger_email_config ) ) {
 		return false;
 	}
 	return $trigger_email_config[ $provider ];
@@ -57,11 +57,11 @@ function trigger_get_provider( $provider ) {
  * @return array
  */
 function trigger_get_plugin_data() {
-	define( 'TRIGGER_PLUGIN_INFO', Trigger::plugin_data() );
+	if ( ! defined( 'TRIGGER_PLUGIN_INFO' ) ) {
+		define( 'TRIGGER_PLUGIN_INFO', Trigger::plugin_data() );
+	}
 	return Trigger::plugin_data();
 }
-
-trigger_get_plugin_data();
 
 /**
  * Verify nonce and authentication.

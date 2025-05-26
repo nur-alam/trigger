@@ -179,9 +179,9 @@ class SmtpConfig {
 		}
 
 		$params = $verify['data'];
-		$data   = json_decode( $params['data'], true );
+		// $params = json_decode( $params['data'], true );
 
-		if ( empty( $data['provider'] ) ) {
+		if ( empty( $params['provider'] ) ) {
 			return $this->json_response( __( 'Provider is required', 'trigger' ), null, 400 );
 		}
 
@@ -189,20 +189,20 @@ class SmtpConfig {
 
 		if ( empty( $default_provider ) || ! is_array( $default_provider ) ) {
 			// todo: add default email provider
-			$updated = $this->update_default_provider( $data['provider'] );
+			$updated = $this->update_default_provider( $params['provider'] );
 			if ( ! $updated ) {
 				return $this->json_response( __( 'Failed to update default email provider', 'trigger' ), null, 400 );
 			}
 		}
 
-		if ( $default_provider['provider'] !== $data['provider'] ) {
-			$updated = $this->update_default_provider( $data['provider'] );
+		if ( $default_provider['provider'] !== $params['provider'] ) {
+			$updated = $this->update_default_provider( $params['provider'] );
 			if ( ! $updated ) {
 				return $this->json_response( __( 'Failed to update default email provider', 'trigger' ), null, 400 );
 			}
 		}
 
-		return $this->json_response( __( 'Default email connection updated successfully', 'trigger' ), $data['provider'], 200 );
+		return $this->json_response( __( 'Default email connection updated successfully', 'trigger' ), $params['provider'], 200 );
 	}
 
 	/**

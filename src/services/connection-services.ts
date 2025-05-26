@@ -103,7 +103,7 @@ export const useIsGmailConnected = () => {
 		mutationFn: isGmailConnected,
 		onSuccess: (response: TriggerResponseType) => {},
 		onError: (error: any) => {
-			toast.error(error.message || __('Failed to check connection. Please try again.', 'trigger'));
+			// toast.error(error.message || __('Failed to check connection. Please try again.', 'trigger'));
 		},
 	});
 };
@@ -134,6 +134,22 @@ export const useAwsVerifyEmail = () => {
 		},
 		onError: (error: any) => {
 			toast.error(error.message ?? __('Failed to verify email', 'trigger'));
+		},
+	});
+};
+
+export const useUpdateDefaultConnection = () => {
+	return useMutation({
+		mutationFn: async (payload: AnyObject) => {
+			payload = { action: 'update_default_connection', ...payload };
+			const res = await fetchUtil(config.ajax_url, { body: payload });
+			return res;
+		},
+		onSuccess: (response: TriggerResponseType) => {
+			toast.success(response.message ?? __('Default connection updated successfully!', 'trigger'));
+		},
+		onError: (error: any) => {
+			toast.error(error.message ?? __('Failed to update default connection', 'trigger'));
 		},
 	});
 };

@@ -72,7 +72,7 @@ export function GmailSendTestMail({ open, onOpenChange, connection }: TestEmailS
 
 	const connectWithGmail = async (e: React.MouseEvent) => {
 		e.preventDefault();
-		const { status_code } = await connectGmailMutation.mutateAsync();
+		await connectGmailMutation.mutateAsync();
 	}
 
 	// Update form value when verified emails are loaded

@@ -1,3 +1,5 @@
+import config from '@/config';
+
 export interface EmailSettingsResponse {
 	status_code: number;
 	message?: string;
@@ -13,6 +15,8 @@ export interface EmailSettingsResponse {
 	};
 	errors?: Record<string, string[]>;
 }
+
+export const redirectUrl = `${config.site_url}/wp-admin/admin.php?page=trigger`;
 
 export type EmailProviderOptionsType = 'smtp' | 'ses' | 'gmail';
 export const emailProviderOptions: EmailProviderOptionsType[] = ['smtp', 'ses', 'gmail'];

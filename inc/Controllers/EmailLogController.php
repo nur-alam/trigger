@@ -74,7 +74,7 @@ class EmailLogController {
 	public function handle_google_oauth_callback() {
 		$provider = trigger_get_provider( 'gmail' );
 		// Handle OAuth Callback
-		if ( isset( $_GET['code'] ) ) {
+		if ( isset( $_GET['code'] ) && null !== $provider && 'gmail' === $provider['provider'] ) {
 			$response = wp_remote_post(
 				'https://oauth2.googleapis.com/token',
 				array(

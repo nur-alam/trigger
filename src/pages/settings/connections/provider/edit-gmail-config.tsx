@@ -18,12 +18,11 @@ import { __ } from "@wordpress/i18n";
 import config from "@/config";
 import { ConnectionType } from "@/pages/settings/connections/index";
 import { GmailConfigFormValues, gmailConfigSchema } from "@/utils/schemaValidation";
-import { TriggerResponseType } from "@/utils/trigger-declaration";
+import { redirectUrl, TriggerResponseType } from "@/utils/trigger-declaration";
 import { useConnectGmail, useIsGmailConnected, useUpdateProvider } from "@/services/connection-services";
+import { copyToClipboard } from "@/utils/utils";
 
 const EditGmailConfig = ({ connection }: { connection: ConnectionType }) => {
-
-	const redirectUrl = `${config.site_url}/wp-admin/admin.php?page=trigger`;
 	const [isGmailConnected, setIsGmailConnected] = useState(false);
 
 	const form = useForm<GmailConfigFormValues>({
@@ -176,8 +175,8 @@ const EditGmailConfig = ({ connection }: { connection: ConnectionType }) => {
 					<Button
 						variant="outline"
 						size="icon"
-						onClick={() => {
-							navigator.clipboard.writeText(redirectUrl);
+						onClick={async () => {
+							await copyToClipboard(redirectUrl);
 							toast.success(__('Copied to clipboard', 'trigger'));
 						}}
 					>

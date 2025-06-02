@@ -9,6 +9,7 @@
 
 use Trigger\Helpers\UtilityHelper;
 use Trigger\Controllers\Provider\aws\SesMailer;
+use Trigger\Controllers\Provider\gmail\GMailer;
 
 /**
  * Authentication checking.
@@ -515,6 +516,9 @@ if ( ! function_exists( 'wp_mail' ) ) :
 				if ( false === $send ) {
 					throw new PHPMailer\PHPMailer\Exception( 'Failed to send email using SES' );
 				}
+			} elseif ( 'gmail' === $default_provider['provider'] ) {
+				$gmailer = new GMailer();
+				$send    = $gmailer->send_email( $to, $subject, $message, $headers, $attachments, false );
 			} else {
 				$send = $phpmailer->send();
 			}

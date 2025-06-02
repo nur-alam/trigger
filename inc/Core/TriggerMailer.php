@@ -397,7 +397,7 @@ class TriggerMailer {
 		 *
 		 * @param PHPMailer $phpmailer The PHPMailer instance (passed by reference).
 		 */
-		do_action_ref_array( 'phpmailer_init', array( &$phpmailer ) );
+		// do_action_ref_array( 'phpmailer_init', array( &$phpmailer ) );
 
 		do_action_ref_array( 'trigger_phpmailer_init', array( &$phpmailer ) );
 

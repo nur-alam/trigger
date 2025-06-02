@@ -67,17 +67,29 @@ class GMailer {
 	/**
 	 * Send email using Gmail API
 	 *
-	 * @param array $data Email data.
+	 * @param string $to Recipient email address.
+	 * @param string $subject Email subject.
+	 * @param string $message Email body (HTML).
+	 * @param array  $headers Email headers.
+	 * @param array  $attachments Array of attachments.
+	 * @param bool   $is_html Whether the message is in HTML format.
 	 *
-	 * @return bool|string True on success, error message on failure.
+	 * @return bool|string True on success, error message on failure
 	 */
-	public function send_email( $data ) {
-		$to      = $data['sendTo'];
-		$subject = 'Test Email from Gmail API';
-		$body    = "Hello!\nThis email was sent using Gmail API (no composer) from a WordPress plugin.";
+	public function send_email( $to, $subject, $message, $headers = array(), $attachments, $is_html = false ) {
+		if ( is_array( $to ) ) {
+			$to = $to[0];
+		}
+		$subject = $subject;
+		$body    = $message;
 
-		$raw_message  = "From: me\r\n";
-		$raw_message .= "To: $to\r\n";
+		if ( $is_html ) {
+			// todo $body = wp_kses_post( $message );
+			$is_html = $is_html;
+		}
+
+		// $raw_message  = "From: {$headers['From']}\r\n";
+		$raw_message  = "To: $to\r\n";
 		$raw_message .= "Subject: $subject\r\n";
 		$raw_message .= "MIME-Version: 1.0\r\n";
 		$raw_message .= "Content-Type: text/plain; charset=utf-8\r\n\r\n";

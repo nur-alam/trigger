@@ -65,6 +65,7 @@ class EmailLogController {
 		add_action( 'wp_ajax_trigger_delete_email_log', array( $this, 'delete_email_log' ) );
 		add_action( 'wp_ajax_trigger_bulk_delete_email_logs', array( $this, 'bulk_delete_email_logs' ) );
 		add_action( 'wp_ajax_trigger_send_test_email', array( $this, 'send_test_email' ) );
+		add_action( 'wp_ajax_trigger_resend_email', array( $this, 'trigger_resend_email' ) );
 		add_action( 'admin_init', array( $this, 'handle_google_oauth_callback' ) );
 	}
 
@@ -280,7 +281,7 @@ class EmailLogController {
 		$params = $verify['data'];
 
 		$validation_rules = array(
-			'sendTo'   => 'required|email',
+			'to'       => 'required|email',
 			'provider' => 'required',
 		);
 
@@ -289,7 +290,7 @@ class EmailLogController {
 			return $this->json_response( $validation_response->message, null, 400 );
 		}
 
-		$subject = __( 'AWS SES Test Email from Trigger', 'trigger' );
+		$subject = __( 'Test Email from Trigger', 'trigger' );
 		$message = __( 'This is a test email sent from Trigger plugin.', 'trigger' );
 		$headers = array( 'Content-Type: text/html; charset=UTF-8' );
 
@@ -304,13 +305,13 @@ class EmailLogController {
 
 		if ( 'ses' === $provider ) {
 			$ses_mailer = new SesMailer();
-			$sent       = $ses_mailer->send_email( $params['sendTo'], $subject, $message, $headers, $config, true );
+			$sent       = $ses_mailer->send_email( $params['to'], $subject, $message, $headers, $config, true );
 		} elseif ( 'gmail' === $provider ) {
 			$gmailer = new GMailer();
-			$sent    = $gmailer->send_email( $params );
+			$sent    = $gmailer->send_email( $params['to'], $subject, $message, $headers, true );
 		} else {
 			// For all other providers, use wp_mail
-			$sent = ( new TriggerMailer() )->trigger_wp_mail( $params['sendTo'], $subject, $message, $headers );
+			$sent = ( new TriggerMailer() )->trigger_wp_mail( $params['to'], $subject, $message, $headers );
 		}
 
 		if ( $sent ) {
@@ -318,7 +319,7 @@ class EmailLogController {
 				do_action(
 					'wp_mail_succeeded',
 					array(
-						'to'      => $params['sendTo'],
+						'to'      => $params['to'],
 						'subject' => $subject,
 						'message' => $message,
 						'headers' => $headers,
@@ -334,7 +335,7 @@ class EmailLogController {
 						'wp_mail_failed',
 						__( 'Failed to send test email', 'trigger' ),
 						array(
-							'to'      => $params['sendTo'],
+							'to'      => $params['to'],
 							'subject' => $subject,
 							'message' => $message,
 							'headers' => $headers,
@@ -343,6 +344,71 @@ class EmailLogController {
 				);
 			}
 			return $this->json_response( __( 'Failed to send test email', 'trigger' ), null, 400 );
+		}
+	}
+
+	/**
+	 * Resend email
+	 *
+	 * @param array $params Array containing the email data.
+	 * @return object
+	 */
+	public function trigger_resend_email( $params ) {
+		try {
+			$verify = trigger_verify_request();
+			if ( ! $verify['success'] ) {
+				return $this->json_response( $verify['message'], null, $verify['code'] );
+			}
+
+			$params = $verify['data'];
+
+			$default_provider = trigger_get_default_provider();
+			$provider         = $default_provider['provider'];
+
+			if ( 'ses' === $provider ) {
+				$ses_mailer = new SesMailer();
+				$sent       = $ses_mailer->send_email( $params['to'], $params['subject'], $params['message'], $params['headers'], array(), true );
+			} elseif ( 'gmail' === $provider ) {
+				$gmailer = new GMailer();
+				$sent    = $gmailer->send_email( $params['to'], $params['subject'], $params['message'], $params['headers'], array(), true );
+			} else {
+				// For all other providers, use wp_mail
+				$sent = ( new TriggerMailer() )->trigger_wp_mail( $params['to'], $params['subject'], $params['message'], $params['headers'] );
+			}
+
+			if ( $sent ) {
+				if ( 'smtp' !== $provider ) {
+					do_action(
+						'wp_mail_succeeded',
+						array(
+							'to'      => $params['to'],
+							'subject' => $params['subject'],
+							'message' => $params['message'],
+							'headers' => $params['headers'],
+						)
+					);
+				}
+				return $this->json_response( __( 'Test email sent successfully', 'trigger' ), null, 200 );
+			} else {
+				if ( 'smtp' !== $provider ) {
+					do_action(
+						'wp_mail_failed',
+						new \WP_Error(
+							'wp_mail_failed',
+							__( 'Failed to send test email', 'trigger' ),
+							array(
+								'to'      => $params['to'],
+								'subject' => $params['subject'],
+								'message' => $params['message'],
+								'headers' => $params['headers'],
+							)
+						)
+					);
+				}
+				return $this->json_response( __( 'Failed to send test email', 'trigger' ), null, 400 );
+			}
+		} catch ( \Throwable $th ) {
+			return $this->json_response( 'Error resending email: ' . $th->getMessage(), null, 500 );
 		}
 	}
 }

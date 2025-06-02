@@ -29,7 +29,7 @@ class EmailConfiguration {
 	public function __construct() {
 		$this->config = get_option( TRIGGER_DEFAULT_EMAIL_PROVIDER, array() );
 		add_action( 'phpmailer_init', array( $this, 'configure_email' ), 10, 1 );
-		add_action( 'trigger_phpmailer_init', array( $this, 'config_smtp_for_test_ail' ), 10, 1 );
+		add_action( 'trigger_phpmailer_init', array( $this, 'config_smtp_for_test_mail' ), 10, 1 );
 	}
 
 	/**
@@ -96,7 +96,7 @@ class EmailConfiguration {
 	 * @return void
 	 * @throws Exception If there's an error configuring SES.
 	 */
-	public function config_smtp_for_test_ail( PHPMailer $phpmailer ) {
+	public function config_smtp_for_test_mail( PHPMailer $phpmailer ) {
 		$provider = trigger_get_provider( 'smtp' );
 		if ( empty( $provider ) ) {
 			return;

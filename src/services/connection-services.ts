@@ -153,3 +153,29 @@ export const useUpdateDefaultConnection = () => {
 		},
 	});
 };
+
+export const useResendEmailMutation = () => {
+	return useMutation({
+		mutationFn: async (email: AnyObject) => {
+			let payload = {
+				action: 'trigger_resend_email',
+				id: email.id.toString(),
+				to: email.mail_to,
+				subject: email.subject,
+				message: email.message,
+				headers: email.headers,
+				attachments: email.attachments,
+			};
+			const res = fetchUtil(config.ajax_url, { body: payload });
+			return res;
+		},
+		onSuccess: (response: TriggerResponseType) => {
+			if (response.status_code === 200) {
+				toast.success(response?.message || __('Email resend successfully', 'trigger'));
+			}
+		},
+		onError: () => {
+			toast.error(__('Failed to resend email', 'trigger'));
+		},
+	});
+};

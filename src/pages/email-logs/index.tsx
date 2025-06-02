@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { ColumnDef, SortingState, PaginationState, ColumnFiltersState, RowSelectionState } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
-import { Eye, Trash2, AlertTriangle, ChevronUp, ChevronDown } from 'lucide-react'
+import { Eye, Trash2, AlertTriangle, ChevronUp, ChevronDown, Ellipsis, LoaderCircle, Forward } from 'lucide-react'
 import {
 	Dialog,
 	DialogContent,
 } from "@/components/ui/dialog"
-import { toast } from 'sonner'
+import toast from 'react-hot-toast'
 import config from '@/config'
 import { format } from 'date-fns'
 import { __ } from '@wordpress/i18n'
@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DataTable } from '@/components/data-table'
 import { getProviderFullName } from '@/utils/utils'
+import { useResendEmailMutation } from '@/services/connection-services'
 interface EmailLog {
 	id: number
 	mail_to: string
@@ -111,7 +112,6 @@ const EmailLogs = () => {
 			});
 
 			const responseData = await response.json() as EmailLogsResponse;
-
 			if (responseData?.status_code === 200) {
 				toast.success(responseData?.message || __('Email log deleted successfully', 'trigger'))
 				await fetchEmailLogs({
@@ -195,6 +195,14 @@ const EmailLogs = () => {
 		setLastSelectedIndex(rowIndex);
 	};
 
+	const [resendEmailPending, setResendEmailPending] = useState<EmailLog | null>(null);
+	const { mutateAsync: resendEmailMutate, isPending: resendEmailMutationPending } = useResendEmailMutation();
+	const resendEmail = async (email: EmailLog) => {
+		await resendEmailMutate(email);
+	}
+
+
+
 	const columns: ColumnDef<EmailLog>[] = [
 		{
 			id: 'select',
@@ -266,6 +274,16 @@ const EmailLogs = () => {
 				const email = row.original
 				return (
 					<div className="flex items-center gap-2">
+						<Button
+							variant="ghost"
+							size="icon"
+							// onClick={() => resendEmail(email)}
+							onClick={() => setResendEmailPending(email)}
+							// disabled={resendEmailMutationPending}
+							className="h-8 w-8 p-0"
+						>
+							<Forward className='h-8 w-4 p-0' />
+						</Button>
 						<Button
 							variant="ghost"
 							size="icon"
@@ -512,6 +530,39 @@ const EmailLogs = () => {
 					</div>
 				)}
 			</ConfirmationDialog>
+
+			<ConfirmationDialog
+				open={!!resendEmailPending}
+				onOpenChange={(open) => !open && setResendEmailPending(null)}
+				title={__('Resend Email', 'trigger')}
+				description={__('Are you sure you want to resend this email?', 'trigger')}
+				icon={<Forward className="h-5 w-5 text-primary" />}
+				variant="success"
+				confirmText={__('Resend', 'trigger')}
+				cancelText={__('Cancel', 'trigger')}
+				onConfirm={async () => {
+					if (resendEmailPending) {
+						await resendEmail(resendEmailPending);
+						setResendEmailPending(null);
+					}
+				}}
+				loading={resendEmailMutationPending}
+				loadingText={__('Resending...', 'trigger')}
+			>
+				{resendEmailPending && (
+					<div className="space-y-2 mt-4">
+						<div>
+							<span className="font-medium">{__('To:', 'trigger')}</span>
+							<p className="text-sm text-muted-foreground">{resendEmailPending.mail_to}</p>
+						</div>
+						<div>
+							<span className="font-medium">{__('Subject:', 'trigger')}</span>
+							<p className="text-sm text-muted-foreground">{resendEmailPending.subject}</p>
+						</div>
+					</div>
+				)}
+			</ConfirmationDialog>
+
 		</div>
 	)
 }

@@ -63,7 +63,7 @@ export type GmailConfigFormValues = z.infer<typeof gmailConfigSchema>;
 export const testEmailSchema = z.object({
 	provider: emailProviderSchema,
 	fromEmail: z.string().email({ message: 'Invalid From-email address' }),
-	sendTo: z.string().email({ message: 'Invalid Send-to Email address' }),
+	to: z.string().email({ message: 'Invalid Send-to Email address' }),
 });
 
 export type TestEmailFormValues = z.infer<typeof testEmailSchema>;

@@ -38,7 +38,7 @@ const formSchema = z.object({
 	fromEmail: z.string().email({
 		message: "Need a valid email address.",
 	}),
-	sendTo: z.string().email({
+	to: z.string().email({
 		message: "Need a valid email address.",
 	}),
 });
@@ -52,7 +52,7 @@ export function GmailSendTestMail({ open, onOpenChange, connection }: TestEmailS
 	const form = useForm<FormValues>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			sendTo: "",
+			to: "",
 			fromEmail: connection.fromEmail,
 		},
 	});
@@ -62,7 +62,7 @@ export function GmailSendTestMail({ open, onOpenChange, connection }: TestEmailS
 	const handleSendTestEmail = async (values: FormValues) => {
 		const payload = {
 			provider: connection.provider,
-			sendTo: values.sendTo,
+			to: values.to,
 			fromEmail: values.fromEmail || connection.fromEmail
 		};
 		await sendTestMailMutation(payload);
@@ -175,7 +175,7 @@ export function GmailSendTestMail({ open, onOpenChange, connection }: TestEmailS
 										/>
 										<FormField
 											control={form.control}
-											name="sendTo"
+											name="to"
 											render={({ field }) => (
 												<FormItem>
 													<FormLabel>{__("Send To", "trigger")}</FormLabel>

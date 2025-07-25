@@ -96,7 +96,6 @@ const DraggableComponent: React.FC<DraggableComponentProps> = ({
     attributes,
     listeners,
     setNodeRef,
-    transform,
     isDragging,
   } = useDraggable({
     id: type,
@@ -106,20 +105,12 @@ const DraggableComponent: React.FC<DraggableComponentProps> = ({
     }
   });
 
-  const style = transform ? {
-    transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-  } : undefined;
-
   return (
     <div
       ref={setNodeRef}
-      style={style}
       {...listeners}
       {...attributes}
-      className={`
-        cursor-grab active:cursor-grabbing
-        ${isDragging ? 'opacity-50' : ''}
-      `}
+      className="cursor-grab active:cursor-grabbing"
     >
       <Card className="hover:shadow-md transition-shadow duration-200 border-2 border-transparent hover:border-blue-200">
         <CardContent className="p-4">

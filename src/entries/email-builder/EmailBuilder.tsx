@@ -8,6 +8,7 @@ import {
 	useSensor,
 	useSensors,
 	pointerWithin,
+	DragOverlay,
 } from '@dnd-kit/core';
 import {
 	SortableContext,
@@ -27,6 +28,14 @@ import {
 	Upload,
 	Palette,
 	Settings,
+	Type,
+	Heading,
+	MousePointer,
+	Image,
+	Minus,
+	Space,
+	Share2,
+	FileText,
 } from 'lucide-react';
 
 import { useEmailBuilderRedux } from './hooks/useEmailBuilderRedux';
@@ -34,6 +43,74 @@ import { ComponentPalette } from './components/ComponentPalette';
 import { EmailCanvas } from './components/EmailCanvas';
 import { PropertiesPanel } from './components/PropertiesPanel';
 import { EmailPreview } from './components/EmailPreview';
+
+// Component type mapping for drag overlay
+const componentTypeMap = {
+	text: { name: __('Text', 'trigger'), icon: Type },
+	heading: { name: __('Heading', 'trigger'), icon: Heading },
+	button: { name: __('Button', 'trigger'), icon: MousePointer },
+	image: { name: __('Image', 'trigger'), icon: Image },
+	divider: { name: __('Divider', 'trigger'), icon: Minus },
+	spacer: { name: __('Spacer', 'trigger'), icon: Space },
+	social: { name: __('Social Links', 'trigger'), icon: Share2 },
+	footer: { name: __('Footer', 'trigger'), icon: FileText },
+};
+
+// DragOverlay component to show while dragging
+const DragOverlayComponent: React.FC<{ activeId: string | null }> = ({ activeId }) => {
+	if (!activeId) return null;
+
+	// Check if it's a component type (from palette)
+	const componentInfo = componentTypeMap[activeId as keyof typeof componentTypeMap];
+
+	if (componentInfo) {
+		// Dragging from palette
+		const Icon = componentInfo.icon;
+
+		return (
+			<Card className="w-64 shadow-lg border-2 border-blue-400 bg-blue-50 opacity-90">
+				<CardContent className="p-4">
+					<div className="flex items-center space-x-3">
+						<div className="flex-shrink-0">
+							<Icon className="w-6 h-6 text-blue-600" />
+						</div>
+						<div className="flex-1 min-w-0">
+							<h4 className="text-sm font-medium text-blue-900 truncate">
+								{componentInfo.name}
+							</h4>
+							<p className="text-xs text-blue-700 truncate">
+								{__('Drag to canvas', 'trigger')}
+							</p>
+						</div>
+					</div>
+				</CardContent>
+			</Card>
+		);
+	} else {
+		// Dragging existing component - show a generic placeholder
+		return (
+			<Card className="w-64 shadow-lg border-2 border-green-400 bg-green-50 opacity-90">
+				<CardContent className="p-4">
+					<div className="flex items-center space-x-3">
+						<div className="flex-shrink-0">
+							<div className="w-6 h-6 bg-green-600 rounded flex items-center justify-center">
+								<span className="text-white text-xs font-bold">⋮⋮</span>
+							</div>
+						</div>
+						<div className="flex-1 min-w-0">
+							<h4 className="text-sm font-medium text-green-900 truncate">
+								{__('Component', 'trigger')}
+							</h4>
+							<p className="text-xs text-green-700 truncate">
+								{__('Reordering', 'trigger')}
+							</p>
+						</div>
+					</div>
+				</CardContent>
+			</Card>
+		);
+	}
+};
 
 const EmailBuilder: React.FC = () => {
 	const [activeTab, setActiveTab] = useState('design');
@@ -67,7 +144,15 @@ const EmailBuilder: React.FC = () => {
 	);
 
 	const handleDragStart = (event: DragStartEvent) => {
-		setActiveId(event.active.id as string);
+		const { active } = event;
+
+		// For palette items, set activeId to the component type for the overlay
+		if (active.data.current?.type === 'palette-item') {
+			setActiveId(active.data.current.componentType);
+		} else {
+			// For existing components, use the component id
+			setActiveId(active.id as string);
+		}
 	};
 
 	const handleDragOver = (event: DragOverEvent) => {
@@ -353,6 +438,11 @@ const EmailBuilder: React.FC = () => {
 							/>
 						</div>
 					</div>
+
+					{/* Drag Overlay */}
+					<DragOverlay>
+						<DragOverlayComponent activeId={activeId} />
+					</DragOverlay>
 				</DndContext>
 			</div>
 		</div>

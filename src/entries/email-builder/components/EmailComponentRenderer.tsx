@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import { EmailComponent } from '../types';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { __ } from '@wordpress/i18n';
-import { 
-  GripVertical, 
-  Edit, 
-  Trash2, 
-  Eye, 
-  EyeOff 
+import {
+  GripVertical,
+  Edit,
+  Trash2,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 interface EmailComponentRendererProps {
@@ -37,8 +36,6 @@ export const EmailComponentRenderer: React.FC<EmailComponentRendererProps> = ({
     attributes,
     listeners,
     setNodeRef,
-    transform,
-    transition,
     isDragging,
   } = useSortable({
     id: component.id,
@@ -48,14 +45,9 @@ export const EmailComponentRenderer: React.FC<EmailComponentRendererProps> = ({
     }
   });
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
   const renderComponent = () => {
     const { props } = component;
-    
+
     switch (component.type) {
       case 'text':
         return (
@@ -192,10 +184,8 @@ export const EmailComponentRenderer: React.FC<EmailComponentRendererProps> = ({
   return (
     <div
       ref={setNodeRef}
-      style={style}
       className={`
         relative group
-        ${isDragging ? 'opacity-50' : ''}
         ${isSelected ? 'ring-2 ring-blue-500' : ''}
       `}
       onMouseEnter={() => setIsHovered(true)}
@@ -219,7 +209,7 @@ export const EmailComponentRenderer: React.FC<EmailComponentRendererProps> = ({
           >
             <GripVertical className="h-4 w-4" />
           </Button>
-          
+
           <Button
             variant="ghost"
             size="sm"
@@ -231,7 +221,7 @@ export const EmailComponentRenderer: React.FC<EmailComponentRendererProps> = ({
           >
             <Edit className="h-4 w-4" />
           </Button>
-          
+
           <Button
             variant="ghost"
             size="sm"

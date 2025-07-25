@@ -29,6 +29,7 @@ class Migration {
 	public static function tables() {
 		$tables = array(
 			new EmailLogTable(),
+			new EmailTemplateTable(),
 		);
 
 		return $tables;

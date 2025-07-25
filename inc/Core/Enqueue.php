@@ -70,13 +70,6 @@ class Enqueue {
 		}
 
 		if ( 'trigger_page_trigger-email-builder' === $page ) {
-			// wp_enqueue_style(
-			// 'trigger-email-builder-style',
-			// $trigger_style_bundle,
-			// array(),
-			// TRIGGER_VERSION,
-			// 'all'
-			// );
 			wp_enqueue_style(
 				'trigger-style',
 				$trigger_style_bundle,

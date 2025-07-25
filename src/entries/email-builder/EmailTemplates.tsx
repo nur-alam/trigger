@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { 
-	fetchTemplatesAsync, 
-	loadTemplateAsync, 
+import {
+	fetchTemplatesAsync,
+	loadTemplateAsync,
 	saveTemplateAsync,
 	deleteTemplateAsync
 } from '@/store/thunks/emailBuilderThunks';
-import { 
-	selectIsLoading, 
-	selectError 
+import {
+	selectIsLoading,
+	selectError
 } from '@/store/selectors/emailBuilderSelectors';
 import { EmailTemplate } from './types';
-import { 
-	Plus, 
-	Edit3, 
-	Trash2, 
-	Copy, 
-	Calendar, 
+import {
+	Plus,
+	Edit3,
+	Trash2,
+	Copy,
+	Calendar,
 	Search,
 	Grid,
 	List,
@@ -48,8 +48,8 @@ const EmailTemplates: React.FC<EmailTemplatesProps> = ({ className = '' }) => {
 
 	const loadTemplates = async () => {
 		try {
-			const result = await dispatch(fetchTemplatesAsync()).unwrap();
-			setTemplates(result);
+			const result = await dispatch(fetchTemplatesAsync({})).unwrap();
+			setTemplates(result?.templates || []);
 		} catch (error) {
 			toast.error('Failed to load templates');
 			console.error('Error loading templates:', error);
@@ -74,9 +74,9 @@ const EmailTemplates: React.FC<EmailTemplatesProps> = ({ className = '' }) => {
 	const handleDuplicateTemplate = async (template: EmailTemplate) => {
 		try {
 			const duplicatedName = `${template.name} (Copy)`;
-			await dispatch(saveTemplateAsync({ 
-				name: duplicatedName, 
-				components: template.components 
+			await dispatch(saveTemplateAsync({
+				name: duplicatedName,
+				components: template.components
 			})).unwrap();
 			await loadTemplates(); // Refresh the list
 			toast.success('Template duplicated successfully');
@@ -103,7 +103,7 @@ const EmailTemplates: React.FC<EmailTemplatesProps> = ({ className = '' }) => {
 
 	// Filter and sort templates
 	const filteredAndSortedTemplates = templates
-		.filter(template => 
+		.filter(template =>
 			template.name.toLowerCase().includes(searchTerm.toLowerCase())
 		)
 		.sort((a, b) => {
@@ -200,21 +200,19 @@ const EmailTemplates: React.FC<EmailTemplatesProps> = ({ className = '' }) => {
 					<div className="flex items-center gap-2">
 						<button
 							onClick={() => setViewMode('grid')}
-							className={`p-2 rounded-lg transition-colors ${
-								viewMode === 'grid' 
-									? 'bg-blue-100 text-blue-600' 
-									: 'text-gray-400 hover:text-gray-600'
-							}`}
+							className={`p-2 rounded-lg transition-colors ${viewMode === 'grid'
+								? 'bg-blue-100 text-blue-600'
+								: 'text-gray-400 hover:text-gray-600'
+								}`}
 						>
 							<Grid size={20} />
 						</button>
 						<button
 							onClick={() => setViewMode('list')}
-							className={`p-2 rounded-lg transition-colors ${
-								viewMode === 'list' 
-									? 'bg-blue-100 text-blue-600' 
-									: 'text-gray-400 hover:text-gray-600'
-							}`}
+							className={`p-2 rounded-lg transition-colors ${viewMode === 'list'
+								? 'bg-blue-100 text-blue-600'
+								: 'text-gray-400 hover:text-gray-600'
+								}`}
 						>
 							<List size={20} />
 						</button>
@@ -239,8 +237,8 @@ const EmailTemplates: React.FC<EmailTemplatesProps> = ({ className = '' }) => {
 								{searchTerm ? 'No templates found' : 'No templates yet'}
 							</div>
 							<div className="text-gray-500 mb-4">
-								{searchTerm 
-									? 'Try adjusting your search terms' 
+								{searchTerm
+									? 'Try adjusting your search terms'
 									: 'Create your first email template to get started'
 								}
 							</div>
@@ -256,16 +254,15 @@ const EmailTemplates: React.FC<EmailTemplatesProps> = ({ className = '' }) => {
 					</div>
 				) : (
 					<div className={
-						viewMode === 'grid' 
+						viewMode === 'grid'
 							? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
 							: 'space-y-4'
 					}>
 						{filteredAndSortedTemplates.map((template) => (
 							<div
 								key={template.id}
-								className={`bg-white border border-gray-200 rounded-lg hover:shadow-lg transition-shadow ${
-									viewMode === 'list' ? 'flex items-center p-4' : 'p-4'
-								}`}
+								className={`bg-white border border-gray-200 rounded-lg hover:shadow-lg transition-shadow ${viewMode === 'list' ? 'flex items-center p-4' : 'p-4'
+									}`}
 							>
 								{viewMode === 'grid' ? (
 									<>

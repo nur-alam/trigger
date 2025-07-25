@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { EmailComponent, HistoryState } from '../../entries/email-builder/types';
-import { saveTemplateAsync, loadTemplateAsync, fetchTemplatesAsync, deleteTemplateAsync } from '../thunks/emailBuilderThunks';
+import { saveTemplateAsync, loadTemplateAsync, fetchTemplatesAsync, deleteTemplateAsync, duplicateTemplateAsync, updateTemplateAsync } from '../thunks/emailBuilderThunks';
 import { generateUniqueId } from '../../entries/email-builder/utils/helpers';
 
 const MAX_HISTORY_SIZE = 50;
@@ -229,7 +229,8 @@ const emailBuilderSlice = createSlice({
 			.addCase(loadTemplateAsync.fulfilled, (state, action) => {
 				state.isLoading = false;
 				state.error = null;
-				const components = action.payload;
+				const template = action.payload;
+				const components = template.components;
 				saveToHistory(state, components, null);
 				state.components = components;
 				state.selectedComponentId = null;
@@ -263,6 +264,32 @@ const emailBuilderSlice = createSlice({
 			.addCase(deleteTemplateAsync.rejected, (state, action) => {
 				state.isLoading = false;
 				state.error = action.error.message || 'Failed to delete template';
+			})
+			// Duplicate template
+			.addCase(duplicateTemplateAsync.pending, (state) => {
+				state.isLoading = true;
+				state.error = null;
+			})
+			.addCase(duplicateTemplateAsync.fulfilled, (state) => {
+				state.isLoading = false;
+				state.error = null;
+			})
+			.addCase(duplicateTemplateAsync.rejected, (state, action) => {
+				state.isLoading = false;
+				state.error = action.error.message || 'Failed to duplicate template';
+			})
+			// Update template
+			.addCase(updateTemplateAsync.pending, (state) => {
+				state.isLoading = true;
+				state.error = null;
+			})
+			.addCase(updateTemplateAsync.fulfilled, (state) => {
+				state.isLoading = false;
+				state.error = null;
+			})
+			.addCase(updateTemplateAsync.rejected, (state, action) => {
+				state.isLoading = false;
+				state.error = action.error.message || 'Failed to update template';
 			});
 	},
 });

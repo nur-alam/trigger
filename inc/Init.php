@@ -22,6 +22,7 @@ use Trigger\Controllers\EmailLogController;
 use Trigger\Controllers\Provider\InitProvider;
 use Trigger\Frontend\CustomTemplate;
 use Trigger\RestAPI\Routes;
+use Trigger\Services\EmailBuilder\EmailBuilderInit;
 
 /**
  * The Init class initializes plugin dependencies by creating instances
@@ -43,5 +44,6 @@ class Init {
 		new SmtpConfig();
 		new EmailLogController();
 		new InitProvider();
+		new EmailBuilderInit();
 	}
 }

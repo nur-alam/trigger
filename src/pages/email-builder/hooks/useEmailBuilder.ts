@@ -30,14 +30,23 @@ export const useEmailBuilder = () => {
     setHistoryIndex(newHistory.length - 1);
   }, [history, historyIndex]);
 
-  const addComponent = useCallback((type: string) => {
+  const addComponent = useCallback((type: string, insertIndex?: number) => {
     const newComponent: EmailComponent = {
       id: generateUniqueId(),
       type,
       props: getDefaultPropsForType(type)
     };
 
-    const newComponents = [...components, newComponent];
+    let newComponents: EmailComponent[];
+    if (insertIndex !== undefined && insertIndex >= 0 && insertIndex <= components.length) {
+      // Insert at specific position
+      newComponents = [...components];
+      newComponents.splice(insertIndex, 0, newComponent);
+    } else {
+      // Add at the end
+      newComponents = [...components, newComponent];
+    }
+
     saveToHistory(newComponents, newComponent.id);
     setComponents(newComponents);
     setSelectedComponentId(newComponent.id);

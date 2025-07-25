@@ -7,7 +7,7 @@ import {
 	PointerSensor,
 	useSensor,
 	useSensors,
-	closestCenter,
+	pointerWithin,
 } from '@dnd-kit/core';
 import {
 	SortableContext,
@@ -69,28 +69,77 @@ const EmailBuilder: React.FC = () => {
 	};
 
 	const handleDragOver = (event: DragOverEvent) => {
-		// Handle drag over logic if needed
+		const { active, over } = event;
+		
+		// Only process palette items
+		if (active.data.current?.type !== 'palette-item') {
+			return;
+		}
+		
+		if (!over) {
+			console.log('No over target');
+			return;
+		}
+		
+		console.log('Drag over - over.id:', over.id, 'over.data:', over.data.current);
+		
+		// STRICT: Only allow drops on email-canvas or components
+		const isEmailCanvas = over.id === 'email-canvas';
+		const isComponent = over.data.current?.type === 'component';
+		
+		console.log('Is email canvas:', isEmailCanvas, 'Is component:', isComponent);
+		
+		if (!isEmailCanvas && !isComponent) {
+			console.log('Invalid drop target - blocking');
+			// Block the drop by returning early
+			return;
+		}
 	};
 
 	const handleDragEnd = (event: DragEndEvent) => {
 		const { active, over } = event;
+		console.log('Drag end - active:', active.data.current, 'over:', over?.id, over?.data?.current);
 		setActiveId(null);
 
-		if (!over) return;
+		if (!over) {
+			console.log('No over target, returning');
+			return;
+		}
 
 		// Handle dropping new components from palette
-		if (active.data.current?.type === 'palette-item' && over.id === 'email-canvas') {
+		if (active.data.current?.type === 'palette-item') {
+			// STRICT VALIDATION: Must be exactly email-canvas or component
+			const isEmailCanvas = over.id === 'email-canvas';
+			const isComponent = over.data.current?.type === 'component';
+			
+			console.log('Drop validation - Canvas:', isEmailCanvas, 'Component:', isComponent);
+			
+			// Reject any drop that's not on canvas or component
+			if (!isEmailCanvas && !isComponent) {
+				console.log('REJECTED: Invalid drop target');
+				return;
+			}
+			
 			const componentType = active.data.current.componentType;
-			addComponent(componentType);
+			console.log('Adding component:', componentType);
+			
+			// If dropping on a component, insert after that component
+			if (isComponent && !isEmailCanvas) {
+				const targetIndex = components.findIndex(c => c.id === over.id);
+				addComponent(componentType, targetIndex + 1);
+			} else if (isEmailCanvas) {
+				// Drop at the end of the canvas
+				addComponent(componentType);
+			}
 			return;
 		}
 
 		// Handle reordering existing components
-		if (active.data.current?.type === 'component' && over.data.current?.type === 'component') {
+		if (active.data.current?.type === 'component') {
 			const activeIndex = components.findIndex(c => c.id === active.id);
 			const overIndex = components.findIndex(c => c.id === over.id);
-
-			if (activeIndex !== overIndex) {
+			
+			if (activeIndex !== -1 && overIndex !== -1 && activeIndex !== overIndex) {
 				reorderComponents(activeIndex, overIndex);
 			}
 		}
@@ -216,11 +265,10 @@ const EmailBuilder: React.FC = () => {
 			<div className="flex-1 flex overflow-hidden">
 				<DndContext
 					sensors={sensors}
-					collisionDetection={closestCenter}
+					collisionDetection={pointerWithin}
 					onDragStart={handleDragStart}
 					onDragOver={handleDragOver}
 					onDragEnd={handleDragEnd}
-					modifiers={[restrictToVerticalAxis]}
 				>
 					{/* Left Sidebar - Component Palette */}
 					<div className="w-80 bg-white border-r overflow-y-auto">

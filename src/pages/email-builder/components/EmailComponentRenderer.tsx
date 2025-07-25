@@ -43,7 +43,7 @@ export const EmailComponentRenderer: React.FC<EmailComponentRendererProps> = ({
   } = useSortable({
     id: component.id,
     data: {
-      type: 'canvas-item',
+      type: 'component',
       component
     }
   });

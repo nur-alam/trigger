@@ -33,10 +33,22 @@ export const EmailCanvas: React.FC<EmailCanvasProps> = ({
         <div
           ref={setNodeRef}
           className={`
-            bg-white shadow-lg rounded-lg min-h-[600px] relative
-            ${isOver ? 'ring-2 ring-blue-400 ring-opacity-50' : ''}
+            bg-white shadow-lg rounded-lg min-h-[600px] relative transition-all duration-200
+            ${isOver ? 'ring-2 ring-blue-400 ring-opacity-50 bg-blue-50' : ''}
           `}
         >
+          {/* Drop zone indicator when dragging over empty canvas */}
+          {isOver && components.length === 0 && (
+            <div className="absolute inset-0 flex items-center justify-center bg-blue-50 bg-opacity-75 rounded-lg border-2 border-dashed border-blue-300">
+              <div className="text-center">
+                <Plus className="w-12 h-12 mx-auto mb-2 text-blue-400" />
+                <p className="text-blue-600 font-medium">
+                  {__('Drop component here', 'trigger')}
+                </p>
+              </div>
+            </div>
+          )}
+          
           {components.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-96 text-gray-500">
               <Plus className="w-16 h-16 mb-4 text-gray-300" />

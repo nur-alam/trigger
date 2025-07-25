@@ -43,27 +43,6 @@ const ConnectionList = ({ initialConnections, setInitialConnections }: { initial
 		setIsDeleteSheetOpen(true);
 	};
 
-	const handleConnectionUpdated = () => {
-		// Reload the page or fetch connections again
-		window.location.reload();
-	};
-
-	const [searchParams] = useSearchParams();
-	const isGmailRedirect = searchParams.get('google_gmail_redirect') === 'true';
-	if (isGmailRedirect) {
-		toast.success('Gmail connected successfully!');
-		setTimeout(() => {
-			window.location.assign(`${config.site_url}/wp-admin/admin.php?page=trigger#/connections`);
-		}, 500);
-	}
-	const isGmailRedirectFailed = searchParams.get('google_gmail_redirect_failed') === 'true';
-	if (isGmailRedirectFailed) {
-		toast.error('Gmail connection failed!');
-		setTimeout(() => {
-			window.location.assign(`${config.site_url}/wp-admin/admin.php?page=trigger#/connections`);
-		}, 500);
-	}
-
 	return (
 		<div className="rounded-md border mt-10 p-4">
 			<div className="flex justify-between py-3 mb-3" >

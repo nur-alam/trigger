@@ -16,23 +16,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { DataTable } from '@/components/data-table'
 import { getProviderFullName } from '@/utils/utils'
 import { useResendEmailMutation } from '@/services/connection-services'
-interface EmailLog {
-	id: number
-	mail_to: string
-	mail_from: string
-	subject: string
-	message: string
-	created_at: string
-	headers: string
-	attachments: string
-}
-
-interface PaginationMeta {
-	total: number
-	per_page: number
-	current_page: number
-	total_pages: number
-}
+import { EmailLog, PaginationMeta } from '@/utils/trigger-declaration';
 
 interface EmailLogsResponse {
 	status_code: number
@@ -200,7 +184,6 @@ const EmailLogs = () => {
 	const resendEmail = async (email: EmailLog) => {
 		await resendEmailMutate(email);
 	}
-
 
 
 	const columns: ColumnDef<EmailLog>[] = [

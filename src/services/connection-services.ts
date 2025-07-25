@@ -179,3 +179,32 @@ export const useResendEmailMutation = () => {
 		},
 	});
 };
+
+export const useHandleGoogleOAuthCallback = () => {
+	return useMutation({
+		mutationFn: async (payload: AnyObject) => {
+			payload = {
+				action: 'handle_google_oauth_callback',
+				...payload,
+			};
+			console.log('juicy pops', payload);
+			const res = await fetchUtil(config.ajax_url, { body: payload });
+			return res;
+		},
+		onSuccess: (response: TriggerResponseType) => {
+			if (response.status_code === 200) {
+				toast.success(response?.message || __('Google OAuth callback handled successfully', 'trigger'));
+				setTimeout(() => {
+					window.location.assign(`${config.site_url}/wp-admin/admin.php?page=trigger#/connections`);
+				}, 500);
+			}
+		},
+		onError: (error) => {
+			console.log('google error', error);
+			toast.error(error?.message || __('Gmail connection failed!', 'trigger'));
+			setTimeout(() => {
+				window.location.assign(`${config.site_url}/wp-admin/admin.php?page=trigger#/connections`);
+			}, 500);
+		},
+	});
+};

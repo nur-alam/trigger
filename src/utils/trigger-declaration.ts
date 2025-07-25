@@ -1,5 +1,23 @@
 import config from '@/config';
 
+export interface EmailLog {
+	id: number;
+	mail_to: string;
+	mail_from: string;
+	subject: string;
+	message: string;
+	created_at: string;
+	headers: string;
+	attachments: string;
+}
+
+export interface PaginationMeta {
+	total: number;
+	per_page: number;
+	current_page: number;
+	total_pages: number;
+}
+
 export interface EmailSettingsResponse {
 	status_code: number;
 	message?: string;

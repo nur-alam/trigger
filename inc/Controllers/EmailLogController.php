@@ -66,7 +66,8 @@ class EmailLogController {
 		add_action( 'wp_ajax_trigger_bulk_delete_email_logs', array( $this, 'bulk_delete_email_logs' ) );
 		add_action( 'wp_ajax_trigger_send_test_email', array( $this, 'send_test_email' ) );
 		add_action( 'wp_ajax_trigger_resend_email', array( $this, 'trigger_resend_email' ) );
-		add_action( 'admin_init', array( $this, 'handle_google_oauth_callback' ) );
+		// add_action( 'admin_init', array( $this, 'handle_google_oauth_callback' ) );
+		add_action( 'wp_ajax_handle_google_oauth_callback', array( $this, 'handle_google_oauth_callback' ) );
 	}
 
 	/**
@@ -74,13 +75,16 @@ class EmailLogController {
 	 */
 	public function handle_google_oauth_callback() {
 		$provider = trigger_get_provider( 'gmail' );
-		// Handle OAuth Callback
-		if ( isset( $_GET['code'] ) && null !== $provider && 'gmail' === $provider['provider'] ) {
+		// Verify nonce for security.
+		$data = trigger_verify_request( true );
+		$code = $data['data']['code'];
+
+		if ( ! empty( $code ) && null !== $provider && 'gmail' === $provider['provider'] ) {
 			$response = wp_remote_post(
 				'https://oauth2.googleapis.com/token',
 				array(
 					'body' => array(
-						'code'          => $_GET['code'], // phpcs:ignore
+						'code'          => $code,
 						'client_id'     => $provider['clientId'],
 						'client_secret' => $provider['clientSecret'],
 						'redirect_uri'  => TRIGGER_REDIRECT_URI,
@@ -91,9 +95,11 @@ class EmailLogController {
 			$body     = json_decode( wp_remote_retrieve_body( $response ), true );
 			if ( isset( $body['access_token'] ) ) {
 				update_option( GMAIL_AUTH_CREDENTIALS, $body );
-				wp_safe_redirect( admin_url( 'admin.php?page=trigger#/connections?google_gmail_redirect=true' ) );
+				return $this->json_response( 'Gmail connected successfully!', null, 200 );
+				// wp_safe_redirect( admin_url( 'admin.php?page=trigger#/connections?google_gmail_redirect=true' ) );
 			} else {
-				wp_safe_redirect( admin_url( 'admin.php?page=trigger#/connections?google_gmail_redirect_failed=true' ) );
+				return $this->json_response( 'Gmail connection failed!', null, 400 );
+				// wp_safe_redirect( admin_url( 'admin.php?page=trigger#/connections?google_gmail_redirect_failed=true' ) );
 			}
 		}
 	}

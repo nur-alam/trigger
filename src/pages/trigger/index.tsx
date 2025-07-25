@@ -8,7 +8,12 @@ import { __ } from '@wordpress/i18n';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { format } from 'date-fns';
 import config from '@/config';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
+import { fetchUtil } from '@/utils/requestUtils';
+import { TriggerResponseType } from '@/utils/trigger-declaration';
+import toast from 'react-hot-toast';
+import { useHandleGoogleOAuthCallback } from '@/services/connection-services';
 
 
 interface EmailStats {
@@ -54,6 +59,19 @@ const TriggerDashboard = () => {
 	useEffect(() => {
 		fetchEmailStats();
 	}, []);
+
+	const [searchParams] = useSearchParams();
+	const params = new URLSearchParams(window.location.search);
+	const code = params.get('code');
+
+	const { mutateAsync: handleGoogleOAuthCallback } = useHandleGoogleOAuthCallback();
+
+	useEffect(() => {
+		if (code) {
+			handleGoogleOAuthCallback({ 'code': code });
+		}
+	}, [code]);
+
 
 	return (
 		<div className="p-4 space-y-6">

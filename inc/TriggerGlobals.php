@@ -38,7 +38,7 @@ function trigger_get_default_provider() {
 }
 
 /**
- * [trigger_get_provider description]
+ * Trigger_get_provider description
  *
  * @param provider $provider description.
  *
@@ -49,7 +49,7 @@ function trigger_get_provider( $provider ) {
 	if ( empty( $trigger_email_config ) ) {
 		return false;
 	}
-	return $trigger_email_config[ $provider ];
+	return $trigger_email_config[ $provider ] ?? false;
 }
 
 /**

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import ConnectionList from "./connection-list";
 import { __ } from "@wordpress/i18n";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { EmailProviderOptionsType, TriggerResponseType } from "@/utils/trigger-declaration";
 import { useGetAllProviders } from "@/services/connection-services";
 

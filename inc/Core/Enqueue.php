@@ -45,6 +45,7 @@ class Enqueue {
 		$plugin_data          = Trigger::plugin_data();
 		$trigger_style_bundle = $plugin_data['plugin_url'] . 'assets/dist/css/style.min.css';
 		$trigger_admin_bundle = $plugin_data['plugin_url'] . 'assets/dist/js/backend-bundle.min.js';
+		$trigger_email_bundle = $plugin_data['plugin_url'] . 'assets/dist/js/email-builder-bundle.min.js';
 
 		if ( 'toplevel_page_trigger' === $page ) {
 			wp_enqueue_style(
@@ -85,7 +86,7 @@ class Enqueue {
 			);
 			wp_enqueue_script(
 				'trigger-email-builder',
-				$trigger_admin_bundle,
+				$trigger_email_bundle,
 				array( 'wp-element', 'wp-i18n' ),
 				TRIGGER_VERSION,
 				true

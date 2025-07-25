@@ -1,7 +1,7 @@
 import Trigger from '@/pages/trigger';
 import Settings from '@pages/settings';
 import EmailLogs from '@pages/email-logs';
-import EmailBuilder from '@/pages/email-builder';
+import EmailBuilder from '@/entries/email-builder';
 const SLUG = 'trigger';
 
 export const pageUrls = {

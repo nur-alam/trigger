@@ -29,7 +29,7 @@ import {
 	Settings,
 } from 'lucide-react';
 
-import { useEmailBuilder } from './hooks/useEmailBuilder';
+import { useEmailBuilderRedux } from './hooks/useEmailBuilderRedux';
 import { ComponentPalette } from './components/ComponentPalette';
 import { EmailCanvas } from './components/EmailCanvas';
 import { PropertiesPanel } from './components/PropertiesPanel';
@@ -51,10 +51,12 @@ const EmailBuilder: React.FC = () => {
 		setActiveId,
 		undo,
 		redo,
+		canUndo,
+		canRedo,
 		generateHTML,
 		saveTemplate,
 		loadTemplate
-	} = useEmailBuilder();
+	} = useEmailBuilderRedux();
 
 	const sensors = useSensors(
 		useSensor(PointerSensor, {
@@ -148,7 +150,8 @@ const EmailBuilder: React.FC = () => {
 	const handleSaveTemplate = async () => {
 		const templateName = prompt(__('Enter template name:', 'trigger'));
 		if (templateName) {
-			await saveTemplate(templateName, components);
+			await saveTemplate(templateName);
+			// await saveTemplate(templateName, components);
 		}
 	};
 
@@ -205,7 +208,7 @@ const EmailBuilder: React.FC = () => {
 							onClick={undo}
 							variant="outline"
 							size="sm"
-							disabled={!components.length}
+							disabled={!canUndo}
 						>
 							<Undo2 className="h-4 w-4" />
 						</Button>
@@ -214,7 +217,7 @@ const EmailBuilder: React.FC = () => {
 							onClick={redo}
 							variant="outline"
 							size="sm"
-							disabled={!components.length}
+							disabled={!canRedo}
 						>
 							<Redo2 className="h-4 w-4" />
 						</Button>

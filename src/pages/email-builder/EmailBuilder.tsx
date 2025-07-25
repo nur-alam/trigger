@@ -70,25 +70,25 @@ const EmailBuilder: React.FC = () => {
 
 	const handleDragOver = (event: DragOverEvent) => {
 		const { active, over } = event;
-		
+
 		// Only process palette items
 		if (active.data.current?.type !== 'palette-item') {
 			return;
 		}
-		
+
 		if (!over) {
 			console.log('No over target');
 			return;
 		}
-		
+
 		console.log('Drag over - over.id:', over.id, 'over.data:', over.data.current);
-		
+
 		// STRICT: Only allow drops on email-canvas or components
 		const isEmailCanvas = over.id === 'email-canvas';
 		const isComponent = over.data.current?.type === 'component';
-		
+
 		console.log('Is email canvas:', isEmailCanvas, 'Is component:', isComponent);
-		
+
 		if (!isEmailCanvas && !isComponent) {
 			console.log('Invalid drop target - blocking');
 			// Block the drop by returning early
@@ -111,18 +111,18 @@ const EmailBuilder: React.FC = () => {
 			// STRICT VALIDATION: Must be exactly email-canvas or component
 			const isEmailCanvas = over.id === 'email-canvas';
 			const isComponent = over.data.current?.type === 'component';
-			
+
 			console.log('Drop validation - Canvas:', isEmailCanvas, 'Component:', isComponent);
-			
+
 			// Reject any drop that's not on canvas or component
 			if (!isEmailCanvas && !isComponent) {
 				console.log('REJECTED: Invalid drop target');
 				return;
 			}
-			
+
 			const componentType = active.data.current.componentType;
 			console.log('Adding component:', componentType);
-			
+
 			// If dropping on a component, insert after that component
 			if (isComponent && !isEmailCanvas) {
 				const targetIndex = components.findIndex(c => c.id === over.id);
@@ -138,7 +138,7 @@ const EmailBuilder: React.FC = () => {
 		if (active.data.current?.type === 'component') {
 			const activeIndex = components.findIndex(c => c.id === active.id);
 			const overIndex = components.findIndex(c => c.id === over.id);
-			
+
 			if (activeIndex !== -1 && overIndex !== -1 && activeIndex !== overIndex) {
 				reorderComponents(activeIndex, overIndex);
 			}
@@ -271,7 +271,7 @@ const EmailBuilder: React.FC = () => {
 					onDragEnd={handleDragEnd}
 				>
 					{/* Left Sidebar - Component Palette */}
-					<div className="w-80 bg-white border-r overflow-y-auto">
+					<div className="w-80 bg-white border-r">
 						<div className="p-6">
 							<Tabs value={activeTab} onValueChange={setActiveTab}>
 								<TabsList className="grid w-full grid-cols-2">

@@ -67,6 +67,35 @@ class Enqueue {
 				'before'
 			);
 		}
+
+		if ( 'trigger_page_trigger-email-builder' === $page ) {
+			// wp_enqueue_style(
+			// 'trigger-email-builder-style',
+			// $trigger_style_bundle,
+			// array(),
+			// TRIGGER_VERSION,
+			// 'all'
+			// );
+			wp_enqueue_style(
+				'trigger-style',
+				$trigger_style_bundle,
+				array(),
+				TRIGGER_VERSION,
+				'all'
+			);
+			wp_enqueue_script(
+				'trigger-email-builder',
+				$trigger_admin_bundle,
+				array( 'wp-element', 'wp-i18n' ),
+				TRIGGER_VERSION,
+				true
+			);
+			wp_add_inline_script(
+				'trigger-email-builder',
+				'const _triggerObject = ' . wp_json_encode( self::scripts_data() ) . ';window._triggerObject=_triggerObject',
+				'before'
+			);
+		}
 	}
 
 	/**

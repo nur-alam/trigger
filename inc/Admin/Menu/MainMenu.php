@@ -134,34 +134,42 @@ class MainMenu {
 		);
 
 		// Register main menu.
-		// add_submenu_page(
-		// $this->slug(),
-		// 'Dashboard',
-		// 'Dashboard',
-		// $this->capability(),
-		// $this->slug(),
-		// array( $this, 'view' )
-		// );
+		add_submenu_page(
+			$this->slug(),
+			'Dashboard',
+			'Dashboard',
+			$this->capability(),
+			$this->slug(),
+			array( $this, 'view' )
+		);
 
-		// $submenus = $this->submenu_factory();
+		// Email Builder submenu
+		add_submenu_page(
+			$this->slug(),
+			__( 'Email Builder', 'trigger' ),
+			__( 'Email Builder', 'trigger' ),
+			$this->capability(),
+			$this->slug() . '-email-builder',
+			array( $this, 'email_builder_view' )
+		);
 
 		// $email_logs_submenu = new EmailLogs();
 		// add_submenu_page(
 		// $this->slug(),
 		// $email_logs_submenu->page_title(),
 		// $email_logs_submenu->menu_title(),
-		// $email_logs_submenu->capability(),
+		// $this->capability(),
 		// $email_logs_submenu->slug(),
 		// array( $this, 'view' )
 		// );
 
-		// // Register sub-menus.
+		// Register sub-menus.
 		// $settings_submenu = new Settings();
 		// add_submenu_page(
 		// $this->slug(),
 		// $settings_submenu->page_title(),
 		// $settings_submenu->menu_title(),
-		// $settings_submenu->capability(),
+		// $this->capability(),
 		// $settings_submenu->slug(),
 		// array( $this, 'view' )
 		// );
@@ -189,7 +197,15 @@ class MainMenu {
 	 * @return void
 	 */
 	public function view() {
-		$dpage = trailingslashit( $this->plugin_data['views'] . 'pages' ) . 'trigger-view.php';
 		include trailingslashit( $this->plugin_data['views'] . 'pages' ) . 'trigger-view.php';
+	}
+
+	/**
+	 * Page view
+	 *
+	 * @return void
+	 */
+	public function email_builder_view() {
+		include trailingslashit( $this->plugin_data['views'] . 'pages' ) . 'email-builder-view.php';
 	}
 }

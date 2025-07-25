@@ -62,7 +62,7 @@ const Modal: React.FC<ModalProps> = ({
 					onClick={(e) => e.stopPropagation()}
 				>
 					{/* Header */}
-					{title && (
+					{/* {title && (
 						<div className="flex items-center justify-between p-6 border-b border-gray-200">
 							<h2 className="text-xl font-semibold text-gray-900">{title}</h2>
 							<button
@@ -72,17 +72,17 @@ const Modal: React.FC<ModalProps> = ({
 								<X className="w-5 h-5 text-gray-500" />
 							</button>
 						</div>
-					)}
+					)} */}
 
 					{/* Close button when no title */}
-					{!title && (
+					{/* {!title && (
 						<button
 							onClick={onClose}
 							className="absolute top-4 right-4 z-10 p-2 hover:bg-gray-100 rounded-lg transition-colors bg-white shadow-sm"
 						>
 							<X className="w-5 h-5 text-gray-500" />
 						</button>
-					)}
+					)} */}
 
 					{/* Content */}
 					<div className="flex-1 overflow-auto">

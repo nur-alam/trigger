@@ -44,6 +44,5 @@ class Init {
 		new SmtpConfig();
 		new EmailLogController();
 		new InitProvider();
-		new EmailBuilderInit();
 	}
 }

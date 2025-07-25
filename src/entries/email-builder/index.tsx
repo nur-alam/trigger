@@ -2,9 +2,6 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import { HashRouter, Route, Routes } from 'react-router-dom';
-import { ReduxProvider } from '@/store/ReduxProvider';
-import EmailBuilder from './EmailBuilder';
-import EmailTemplates from './EmailTemplates';
 import { Toaster } from 'react-hot-toast';
 import EmailBuilderHeader from './components/EmailBuilderHeader';
 
@@ -16,17 +13,15 @@ if (container) {
 		<React.StrictMode>
 			<HashRouter>
 				<EmailBuilderHeader />
-				<ReduxProvider>
-					<Routes>
-						<Route path="/" element={<App />} />
-						<Route path="/email-builder" element={
-							<EmailBuilder />
-						} />
-						<Route path="/email-templates" element={
-							<EmailTemplates />
-						} />
-					</Routes>
-				</ReduxProvider>
+				<Routes>
+					<Route path="/" element={<App />} />
+					{/* <Route path="/email-builder" element={
+						<EmailBuilder />
+					} />
+					<Route path="/email-templates" element={
+						<EmailTemplates />
+					} /> */}
+				</Routes>
 
 				<Toaster
 					position="bottom-right"

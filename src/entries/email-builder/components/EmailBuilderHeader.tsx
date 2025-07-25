@@ -12,9 +12,7 @@ interface MenuItem {
 }
 
 const menuItems: MenuItem[] = [
-	{ id: "home", label: "Home", path: "/home", icon: <HomeIcon /> },
-	{ id: "email_builder", label: "Email Builder", path: "/email-builder", icon: <MailIcon /> },
-	{ id: "email_templates", label: "Templates", path: "/email-templates", icon: <LinkIcon /> }
+	{ id: "home", label: "Home", path: "/", icon: <HomeIcon /> },
 ];
 
 const EmailBuilderHeader = () => {

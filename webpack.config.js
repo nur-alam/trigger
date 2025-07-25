@@ -99,7 +99,7 @@ module.exports = (env, options) => {
 				name: 'configEditor',
 				entry: src_files,
 				output: {
-					path: path.resolve(dest_path),
+					path: path.resolve(__dirname, dest_path),
 					filename: '[name].js',
 					chunkFilename: `lazy-chunks/[name].[contenthash].min.js?v=${version}`,
 					clean: true,
@@ -119,7 +119,7 @@ module.exports = (env, options) => {
 						'@utils': path.resolve(__dirname, './src/utils'),
 						'@hooks': path.resolve(__dirname, './src/hooks'),
 						'@pages': path.resolve(__dirname, './src/pages'),
-						'@entries': path.resolve(__dirname, './src/entries'),
+						'@email-builder': path.resolve(__dirname, './src/entries/email-builder'),
 					},
 				},
 			})

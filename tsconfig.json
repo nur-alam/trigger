@@ -20,7 +20,8 @@
             "@lib/*": ["./src/lib/*"],
             "@utils/*": ["./src/utils/*"],
             "@hooks": ["./src/hooks"],
-            "@pages/*": ["./src/pages/*"]
+            "@pages/*": ["./src/pages/*"],
+            "@email-builder/*": ["./src/entries/email-builder/*"]
         }
     },
     "include": ["src/**/*.ts", "src/**/*.tsx"],

@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
+import EmailBuilder from '@email-builder/builder/EmailBuilder';
 import { HashRouter, Route, Routes } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import EmailBuilderHeader from './components/EmailBuilderHeader';
@@ -15,17 +16,12 @@ if (container) {
 				<EmailBuilderHeader />
 				<Routes>
 					<Route path="/" element={<App />} />
-					{/* <Route path="/email-builder" element={
-						<EmailBuilder />
-					} />
-					<Route path="/email-templates" element={
-						<EmailTemplates />
-					} /> */}
+					<Route path="/create/new-email-template" element={<EmailBuilder />} />
+					<Route path="/edit/email-template/:id" element={<EmailBuilder />} />
 				</Routes>
 
 				<Toaster
 					position="bottom-right"
-					// position="bottom-center"
 					containerClassName="!z-[9999999]"
 					toastOptions={{
 						duration: 5000,
@@ -51,7 +47,6 @@ if (container) {
 						},
 					}}
 				/>
-
 			</HashRouter>
 		</React.StrictMode>
 	);

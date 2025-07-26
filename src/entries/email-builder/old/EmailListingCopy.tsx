@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import {
 	Search,
 	Grid3X3,
@@ -385,6 +385,24 @@ const TemplateCard: React.FC<{
 	onDuplicate: () => void;
 }> = ({ template, isSelected, onSelect, onEdit, onPreview, onDuplicate }) => {
 	const [showMenu, setShowMenu] = useState(false);
+	const menuRef = useRef<HTMLDivElement>(null);
+
+	// Handle click outside to close menu
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+				setShowMenu(false);
+			}
+		};
+
+		if (showMenu) {
+			document.addEventListener('mousedown', handleClickOutside);
+		}
+
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside);
+		};
+	}, [showMenu]);
 
 	return (
 		<div className={`relative bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow ${isSelected ? 'ring-2 ring-blue-500 border-blue-500' : 'border-gray-200'
@@ -401,7 +419,7 @@ const TemplateCard: React.FC<{
 
 			{/* Menu Button */}
 			<div className="absolute top-3 right-3 z-10">
-				<div className="relative">
+				<div className="relative" ref={menuRef}>
 					<button
 						onClick={() => setShowMenu(!showMenu)}
 						className="p-1 bg-white rounded-full shadow-sm hover:bg-gray-50"
@@ -458,8 +476,8 @@ const TemplateCard: React.FC<{
 				<div className="flex items-center justify-between mb-2">
 					<h3 className="font-medium text-gray-900 truncate">{template.name}</h3>
 					<span className={`px-2 py-1 text-xs rounded-full ${template.status === 'published' ? 'bg-green-100 text-green-800' :
-							template.status === 'draft' ? 'bg-yellow-100 text-yellow-800' :
-								'bg-blue-100 text-blue-800'
+						template.status === 'draft' ? 'bg-yellow-100 text-yellow-800' :
+							'bg-blue-100 text-blue-800'
 						}`}>
 						{template.status}
 					</span>
@@ -519,6 +537,24 @@ const TemplateListItem: React.FC<{
 	onDuplicate: () => void;
 }> = ({ template, isSelected, onSelect, onEdit, onPreview, onDuplicate }) => {
 	const [showMenu, setShowMenu] = useState(false);
+	const menuRef = useRef<HTMLDivElement>(null);
+
+	// Handle click outside to close menu
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+				setShowMenu(false);
+			}
+		};
+
+		if (showMenu) {
+			document.addEventListener('mousedown', handleClickOutside);
+		}
+
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside);
+		};
+	}, [showMenu]);
 
 	return (
 		<div className={`flex items-center p-4 bg-white border rounded-lg hover:bg-gray-50 ${isSelected ? 'ring-2 ring-blue-500 border-blue-500' : 'border-gray-200'
@@ -541,8 +577,8 @@ const TemplateListItem: React.FC<{
 
 					<div className="flex items-center space-x-6 ml-4">
 						<span className={`px-2 py-1 text-xs rounded-full ${template.status === 'published' ? 'bg-green-100 text-green-800' :
-								template.status === 'draft' ? 'bg-yellow-100 text-yellow-800' :
-									'bg-blue-100 text-blue-800'
+							template.status === 'draft' ? 'bg-yellow-100 text-yellow-800' :
+								'bg-blue-100 text-blue-800'
 							}`}>
 							{template.status}
 						</span>
@@ -564,7 +600,7 @@ const TemplateListItem: React.FC<{
 						</div>
 
 						{/* Actions Menu */}
-						<div className="relative">
+						<div className="relative" ref={menuRef}>
 							<button
 								onClick={() => setShowMenu(!showMenu)}
 								className="p-1 hover:bg-gray-100 rounded"

@@ -10,7 +10,6 @@ import Settings from '@/pages/settings';
 import { Toaster } from 'react-hot-toast';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReduxProvider } from '@/store/ReduxProvider';
-import EmailBuilder from './entries/email-builder/EmailBuilder';
 const root = ReactDOM.createRoot(document.getElementById('trigger-root') as HTMLElement);
 
 // QueryClient instance
@@ -35,11 +34,6 @@ root.render(
 				<Route path="/connections" element={<Connections />} />
 				<Route path="/general" element={<GeneralSettings />} />
 				<Route path="/add-connection" element={<AddConnection />} />
-				<Route path="/email-builder" element={
-					<ReduxProvider>
-						<EmailBuilder />
-					</ReduxProvider>
-				} />
 			</Routes>
 
 			<Toaster

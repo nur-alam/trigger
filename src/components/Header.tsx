@@ -16,9 +16,6 @@ const menuItems: MenuItem[] = [
 	{ id: "email_logs", label: "Email Logs", path: "/email_logs", icon: <MailIcon /> },
 	{ id: "connections", label: "Connections", path: "/connections", icon: <LinkIcon /> },
 	{ id: "settings", label: "Settings", path: "/settings", icon: <SettingsIcon /> },
-	{ id: "email_builder", label: "Email Builder", path: "/email-builder", icon: <MailIcon /> },
-	// { id: "general", label: "General", path: "/general" },
-	// { id: "add-connection", label: "Add Connection", path: "/add-connection", badge: "Coming Soon" },
 ];
 
 const Header = () => {

@@ -1,5 +1,19 @@
+import {
+	Square,
+	Type,
+	Image,
+	Focus,
+	Minus,
+	Columns,
+	Columns2,
+	Columns3,
+	Columns4,
+	Layers,
+	FileImage,
+} from 'lucide-react';
+
 // Mock data for email templates
-const mockEmailTemplates = [
+export const mockEmailTemplates = [
 	{
 		id: '1',
 		name: 'Welcome Email',
@@ -86,4 +100,68 @@ const mockEmailTemplates = [
 	},
 ];
 
-export default mockEmailTemplates;
+export const mockEmailTemplateCategories = [
+	{
+		id: 'onboarding',
+		name: 'Onboarding',
+		description: 'Templates for welcome emails and onboarding processes',
+	},
+	{
+		id: 'newsletter',
+		name: 'Newsletter',
+		description: 'Templates for monthly newsletters and digest emails',
+	},
+	{
+		id: 'marketing',
+		name: 'Marketing',
+		description: 'Templates for marketing campaigns and announcements',
+	},
+	{
+		id: 'transactional',
+		name: 'Transactional',
+		description: 'Templates for transactional emails and notifications',
+	},
+	{
+		id: 'promotional',
+		name: 'Promotional',
+		description: 'Templates for promotional offers and sales',
+	},
+];
+
+export const elements = [
+	{ id: 'button', icon: Square, label: 'Button' },
+	{ id: 'text', icon: Type, label: 'Text' },
+	{ id: 'image', icon: Image, label: 'Image' },
+	{ id: 'logo', icon: Focus, label: 'Logo' },
+	{ id: 'logo-header', icon: Square, label: 'Logo Header' },
+	{ id: 'divider', icon: Minus, label: 'Divider' },
+	{ id: 'social-icons', icon: Focus, label: 'Social Icons' },
+];
+
+export const mediaItems = [
+	{ id: 'img1', name: 'hero-banner.jpg', type: 'image', size: '1.2 MB', url: '/placeholder-image.jpg' },
+	{ id: 'img2', name: 'product-photo.png', type: 'image', size: '800 KB', url: '/placeholder-image.jpg' },
+	{ id: 'vid1', name: 'intro-video.mp4', type: 'video', size: '5.4 MB', url: '/placeholder-video.mp4' },
+	{ id: 'aud1', name: 'background-music.mp3', type: 'audio', size: '2.1 MB', url: '/placeholder-audio.mp3' },
+];
+
+export const layouts = [
+	{ id: 'column', icon: Columns, label: 'Column' },
+	{ id: '2-column', icon: Columns2, label: '2 Column' },
+	{ id: '3-column', icon: Columns3, label: '3 Column' },
+	{ id: '4-column', icon: Columns4, label: '4 Column' },
+];
+
+export const layers = [
+	{ id: 'header', name: 'Header Section', type: 'section', visible: true },
+	{ id: 'hero', name: 'Hero Image', type: 'image', visible: true },
+	{ id: 'content', name: 'Main Content', type: 'text', visible: true },
+	{ id: 'cta', name: 'Call to Action', type: 'button', visible: true },
+	{ id: 'footer', name: 'Footer', type: 'section', visible: true },
+];
+export type TabType = 'elements' | 'layers' | 'media';
+export const tabs = [
+	{ id: 'elements' as TabType, label: 'Elements', icon: Square },
+	{ id: 'layers' as TabType, label: 'Layers', icon: Layers },
+	{ id: 'media' as TabType, label: 'Media', icon: FileImage },
+];

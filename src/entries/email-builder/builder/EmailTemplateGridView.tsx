@@ -131,14 +131,14 @@ const EmailTemplateGridView = ({ template, isSelected, onSelect, onEdit, onPrevi
 					</div>
 				</div>
 
-				<div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+				{/* <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
 					<div className="text-xs text-gray-500">
 						<span className="font-medium">{template.opens}</span> opens
 					</div>
 					<div className="text-xs text-gray-500">
 						<span className="font-medium">{template.clicks}</span> clicks
 					</div>
-				</div>
+				</div> */}
 
 				{/* Action Buttons */}
 				<div className="flex items-center space-x-2 mt-3">

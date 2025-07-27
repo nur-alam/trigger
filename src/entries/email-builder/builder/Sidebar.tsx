@@ -1,63 +1,15 @@
 import React, { useState } from 'react';
 import {
-	Square,
-	Type,
 	Image,
-	Focus,
-	Minus,
-	Columns,
-	Columns2,
-	Columns3,
-	Columns4,
-	Layers,
-	FileImage,
 	Video,
 	Music,
 	File
 } from 'lucide-react';
 
-type TabType = 'elements' | 'layers' | 'media';
+import { elements, mediaItems, TabType, layouts, tabs, layers } from '@email-builder/utils/data';
 
 const Sidebar: React.FC = () => {
 	const [activeTab, setActiveTab] = useState<TabType>('elements');
-
-	const layouts = [
-		{ id: 'column', icon: Columns, label: 'Column' },
-		{ id: '2-column', icon: Columns2, label: '2 Column' },
-		{ id: '3-column', icon: Columns3, label: '3 Column' },
-		{ id: '4-column', icon: Columns4, label: '4 Column' },
-	];
-
-	const elements = [
-		{ id: 'button', icon: Square, label: 'Button' },
-		{ id: 'text', icon: Type, label: 'Text' },
-		{ id: 'image', icon: Image, label: 'Image' },
-		{ id: 'logo', icon: Focus, label: 'Logo' },
-		{ id: 'logo-header', icon: Square, label: 'Logo Header' },
-		{ id: 'divider', icon: Minus, label: 'Divider' },
-		{ id: 'social-icons', icon: Focus, label: 'Social Icons' },
-	];
-
-	const layers = [
-		{ id: 'header', name: 'Header Section', type: 'section', visible: true },
-		{ id: 'hero', name: 'Hero Image', type: 'image', visible: true },
-		{ id: 'content', name: 'Main Content', type: 'text', visible: true },
-		{ id: 'cta', name: 'Call to Action', type: 'button', visible: true },
-		{ id: 'footer', name: 'Footer', type: 'section', visible: true },
-	];
-
-	const mediaItems = [
-		{ id: 'img1', name: 'hero-banner.jpg', type: 'image', size: '1.2 MB', url: '/placeholder-image.jpg' },
-		{ id: 'img2', name: 'product-photo.png', type: 'image', size: '800 KB', url: '/placeholder-image.jpg' },
-		{ id: 'vid1', name: 'intro-video.mp4', type: 'video', size: '5.4 MB', url: '/placeholder-video.mp4' },
-		{ id: 'aud1', name: 'background-music.mp3', type: 'audio', size: '2.1 MB', url: '/placeholder-audio.mp3' },
-	];
-
-	const tabs = [
-		{ id: 'elements' as TabType, label: 'Elements', icon: Square },
-		{ id: 'layers' as TabType, label: 'Layers', icon: Layers },
-		{ id: 'media' as TabType, label: 'Media', icon: FileImage },
-	];
 
 	const getMediaIcon = (type: string) => {
 		switch (type) {
@@ -198,7 +150,7 @@ const Sidebar: React.FC = () => {
 					<button
 						key={tab.id}
 						onClick={() => setActiveTab(tab.id)}
-						className={`flex flex-col items-center py-4 px-2 text-xs font-medium transition-colors ${activeTab === tab.id
+						className={`flex flex-col items-center py-4 px-2 text-xs font-medium transition-colors border-r-2 border-transparent ${activeTab === tab.id
 							? 'text-purple-600 bg-purple-100 border-r-2 border-purple-600'
 							: 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
 							}`}

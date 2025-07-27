@@ -20,7 +20,7 @@ const EmailBuilderHeader = () => {
 
 	return (
 		<div className="border-b">
-			<div className="flex h-16 items-center px-4">
+			<div className="flex h-16 items-center pr-4">
 				<nav className="flex items-center space-x-6">
 					{menuItems.map((item) => (
 						<Link

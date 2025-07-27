@@ -50,7 +50,7 @@ const TopToolbar = ({
 		}
 	};
 
-	const getDisplayName = () => {
+	const getTemplateName = () => {
 		if (templateName) return templateName;
 		if (templateId) return `Template #${templateId}`;
 		return 'Untitled Template';
@@ -58,7 +58,7 @@ const TopToolbar = ({
 
 	return (
 		<div className="bg-white border-b border-gray-200 pr-4 py-3">
-			<div className="flex items-center justify-between">
+			<div className="grid grid-cols-3 items-center justify-between">
 				{/* Left Section - Template Info */}
 				<div className="flex items-center space-x-4">
 					{/* Back/Close Button */}
@@ -98,9 +98,9 @@ const TopToolbar = ({
 							</div>
 						) : (
 							<div className="flex items-center space-x-2 group">
-								<h1 className="text-lg font-semibold text-gray-900">
-									{getDisplayName()}
-								</h1>
+								<h2 className="text-lg font-semibold text-gray-900">
+									{getTemplateName()}
+								</h2>
 								<button
 									onClick={handleStartEdit}
 									className="p-1 text-gray-400 hover:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -113,7 +113,7 @@ const TopToolbar = ({
 				</div>
 
 				{/* Center Section - View Mode Toggle */}
-				<div className="flex bg-gray-100 rounded-lg p-1">
+				<div className="flex justify-center bg-gray-100 rounded-lg p-1">
 					<button
 						onClick={() => setViewMode('desktop')}
 						className={`flex items-center space-x-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'desktop'
@@ -137,7 +137,7 @@ const TopToolbar = ({
 				</div>
 
 				{/* Right Section - Actions */}
-				<div className="flex items-center space-x-3">
+				<div className="flex items-center justify-end space-x-3">
 					<button
 						onClick={onSave}
 						className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"

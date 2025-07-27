@@ -7,7 +7,7 @@ import {
 	Plus
 } from 'lucide-react';
 
-import mockEmailTemplates from '@email-builder/utils/data';
+import { mockEmailTemplates } from '@email-builder/utils/data';
 import EmailTemplateGridView from './EmailTemplateGridView';
 import EmailTemplateListView from './EmailTemplateListView';
 import { useNavigate } from 'react-router-dom';
@@ -110,9 +110,9 @@ const EmailTemplateListing = ({ onCreateNew, onEditTemplate, onPreviewTemplate }
 	const statuses = ['all', 'published', 'draft', 'scheduled'];
 
 	return (
-		<div className="flex flex-col h-full bg-white">
+		<div className="flex flex-col h-full bg-white mt-5">
 			{/* Header */}
-			<div className="border-b border-gray-200 p-6">
+			<div className="pr-4">
 				<div className="flex items-center justify-between mb-4">
 					<div>
 						<h1 className="text-2xl font-bold text-gray-900">Email Templates</h1>
@@ -193,7 +193,7 @@ const EmailTemplateListing = ({ onCreateNew, onEditTemplate, onPreviewTemplate }
 			</div>
 
 			{/* Toolbar */}
-			<div className="flex items-center justify-between p-4 border-b border-gray-200">
+			<div className="flex items-center justify-between pr-4 my-5">
 				<div className="flex items-center gap-4">
 					{/* Select All Checkbox */}
 					<label className="flex items-center">
@@ -241,7 +241,7 @@ const EmailTemplateListing = ({ onCreateNew, onEditTemplate, onPreviewTemplate }
 			</div>
 
 			{/* Content */}
-			<div className="flex-1 overflow-auto p-6">
+			<div className="flex-1 overflow-auto pr-4">
 				{filteredAndSortedTemplates.length === 0 ? (
 					<div className="text-center py-12">
 						<div className="text-gray-400 mb-4">

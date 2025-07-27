@@ -8,17 +8,18 @@ import {
 
 import { elements, mediaItems, TabType, layouts, tabs, layers } from '@email-builder/utils/data';
 
+const getMediaIcon = (type: string) => {
+	switch (type) {
+		case 'image': return Image;
+		case 'video': return Video;
+		case 'audio': return Music;
+		default: return File;
+	}
+};
+
 const Sidebar: React.FC = () => {
 	const [activeTab, setActiveTab] = useState<TabType>('elements');
 
-	const getMediaIcon = (type: string) => {
-		switch (type) {
-			case 'image': return Image;
-			case 'video': return Video;
-			case 'audio': return Music;
-			default: return File;
-		}
-	};
 
 	const renderTabContent = () => {
 		switch (activeTab) {

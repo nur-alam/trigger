@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, KeyboardEvent, useRef, FocusEvent } from 'react';
 import { Monitor, Smartphone, Save, ArrowLeft, X, Edit2, Check, XIcon } from 'lucide-react';
 
 interface TopToolbarProps {
@@ -42,11 +42,20 @@ const TopToolbar = ({
 		setIsEditing(false);
 	};
 
-	const handleKeyDown = (e: React.KeyboardEvent) => {
+	const handleKeyDown = (e: KeyboardEvent) => {
 		if (e.key === 'Enter') {
 			handleSaveEdit();
 		} else if (e.key === 'Escape') {
 			handleCancelEdit();
+		}
+	};
+
+	const handleBlur = (event: FocusEvent<HTMLInputElement>) => {
+		const cancelButton = event.currentTarget.parentElement?.querySelector('[data-cancel-button]');
+		if (event.relatedTarget === cancelButton) {
+			handleCancelEdit();
+		} else {
+			handleSaveEdit();
 		}
 	};
 
@@ -79,7 +88,7 @@ const TopToolbar = ({
 									value={editValue}
 									onChange={(e) => setEditValue(e.target.value)}
 									onKeyDown={handleKeyDown}
-									onBlur={handleSaveEdit}
+									onBlur={(event) => handleBlur(event)}
 									className="px-2 py-1 text-lg font-semibold text-gray-900 bg-white border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
 									autoFocus
 								/>
@@ -90,7 +99,7 @@ const TopToolbar = ({
 									<Check className="w-4 h-4" />
 								</button>
 								<button
-									onClick={handleCancelEdit}
+									data-cancel-button
 									className="p-1 text-gray-400 hover:text-gray-600"
 								>
 									<XIcon className="w-4 h-4" />

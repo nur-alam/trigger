@@ -1,9 +1,11 @@
 import React from 'react'
 import EmailTemplateListing from '@email-builder/builder/EmailTemplateListing';
+import CodeSnap from '@email-builder/old/codesnap';
 
 const App = () => {
 	return (
 		<EmailTemplateListing />
+		// <CodeSnap />
 	)
 }
 

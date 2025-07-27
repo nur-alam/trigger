@@ -51,12 +51,7 @@ const TopToolbar = ({
 	};
 
 	const handleBlur = (event: FocusEvent<HTMLInputElement>) => {
-		const cancelButton = event.currentTarget.parentElement?.querySelector('[data-cancel-button]');
-		if (event.relatedTarget === cancelButton) {
-			handleCancelEdit();
-		} else {
-			handleSaveEdit();
-		}
+		handleSaveEdit();
 	};
 
 	const getTemplateName = () => {
@@ -99,7 +94,7 @@ const TopToolbar = ({
 									<Check className="w-4 h-4" />
 								</button>
 								<button
-									data-cancel-button
+									onMouseDown={handleCancelEdit}
 									className="p-1 text-gray-400 hover:text-gray-600"
 								>
 									<XIcon className="w-4 h-4" />

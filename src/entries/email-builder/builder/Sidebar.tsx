@@ -6,6 +6,8 @@ import {
 	File
 } from 'lucide-react';
 
+import { ELEMENTS } from '@email-builder/elements';
+
 import { elements, mediaItems, TabType, layouts, tabs, layers } from '@email-builder/utils/data';
 
 const getMediaIcon = (type: string) => {
@@ -46,7 +48,7 @@ const Sidebar: React.FC = () => {
 						<div className="p-4">
 							<h3 className="text-sm font-medium text-gray-900 mb-3">Elements</h3>
 							<div className="grid grid-cols-2 gap-2">
-								{elements.map((element) => (
+								{ELEMENTS.map((element) => (
 									<button
 										key={element.id}
 										className="flex flex-col items-center p-3 border border-gray-200 rounded-lg hover:border-gray-300 hover:bg-gray-50 transition-colors"

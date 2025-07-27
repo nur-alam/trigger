@@ -10,6 +10,7 @@ import {
 	Columns4,
 	Layers,
 	FileImage,
+	Heading,
 } from 'lucide-react';
 
 // Mock data for email templates
@@ -131,6 +132,7 @@ export const mockEmailTemplateCategories = [
 export const elements = [
 	{ id: 'button', icon: Square, label: 'Button' },
 	{ id: 'text', icon: Type, label: 'Text' },
+	{ id: 'heading', icon: Heading, label: 'Heading' },
 	{ id: 'image', icon: Image, label: 'Image' },
 	{ id: 'logo', icon: Focus, label: 'Logo' },
 	{ id: 'logo-header', icon: Square, label: 'Logo Header' },

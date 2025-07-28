@@ -2,7 +2,7 @@
 
 ## Description
 
-Trigger
+Trigger is a powerful WordPress SMTP configuration plugin that simplifies your site's email delivery system with detailed email logging.
 
 ## System Requirements
 

@@ -22,7 +22,6 @@ const getMediaIcon = (type: string) => {
 const Sidebar: React.FC = () => {
 	const [activeTab, setActiveTab] = useState<TabType>('elements');
 
-
 	const renderTabContent = () => {
 		switch (activeTab) {
 			case 'elements':

@@ -212,9 +212,11 @@ class EmailLogController {
 
 		$params = $verify['data'];
 		$args   = array(
-			'page'     => isset( $params['page'] ) ? absint( $params['page'] ) : 1,
-			'per_page' => isset( $params['per_page'] ) ? absint( $params['per_page'] ) : 10,
-			'search'   => isset( $params['search'] ) ? sanitize_text_field( $params['search'] ) : '',
+			'page'       => isset( $params['page'] ) ? absint( $params['page'] ) : 1,
+			'per_page'   => isset( $params['per_page'] ) ? absint( $params['per_page'] ) : 10,
+			'search'     => isset( $params['search'] ) ? sanitize_text_field( $params['search'] ) : '',
+			'sort_by'    => isset( $params['sort_by'] ) ? sanitize_text_field( $params['sort_by'] ) : 'created_at',
+			'sort_order' => isset( $params['sort_order'] ) ? sanitize_text_field( $params['sort_order'] ) : 'desc',
 		);
 
 		$result = $this->email_log_model->get_all_email_logs( $args );

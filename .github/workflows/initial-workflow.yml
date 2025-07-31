@@ -41,16 +41,6 @@ jobs:
         run: |
           npm run build
           ls -la
-          cd ..
+          pwd
           pwd
           ls -la
-      
-      - name: Create plugin archive
-        run: |
-          pwd
-          find . -name "*.zip" -type f
-          ls -la
-          cd ..
-          pwd
-          ls -la
-          find . -name "*.zip" -type f

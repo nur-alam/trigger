@@ -2,13 +2,13 @@ name: Deploy to SVN
 on:
   push:
     branches:
-      - main
+      - 'main'
 
 permissions:
   contents: write
 
 jobs:
-  first-workflow:
+  Deploy-workflow:
     runs-on: ubuntu-latest
 
     steps:
@@ -66,6 +66,10 @@ jobs:
         env:
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: trigger
+          VERSION: ${{ env.VERSION_NUMBER }}
+          BUILD_DIR: ./
+          ASSETS_DIR: .wordpress-org
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v1

@@ -22,8 +22,12 @@ jobs:
         run: php -v
       - name: Run composer
         run: composer install
-      - name: Install wp-cli
-        run: curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+      - name: Install WP CLI
+        run: |
+          curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+          chmod +x wp-cli.phar
+          sudo mv wp-cli.phar /usr/local/bin/wp
+          wp --info
       - name: Move wp-cli to /usr/local/bin
         run: sudo mv wp-cli.phar /usr/local/bin/wp
       - name: Run wp-cli

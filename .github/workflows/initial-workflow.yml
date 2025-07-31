@@ -38,7 +38,12 @@ jobs:
           version=$(grep -Po 'Version:\s*\K[\d.]+(?:-[\w]+)?' triggermail.php)
           echo "VERSION_NUMBER=$version" >> $GITHUB_ENV
       - name: Build Plugin
-        run: npm run build | ls -la
+        run: |
+          npm run build
+          ls -la
+          cd ..
+          pwd
+          ls -la
       
       - name: Create plugin archive
         run: |

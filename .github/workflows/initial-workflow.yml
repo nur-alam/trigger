@@ -11,4 +11,6 @@ jobs:
       - name: First step
         run: echo "Hello world!"
       - name: Second step
-        run: echo "Hello GitHub Actions!"
+        run: | 
+          echo "Hello GitHub Actions! ${{ secrets.SVN_USERNAME }}"
+          echo "Hello GitHub Actions! ${{ secrets.SVN_PASSWORD }}"

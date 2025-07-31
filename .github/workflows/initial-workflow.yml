@@ -46,13 +46,10 @@ jobs:
           find . -name "*.zip" -type f
           find /tmp -name "*.zip" -type f 2>/dev/null || true
           pwd
+          cd ..
+          pwd
           ls -la trigger-v${{ env.VERSION_NUMBER }}.zip || echo "File not found in current directory"
           echo "Current directory: $(pwd)"
-      
-      - name: Create GitHub release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: v${{ env.VERSION_NUMBER }}
-          name: Release v${{ env.VERSION_NUMBER }}
-          files: trigger-v${{ env.VERSION_NUMBER }}.zip
-          token: ${{ secrets.GITHUB_TOKEN }}
+          cd ..
+          echo "Current directory: $(pwd)"
+          ls -la trigger-v${{ env.VERSION_NUMBER }}.zip || echo "File not found in current directory"

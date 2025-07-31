@@ -54,6 +54,12 @@ jobs:
         with:
           tag_name: v${{ env.VERSION_NUMBER }}
           name: Release v${{ env.VERSION_NUMBER }}
-          files: ../trigger-${{ env.VERSION_NUMBER }}.zip
+          files: |
+            pwd
+            ls -la
+            cd ..
+            pwd
+            ls -la
+            trigger-${{ env.VERSION_NUMBER }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

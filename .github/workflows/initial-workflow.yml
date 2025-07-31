@@ -14,41 +14,60 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
           node-version: '22.16.0'
+
       - name: Install dependencies
         run: npm install --legacy-peer-deps
-      - name: Install php
-        run: sudo apt-get install -y php
-      - name: Run php
-        run: php -v
-      - name: Run composer
-        run: composer install
+
+      - name: Install PHP 8.2
+        run: |
+          sudo add-apt-repository ppa:ondrej/php -y
+          sudo apt-get update
+          sudo apt-get install php8.2 php8.2-cli php8.2-mbstring php8.2-xml
+
+      - name: Install Composer
+        run: sudo apt-get update && sudo apt-get install -y composer
+      
       - name: Install WP CLI
         run: |
           curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-          php wp-cli.phar --info
           chmod +x wp-cli.phar
           sudo mv wp-cli.phar /usr/local/bin/wp
+          wp --info
+
+      - name: Run php
+        run: php -v
+
+      - name: Run composer
+        run: composer install
+
       - name: Install WP CLI dist-archive package
         run: wp package install wp-cli/dist-archive-command
+
       - name: Verify WP CLI installation
         run: wp --info
+
       - name: Extract version number
         id: get_version
         run: |
           version=$(grep -Po 'Version:\s*\K[\d.]+(?:-[\w]+)?' triggermail.php)
           echo "VERSION_NUMBER=$version" >> $GITHUB_ENV
+
       - name: Build Plugin
         run: npm run build
-      - name: Install wp-cli
-        run: curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+
+      - name: WordPress Plugin Deploy
+        id: deploy
+        uses: 10up/action-wordpress-plugin-deploy@stable
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+
       - name: Create GitHub release
         uses: softprops/action-gh-release@v1
-        with:
-          tag_name: v${{ env.VERSION_NUMBER }}
-          name: Release v${{ env.VERSION_NUMBER }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

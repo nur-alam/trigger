@@ -69,9 +69,16 @@ jobs:
           echo "SVN Password is set: ${{ secrets.SVN_PASSWORD }}"
           echo "SVN Password is set: ${{ secrets.SVN_PASSWORD != '' }}"
           
+      - name: Test SVN connection
+        run: |
+          echo "Testing SVN connection to WordPress.org..."
+          svn info https://plugins.svn.wordpress.org/trigger/ --username="${{ secrets.SVN_USERNAME }}" --password="${{ secrets.SVN_PASSWORD }}" --non-interactive --trust-server-cert || echo "SVN connection test failed"
+          
       - name: WordPress Plugin Deploy
         id: deploy
         uses: 10up/action-wordpress-plugin-deploy@stable
+        with:
+          generate-zip: true
         env:
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}

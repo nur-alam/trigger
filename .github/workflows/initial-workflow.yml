@@ -43,7 +43,8 @@ jobs:
       - name: Create plugin archive
         run: |
           wp dist-archive . trigger-v${{ env.VERSION_NUMBER }}.zip
-          ls -la *.zip
+          find . -name "*.zip" -type f
+          ls -la
       
       - name: Create GitHub release
         uses: softprops/action-gh-release@v1

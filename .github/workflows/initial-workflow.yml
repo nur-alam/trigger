@@ -44,7 +44,10 @@ jobs:
         run: |
           wp dist-archive . trigger-v${{ env.VERSION_NUMBER }}.zip
           find . -name "*.zip" -type f
-          ls -la
+          find /tmp -name "*.zip" -type f 2>/dev/null || true
+          pwd
+          ls -la trigger-v${{ env.VERSION_NUMBER }}.zip || echo "File not found in current directory"
+          echo "Current directory: $(pwd)"
       
       - name: Create GitHub release
         uses: softprops/action-gh-release@v1

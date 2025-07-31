@@ -43,15 +43,6 @@ jobs:
       - name: Create plugin archive
         run: |
           wp dist-archive . trigger-v${{ env.VERSION_NUMBER }}.zip
+          cd ..
           ls -la
           find . -name "*.zip" -type f
-          find /tmp -name "*.zip" -type f 2>/dev/null || true
-          pwd
-          cd ..
-          pwd
-          ls -la
-          ls -la trigger-v${{ env.VERSION_NUMBER }}.zip || echo "File not found in current directory"
-          echo "Current directory: $(pwd)"
-          cd ..
-          echo "Current directory: $(pwd)"
-          ls -la trigger-v${{ env.VERSION_NUMBER }}.zip || echo "File not found in current directory"

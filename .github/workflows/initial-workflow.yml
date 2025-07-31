@@ -1,8 +1,8 @@
 name: initial-workflow
 on:
   push:
-    tags:
-      - "*"
+    branches:
+      - main
 
 permissions:
   contents: write

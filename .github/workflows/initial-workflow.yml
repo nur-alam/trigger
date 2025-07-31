@@ -42,7 +42,10 @@ jobs:
       
       - name: Create plugin archive
         run: |
-          wp dist-archive . trigger-v${{ env.VERSION_NUMBER }}.zip
+          pwd
+          find . -name "*.zip" -type f
+          ls -la
           cd ..
+          pwd
           ls -la
           find . -name "*.zip" -type f

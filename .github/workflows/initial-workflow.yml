@@ -42,17 +42,6 @@ jobs:
           version=$(grep -Po 'Version:\s*\K[\d.]+(?:-[\w]+)?' triggermail.php)
           echo "VERSION_NUMBER=$version" >> $GITHUB_ENV
       - name: Build Plugin
-        run: |
-          pwd
-          npm run build
-          pwd
-          ls -la
+        run: npm run build
       - name: Install wp-cli
         run: curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-      - name: Create GitHub release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: v${{ env.VERSION_NUMBER }}
-          name: Release v${{ env.VERSION_NUMBER }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

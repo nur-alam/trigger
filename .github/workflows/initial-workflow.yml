@@ -39,8 +39,11 @@ jobs:
           echo "VERSION_NUMBER=$version" >> $GITHUB_ENV
       - name: Build Plugin
         run: |
+          pwd
           npm run build
+          pwd
           ls -la
           pwd
+          cd ..
           pwd
           ls -la

@@ -206,9 +206,11 @@ class EmailLogModel {
 
 		// Set default arguments
 		$defaults = array(
-			'page'     => 1,
-			'per_page' => 10,
-			'search'   => '',
+			'page'       => 1,
+			'per_page'   => 10,
+			'search'     => '',
+			'sort_by'    => 'created_at',
+			'sort_order' => 'desc',
 		);
 		$args     = wp_parse_args( $args, $defaults );
 
@@ -216,6 +218,11 @@ class EmailLogModel {
 		$page     = max( 1, intval( $args['page'] ) );
 		$per_page = max( 1, intval( $args['per_page'] ) );
 		$offset   = ( $page - 1 ) * $per_page;
+
+		// Validate and sanitize sorting parameters
+		$allowed_sort_columns = array( 'id', 'mail_to', 'subject', 'status', 'provider', 'created_at' );
+		$sort_by = in_array( $args['sort_by'], $allowed_sort_columns, true ) ? $args['sort_by'] : 'created_at';
+		$sort_order = strtoupper( $args['sort_order'] ) === 'ASC' ? 'ASC' : 'DESC';
 
 		// Get total count for pagination
 		$total       = $this->get_total_count( $args['search'] );
@@ -228,7 +235,7 @@ class EmailLogModel {
 				$wpdb->prepare(
 					'SELECT * FROM `' . esc_sql( $this->table_name ) . '` 
 					WHERE subject LIKE %s OR mail_to LIKE %s 
-					ORDER BY created_at DESC 
+					ORDER BY `' . esc_sql( $sort_by ) . '` ' . esc_sql( $sort_order ) . ' 
 					LIMIT %d OFFSET %d',
 					'%' . $wpdb->esc_like( $args['search'] ) . '%',
 					'%' . $wpdb->esc_like( $args['search'] ) . '%',
@@ -240,7 +247,7 @@ class EmailLogModel {
 			$email_logs = $wpdb->get_results(
 				$wpdb->prepare(
 					'SELECT * FROM `' . esc_sql( $this->table_name ) . '` 
-					ORDER BY created_at DESC 
+					ORDER BY `' . esc_sql( $sort_by ) . '` ' . esc_sql( $sort_order ) . ' 
 					LIMIT %d OFFSET %d',
 					$per_page,
 					$offset

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { ColumnDef, SortingState, PaginationState, ColumnFiltersState, RowSelectionState } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
-import { Eye, Trash2, AlertTriangle, ChevronUp, ChevronDown, Ellipsis, LoaderCircle, Forward } from 'lucide-react'
+import { Eye, Trash2, AlertTriangle, ChevronUp, ChevronDown, Forward, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
 import {
 	Dialog,
 	DialogContent,
@@ -204,8 +204,7 @@ const EmailLogs = () => {
 				return (
 					<Checkbox
 						checked={row.getIsSelected()}
-						onCheckedChange={(checked: boolean) => {
-							const event = window.event as MouseEvent | undefined;
+						onCheckedChange={(checked: boolean, event?: React.MouseEvent) => {
 							handleRowSelection(rowIndex, checked, event?.shiftKey ?? false);
 						}}
 						aria-label={__('Select row', 'trigger')}
@@ -225,7 +224,25 @@ const EmailLogs = () => {
 		},
 		{
 			accessorKey: 'status',
-			header: __('Status', 'trigger'),
+			header: ({ column }) => {
+				return (
+					<Button
+						variant="ghost"
+						onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+						className="h-auto p-0 font-medium hover:bg-transparent"
+					>
+						{__('Status', 'trigger')}
+						{column.getIsSorted() === "asc" ? (
+							<ArrowUp className="ml-2 h-4 w-4" />
+						) : column.getIsSorted() === "desc" ? (
+							<ArrowDown className="ml-2 h-4 w-4" />
+						) : (
+							<ArrowUpDown className="ml-2 h-4 w-4" />
+						)}
+					</Button>
+				)
+			},
+			enableSorting: true,
 			cell: ({ row }) => {
 				const status = row.getValue('status') as string
 				return <Badge variant="outline"
@@ -236,7 +253,25 @@ const EmailLogs = () => {
 		},
 		{
 			accessorKey: 'provider',
-			header: __('Provider', 'trigger'),
+			header: ({ column }) => {
+				return (
+					<Button
+						variant="ghost"
+						onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+						className="h-auto p-0 font-medium hover:bg-transparent"
+					>
+						{__('Provider', 'trigger')}
+						{column.getIsSorted() === "asc" ? (
+							<ArrowUp className="ml-2 h-4 w-4" />
+						) : column.getIsSorted() === "desc" ? (
+							<ArrowDown className="ml-2 h-4 w-4" />
+						) : (
+							<ArrowUpDown className="ml-2 h-4 w-4" />
+						)}
+					</Button>
+				)
+			},
+			enableSorting: true,
 			cell: ({ row }) => {
 				const provider = row.getValue('provider') as string
 				return getProviderFullName(provider);
@@ -244,7 +279,25 @@ const EmailLogs = () => {
 		},
 		{
 			accessorKey: 'created_at',
-			header: __('Date', 'trigger'),
+			header: ({ column }) => {
+				return (
+					<Button
+						variant="ghost"
+						onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+						className="h-auto p-0 font-medium hover:bg-transparent"
+					>
+						{__('Date', 'trigger')}
+						{column.getIsSorted() === "asc" ? (
+							<ArrowUp className="ml-2 h-4 w-4" />
+						) : column.getIsSorted() === "desc" ? (
+							<ArrowDown className="ml-2 h-4 w-4" />
+						) : (
+							<ArrowUpDown className="ml-2 h-4 w-4" />
+						)}
+					</Button>
+				)
+			},
+			enableSorting: true,
 			cell: ({ row }) => {
 				const date = new Date(row.getValue('created_at'))
 				return format(date, 'PPpp')
@@ -289,7 +342,7 @@ const EmailLogs = () => {
 		},
 	]
 
-	const fetchEmailLogs = async (params: { page: number; per_page: number; search?: string }) => {
+	const fetchEmailLogs = async (params: { page: number; per_page: number; search?: string; sort_by?: string; sort_order?: string }) => {
 		setLoading(true);
 		try {
 			const formData = new FormData();
@@ -299,6 +352,12 @@ const EmailLogs = () => {
 			formData.append('per_page', params.per_page.toString());
 			if (params.search) {
 				formData.append('search', params.search);
+			}
+			if (params.sort_by) {
+				formData.append('sort_by', params.sort_by);
+			}
+			if (params.sort_order) {
+				formData.append('sort_order', params.sort_order);
 			}
 
 			const response = await fetch(config.ajax_url, {
@@ -321,20 +380,31 @@ const EmailLogs = () => {
 	}
 
 	useEffect(() => {
+		const sortBy = sorting.length > 0 ? sorting[0].id : undefined;
+		const sortOrder = sorting.length > 0 ? (sorting[0].desc ? 'desc' : 'asc') : undefined;
+
 		fetchEmailLogs({
 			page: pageIndex + 1,
 			per_page: pageSize,
 			search: searchQuery,
+			sort_by: sortBy,
+			sort_order: sortOrder,
 		});
-	}, [pageIndex, pageSize])
+	}, [pageIndex, pageSize, sorting, searchQuery])
 
 	const handleSearch = (value: string) => {
 		setSearchQuery(value)
 		setPagination(prev => ({ ...prev, pageIndex: 0 }))
+
+		const sortBy = sorting.length > 0 ? sorting[0].id : undefined;
+		const sortOrder = sorting.length > 0 ? (sorting[0].desc ? 'desc' : 'asc') : undefined;
+
 		fetchEmailLogs({
 			page: 1,
 			per_page: pageSize,
 			search: value,
+			sort_by: sortBy,
+			sort_order: sortOrder,
 		})
 	}
 

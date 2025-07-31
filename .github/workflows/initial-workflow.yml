@@ -28,6 +28,8 @@ jobs:
           php wp-cli.phar --info
           chmod +x wp-cli.phar
           sudo mv wp-cli.phar /usr/local/bin/wp
+      - name: Install WP CLI dist-archive package
+        run: wp package install wp-cli/dist-archive-command
       - name: Verify WP CLI installation
         run: wp --info
       - name: Extract version number
@@ -38,6 +40,11 @@ jobs:
       - name: Build Plugin
         run: npm run build
       
+      - name: Create plugin archive
+        run: |
+          cd wp-content/plugins/trigger
+          wp dist-archive . ../../../trigger-v${{ env.VERSION_NUMBER }}.zip
+      
       - name: Create GitHub release
         uses: softprops/action-gh-release@v1
         env:
@@ -45,3 +52,4 @@ jobs:
         with:
           tag_name: v${{ env.VERSION_NUMBER }}
           name: Release v${{ env.VERSION_NUMBER }}
+          files: trigger-v${{ env.VERSION_NUMBER }}.zip

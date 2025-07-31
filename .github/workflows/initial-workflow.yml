@@ -29,8 +29,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install php8.2 php8.2-cli php8.2-mbstring php8.2-xml
 
-      - name: Install Composer
-        run: sudo apt-get update && sudo apt-get install -y composer
+      - name: Install Composer and SVN
+        run: sudo apt-get update && sudo apt-get install -y composer subversion
       
       - name: Install WP CLI
         run: |
@@ -72,7 +72,10 @@ jobs:
       - name: Test SVN connection
         run: |
           echo "Testing SVN connection to WordPress.org..."
-          svn info https://plugins.svn.wordpress.org/trigger/ --username="${{ secrets.SVN_USERNAME }}" --password="${{ secrets.SVN_PASSWORD }}" --non-interactive --trust-server-cert || echo "SVN connection test failed"
+          echo "SVN version:"
+          svn --version
+          echo "Testing repository access..."
+          svn info https://plugins.svn.wordpress.org/trigger/ --username="${{ secrets.SVN_USERNAME }}" --password="${{ secrets.SVN_PASSWORD }}" --non-interactive --trust-server-cert || echo "SVN connection test failed - this might be normal if the plugin doesn't exist yet"
           
       - name: WordPress Plugin Deploy
         id: deploy

@@ -1,4 +1,4 @@
-name: initial-workflow
+name: Deploy to SVN
 on:
   push:
     branches:

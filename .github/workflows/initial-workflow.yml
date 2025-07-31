@@ -8,9 +8,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: First step
-        run: echo "Hello world!"
-      - name: Second step
-        run: | 
-          echo "Hello GitHub Actions! ${{ secrets.SVN_USERNAME }}"
-          echo "Hello GitHub Actions! ${{ secrets.SVN_PASSWORD }}"
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '22.16.0'
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+      - name: Install php
+        run: sudo apt-get install -y php
+      - name: Run php
+        run: php -v
+      - name: Run composer
+        run: composer install
+      - name: Install wp-cli
+        run: curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+      - name: Move wp-cli to /usr/local/bin
+        run: sudo mv wp-cli.phar /usr/local/bin/wp
+      - name: Run wp-cli
+        run: wp --version

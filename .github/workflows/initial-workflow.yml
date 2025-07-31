@@ -28,8 +28,5 @@ jobs:
           php wp-cli.phar --info
           chmod +x wp-cli.phar
           sudo mv wp-cli.phar /usr/local/bin/wp
-          wp --info
-      - name: Move wp-cli to /usr/local/bin
-        run: sudo mv wp-cli.phar /usr/local/bin/wp
-      - name: Run wp-cli
+      - name: Verify WP CLI installation
         run: wp --info

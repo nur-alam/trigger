@@ -57,9 +57,6 @@ jobs:
           files: |
             pwd
             ls -la
-            cd ..
-            pwd
-            ls -la
             trigger-${{ env.VERSION_NUMBER }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

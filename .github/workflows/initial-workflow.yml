@@ -3,6 +3,10 @@ on:
   push: 
     branches:
       - github-actions
+
+permissions:
+  contents: write
+
 jobs:
   first-workflow:
     runs-on: ubuntu-latest

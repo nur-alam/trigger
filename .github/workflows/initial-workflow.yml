@@ -59,23 +59,6 @@ jobs:
 
       - name: Build Plugin
         run: npm run build
-
-      - name: Debug version and slug
-        run: |
-          echo "Plugin version: ${{ env.VERSION_NUMBER }}"
-          echo "Plugin slug: trigger"
-          echo "SVN Username is set: ${{ secrets.SVN_USERNAME }}"
-          echo "SVN Username is set: ${{ secrets.SVN_USERNAME != '' }}"
-          echo "SVN Password is set: ${{ secrets.SVN_PASSWORD }}"
-          echo "SVN Password is set: ${{ secrets.SVN_PASSWORD != '' }}"
-          
-      - name: Test SVN connection
-        run: |
-          echo "Testing SVN connection to WordPress.org..."
-          echo "SVN version:"
-          svn --version
-          echo "Testing repository access..."
-          svn info https://plugins.svn.wordpress.org/trigger/ --username="${{ secrets.SVN_USERNAME }}" --password="${{ secrets.SVN_PASSWORD }}" --non-interactive --trust-server-cert || echo "SVN connection test failed - this might be normal if the plugin doesn't exist yet"
           
       - name: WordPress Plugin Deploy
         id: deploy

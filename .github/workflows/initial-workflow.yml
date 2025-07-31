@@ -41,9 +41,7 @@ jobs:
         run: npm run build
       
       - name: Create plugin archive
-        run: |
-          cd wp-content/plugins/trigger
-          wp dist-archive . ../../../trigger-v${{ env.VERSION_NUMBER }}.zip
+        run: wp dist-archive . trigger-v${{ env.VERSION_NUMBER }}.zip
       
       - name: Create GitHub release
         uses: softprops/action-gh-release@v1

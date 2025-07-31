@@ -10,3 +10,5 @@ jobs:
     steps:
       - name: First step
         run: echo "Hello world!"
+      - name: Second step
+        run: echo "Hello GitHub Actions!"

@@ -38,16 +38,18 @@ jobs:
           version=$(grep -Po 'Version:\s*\K[\d.]+(?:-[\w]+)?' triggermail.php)
           echo "VERSION_NUMBER=$version" >> $GITHUB_ENV
       - name: Build Plugin
-        run: npm run build
+        run: npm run build | ls -la
       
       - name: Create plugin archive
         run: |
           wp dist-archive . trigger-v${{ env.VERSION_NUMBER }}.zip
+          ls -la
           find . -name "*.zip" -type f
           find /tmp -name "*.zip" -type f 2>/dev/null || true
           pwd
           cd ..
           pwd
+          ls -la
           ls -la trigger-v${{ env.VERSION_NUMBER }}.zip || echo "File not found in current directory"
           echo "Current directory: $(pwd)"
           cd ..

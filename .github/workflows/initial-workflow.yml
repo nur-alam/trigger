@@ -66,24 +66,16 @@ jobs:
           ls -la assets/dist/
           ls -la assets/dist/css/
           ls -la assets/dist/js/
-
-      - name: List built assets (debug)
-        run: |
-          cd ..
-          echo "Checking built assets:"
-          ls -la assets/dist/
-          ls -la assets/dist/css/
-          ls -la assets/dist/js/
           
-      # - name: WordPress Plugin Deploy
-      #   id: deploy
-      #   uses: 10up/action-wordpress-plugin-deploy@stable
-      #   env:
-      #     SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
-      #     SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
-      #     SLUG: trigger
+      - name: WordPress Plugin Deploy
+        id: deploy
+        uses: 10up/action-wordpress-plugin-deploy@stable
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: trigger
 
-      # - name: Create GitHub release
-      #   uses: softprops/action-gh-release@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

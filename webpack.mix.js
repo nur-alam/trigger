@@ -8,4 +8,4 @@ mix.webpackConfig({
 
 mix.setPublicPath('./assets/dist');
 
-mix.sass('assets/src/scss/index.scss', 'assets/dist/css/style.min.css').tailwind();
+mix.sass('./assets/src/scss/index.scss', './assets/dist/css/style.min.css').tailwind();

@@ -10,7 +10,7 @@
 		"prod": "webpack --mode production",
 		"make-pot": "wp i18n make-pot --exclude='node_modules, vendor' . languages/trigger.pot",
 		"bundle": "wp dist-archive . ../trigger-$(grep 'Version:' triggermail.php | awk '{print $3}').zip",
-		"build": "composer i --no-dev && npm run prod && npx mix --production && npm run make-pot && npm run bundle"
+		"build": "composer i --no-dev && npx mix --production && npm run prod && npm run make-pot && npm run bundle"
 	},
 	"author": "nurwp",
 	"license": "ISC",

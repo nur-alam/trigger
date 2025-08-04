@@ -4,7 +4,7 @@ Tags: SMTP configuration, Email delivery, Email logs, Email tracking, WordPress 
 Requires at least: 5.3
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.0.5
+Stable tag: 1.0.6
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -25,7 +25,7 @@ Source code link : https://github.com/nur-alam/trigger
 
 == Changelog ==
 
-= 1.0.5 - June 4, 2025
+= 1.0.6 - June 4, 2025
 
 New: Github workflow added
 

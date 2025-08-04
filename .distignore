@@ -23,6 +23,8 @@ package-lock.json
 package.json
 webpack.config.js
 webpack.mix.js
+tailwind.config.js
+tsconfig.json
 /src
 assets/src
 assets/dist/mix-manifest.json

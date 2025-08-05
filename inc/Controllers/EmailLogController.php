@@ -10,7 +10,6 @@
 
 namespace Trigger\Controllers;
 
-use Exception;
 use Trigger\Models\EmailLogModel;
 use Trigger\Traits\JsonResponse;
 use Trigger\Traits\RestResponse;

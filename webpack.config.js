@@ -86,7 +86,7 @@ module.exports = (env, options) => {
 			dest_path: './assets/dist/js',
 			src_files: {
 				'backend-bundle.min': './src/index.tsx',
-				'email-builder-bundle.min': './src/entries/email-builder/index.tsx',
+				// 'email-builder-bundle.min': './src/entries/email-builder/index.tsx',
 			},
 		},
 	];

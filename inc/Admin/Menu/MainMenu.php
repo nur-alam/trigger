@@ -144,14 +144,14 @@ class MainMenu {
 		);
 
 		// Email Builder submenu
-		add_submenu_page(
-			$this->slug(),
-			__( 'Email Builder', 'trigger' ),
-			__( 'Email Builder', 'trigger' ),
-			$this->capability(),
-			$this->slug() . '-email-builder',
-			array( $this, 'email_builder_view' )
-		);
+		// add_submenu_page(
+		// 	$this->slug(),
+		// 	__( 'Email Builder', 'trigger' ),
+		// 	__( 'Email Builder', 'trigger' ),
+		// 	$this->capability(),
+		// 	$this->slug() . '-email-builder',
+		// 	array( $this, 'email_builder_view' )
+		// );
 
 		// $email_logs_submenu = new EmailLogs();
 		// add_submenu_page(

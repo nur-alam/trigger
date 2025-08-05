@@ -1,3 +1,4 @@
+// tailwind basic import
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -69,8 +70,6 @@
 		@apply font-sans antialiased bg-background text-foreground;
 	}
 }
-
-body {}
 
 .wp-person a:focus .gravatar,
 .wp-person a:focus,

@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Trigger SMTP, Mail Logs, Deliver Mails
- * Version: 1.0.8
+ * Version: 1.0.9
  * Requires at least: 5.3
  * Requires PHP: 7.4
  * Plugin URI: https://wptriggermail.com/

@@ -92,6 +92,16 @@ const GeneralSettings = () => {
 	}, [theDefaultConnection]);
 
 	useEffect(() => {
+		const hasSelectedConnection = connections.some(
+			(connection: ConnectionType) => connection.provider === selectedProvider
+		);
+
+		if (!hasSelectedConnection && selectedProvider !== 'none') {
+			setSelectedProvider('none');
+		}
+	}, [connections, selectedProvider]);
+
+	useEffect(() => {
 		// fetchLogRetention();
 	}, [logRetention]);
 
@@ -106,6 +116,12 @@ const GeneralSettings = () => {
 		}
 		return connection.provider;
 	};
+
+	const selectValue = connections.some(
+		(connection: ConnectionType) => connection.provider === selectedProvider
+	)
+		? selectedProvider
+		: 'none';
 
 	return (
 		<div className="space-y-8 p-6">
@@ -132,7 +148,7 @@ const GeneralSettings = () => {
 							</div>
 						) : (
 							<Select
-								value={selectedProvider}
+								value={selectValue}
 								onValueChange={(value) => updateDefaultConnection(value)}
 								disabled={connectionIsLoading || updateConnectionIsPending}
 							>

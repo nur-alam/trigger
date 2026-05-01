@@ -4,7 +4,7 @@ Tags: SMTP configuration, Email delivery, Email logs, Email tracking, WordPress 
 Requires at least: 5.3
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.10
+Stable tag: 1.0.11
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 

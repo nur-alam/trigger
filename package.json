@@ -10,7 +10,7 @@
 		"watch": "concurrently \"npm run dev\" \"npm run mix\"",
 		"prod": "webpack --mode production",
 		"make-pot": "wp i18n make-pot --exclude='node_modules, vendor' . languages/trigger.pot",
-		"bundle": "version=$(grep 'Version:' triggermail.php | awk '{print $3}') && zip -r ../trigger-${version}.zip . -x 'node_modules/*' '.git/*' '.github/*'",
+		"bundle": "version=$(grep 'Version:' triggermail.php | awk '{print $3}') && out_zip=\"$(pwd)/../trigger-${version}.zip\" && staging_dir=$(mktemp -d) && rsync -a ./ \"$staging_dir/trigger/\" --exclude-from='.distignore' && (cd \"$staging_dir\" && zip -qr \"$out_zip\" trigger) && rm -rf \"$staging_dir\"",
 		"build": "composer i --no-dev && npm run prod && npm run make-pot && npm run bundle"
 	},
 	"author": "nurwp",

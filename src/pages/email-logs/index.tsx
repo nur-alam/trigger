@@ -21,7 +21,7 @@ import { EmailLog, PaginationMeta } from '@/utils/trigger-declaration';
 interface EmailLogsResponse {
 	status_code: number
 	message?: string
-	data: {
+	data?: {
 		email_logs: EmailLog[]
 		meta: PaginationMeta
 	}
@@ -384,8 +384,13 @@ const EmailLogs = () => {
 
 			const responseData = await response.json() as EmailLogsResponse;
 			if (responseData.status_code === 200) {
-				setData(responseData.data.email_logs)
-				setPageCount(responseData.data.meta.total_pages)
+				const emailLogs = Array.isArray(responseData?.data?.email_logs) ? responseData.data.email_logs : []
+				const totalPages = typeof responseData?.data?.meta?.total_pages === 'number'
+					? responseData.data.meta.total_pages
+					: 0
+
+				setData(emailLogs)
+				setPageCount(totalPages)
 			} else {
 				toast.error(responseData?.message || __('Failed to fetch email logs', 'trigger'))
 			}

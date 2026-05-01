@@ -123,7 +123,7 @@ class SmtpConfig {
 			$connections[] = $config;
 		}
 
-		return $this->json_response( __( 'Email configuration deleted successfully', 'trigger' ), null, 200 );
+		return $this->json_response( __( 'Email configuration deleted successfully', 'trigger' ), $connections, 200 );
 	}
 
 	/**
@@ -140,7 +140,7 @@ class SmtpConfig {
 		$config = get_option( TRIGGER_EMAIL_CONFIG, array() );
 
 		if ( empty( $config ) ) {
-			return $this->json_response( __( 'No email connections found', 'trigger' ), null, 200 );
+			return $this->json_response( __( 'No email connections found', 'trigger' ), array(), 200 );
 		}
 
 		// should be delete this commented code later
@@ -150,7 +150,7 @@ class SmtpConfig {
 			$connections[] = $settings;
 		}
 
-		return $this->json_response( __( 'Email connections fetched successfully', 'trigger' ), null, 200 );
+		return $this->json_response( __( 'Email connections fetched successfully', 'trigger' ), $connections, 200 );
 	}
 
 	/**
@@ -161,10 +161,23 @@ class SmtpConfig {
 	public function get_default_email_connection() {
 		$default_provider = trigger_get_default_provider();
 		if ( false === $default_provider ) {
+			$providers = get_option( TRIGGER_EMAIL_CONFIG, array() );
+			if ( ! empty( $providers ) && is_array( $providers ) ) {
+				$provider_keys      = array_keys( $providers );
+				$first_provider_key = reset( $provider_keys );
+
+				if ( $first_provider_key && $this->update_default_provider( $first_provider_key ) ) {
+					$default_provider = trigger_get_default_provider();
+					if ( false !== $default_provider ) {
+						return $this->json_response( 'Fetched default email connection', $default_provider, 200 );
+					}
+				}
+			}
+
 			return $this->json_response( __( 'No default email provider found', 'trigger' ), null, 404 );
 		}
 
-		return $this->json_response( 'Fetched default email connection', null, 200 );
+		return $this->json_response( 'Fetched default email connection', $default_provider, 200 );
 	}
 
 	/**
@@ -191,20 +204,20 @@ class SmtpConfig {
 			// todo: add default email provider
 			$updated = $this->update_default_provider( $params['provider'] );
 			if ( ! $updated ) {
-				return $this->json_response( __( 'Failed to update default email provider', 'trigger' ), null, 400 );
+				return $this->json_response( __( 'Failed to update default email provider', 'trigger' ), $params['provider'], 400 );
 			}
-			return $this->json_response( __( 'Default email connection updated successfully', 'trigger' ), null, 200 ); 
+			return $this->json_response( __( 'Default email connection updated successfully', 'trigger' ), $params['provider'], 200 );
 		}
 
 		if ( $default_provider['provider'] !== $params['provider'] ) {
 			$updated = $this->update_default_provider( $params['provider'] );
 			if ( ! $updated ) {
-				return $this->json_response( __( 'Failed to update default email provider', 'trigger' ), null, 400 );
+				return $this->json_response( __( 'Failed to update default email provider', 'trigger' ), $params['provider'], 400 );
 			}
-			return $this->json_response( __( 'Default email connection updated successfully', 'trigger' ), null, 200 );
+			return $this->json_response( __( 'Default email connection updated successfully', 'trigger' ), $params['provider'], 200 );
 		}
 
-		return $this->json_response( __( 'Default email connection updated successfully', 'trigger' ), null, 200 );
+		return $this->json_response( __( 'Default email connection already set', 'trigger' ), $params['provider'], 200 );
 	}
 
 	/**

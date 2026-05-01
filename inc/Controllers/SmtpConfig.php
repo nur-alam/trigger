@@ -123,7 +123,7 @@ class SmtpConfig {
 			$connections[] = $config;
 		}
 
-		return $this->json_response( __( 'Email configuration deleted successfully', 'trigger' ), $connections, 200 );
+		return $this->json_response( __( 'Email configuration deleted successfully', 'trigger' ), null, 200 );
 	}
 
 	/**
@@ -140,7 +140,7 @@ class SmtpConfig {
 		$config = get_option( TRIGGER_EMAIL_CONFIG, array() );
 
 		if ( empty( $config ) ) {
-			return $this->json_response( __( 'No email connections found', 'trigger' ), array(), 200 );
+			return $this->json_response( __( 'No email connections found', 'trigger' ), null, 200 );
 		}
 
 		// should be delete this commented code later
@@ -150,7 +150,7 @@ class SmtpConfig {
 			$connections[] = $settings;
 		}
 
-		return $this->json_response( __( 'Email connections fetched successfully', 'trigger' ), $connections, 200 );
+		return $this->json_response( __( 'Email connections fetched successfully', 'trigger' ), null, 200 );
 	}
 
 	/**
@@ -164,7 +164,7 @@ class SmtpConfig {
 			return $this->json_response( __( 'No default email provider found', 'trigger' ), null, 404 );
 		}
 
-		return $this->json_response( 'Fetched default email connection', $default_provider, 200 );
+		return $this->json_response( 'Fetched default email connection', null, 200 );
 	}
 
 	/**
@@ -193,6 +193,7 @@ class SmtpConfig {
 			if ( ! $updated ) {
 				return $this->json_response( __( 'Failed to update default email provider', 'trigger' ), null, 400 );
 			}
+			return $this->json_response( __( 'Default email connection updated successfully', 'trigger' ), null, 200 ); 
 		}
 
 		if ( $default_provider['provider'] !== $params['provider'] ) {
@@ -200,9 +201,10 @@ class SmtpConfig {
 			if ( ! $updated ) {
 				return $this->json_response( __( 'Failed to update default email provider', 'trigger' ), null, 400 );
 			}
+			return $this->json_response( __( 'Default email connection updated successfully', 'trigger' ), null, 200 );
 		}
 
-		return $this->json_response( __( 'Default email connection updated successfully', 'trigger' ), $params['provider'], 200 );
+		return $this->json_response( __( 'Default email connection updated successfully', 'trigger' ), null, 200 );
 	}
 
 	/**

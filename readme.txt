@@ -25,7 +25,7 @@ Source code link : https://github.com/nur-alam/trigger
 
 == Changelog ==
 
-= 1.0.10 - June 4, 2025
+= 1.0.11 - May 2, 2026
 
 = Implemented a method to hide admin notices when on the Trigger plugin page.
 = Added a utility function to render email bodies correctly, handling potential CSS prefixes.

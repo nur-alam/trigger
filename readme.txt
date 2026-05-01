@@ -2,9 +2,9 @@
 Contributors: nurwp
 Tags: SMTP configuration, Email delivery, Email logs, Email tracking, WordPress email
 Requires at least: 5.3
-Tested up to: 6.8
+Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.9
+Stable tag: 1.0.10
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -24,6 +24,12 @@ Key Features:
 Source code link : https://github.com/nur-alam/trigger
 
 == Changelog ==
+
+= 1.0.10 - June 4, 2025
+
+= Implemented a method to hide admin notices when on the Trigger plugin page.
+= Added a utility function to render email bodies correctly, handling potential CSS prefixes.
+= Updated the email logs display to utilize the new rendering function for better email body presentation.
 
 = 1.0.9 - June 4, 2025
 

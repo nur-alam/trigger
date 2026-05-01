@@ -64,6 +64,7 @@ if ( ! class_exists( 'Trigger' ) ) {
 			// new Init();
 			// Initialize plugin.
 			add_action( 'init', array( $this, 'init_plugin' ) );
+			add_action( 'admin_head', array( $this, 'hide_admin_notices_on_trigger_page' ), 1 );
 		}
 
 		/**
@@ -74,6 +75,32 @@ if ( ! class_exists( 'Trigger' ) ) {
 		public function init_plugin() {
 			// Initialize plugin.
 			new Init();
+		}
+
+		/**
+		 * Hide admin notices on Trigger plugin page.
+		 *
+		 * @return void
+		 */
+		public function hide_admin_notices_on_trigger_page() {
+			if ( ! is_admin() ) {
+				return;
+			}
+
+			if ( ! isset( $_GET['page'] ) || 'trigger' !== sanitize_key( wp_unslash( $_GET['page'] ) ) ) {
+				return;
+			}
+
+			global $pagenow;
+			if ( 'admin.php' !== $pagenow ) {
+				return;
+			}
+
+			remove_all_actions( 'admin_notices' );
+			remove_all_actions( 'all_admin_notices' );
+			remove_all_actions( 'network_admin_notices' );
+			remove_all_actions( 'user_admin_notices' );
+			remove_action( 'admin_notices', 'update_nag', 3 );
 		}
 
 		/**

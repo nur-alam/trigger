@@ -181,9 +181,7 @@ class EmailLogModel {
 		}
 
 		return (int) $wpdb->get_var(
-			$wpdb->prepare(
-				'SELECT COUNT(*) FROM `' . esc_sql( $this->table_name ) . '`'
-			)
+			'SELECT COUNT(*) FROM `' . esc_sql( $this->table_name ) . '`'
 		);
 	}
 
@@ -338,9 +336,7 @@ class EmailLogModel {
 		global $wpdb;
 
 		$total_logs = (int) $wpdb->get_var(
-			$wpdb->prepare(
-				'SELECT COUNT(*) FROM `' . esc_sql( $this->table_name ) . '`'
-			)
+			'SELECT COUNT(*) FROM `' . esc_sql( $this->table_name ) . '`'
 		);
 
 		$total_success_logs = (int) $wpdb->get_var(

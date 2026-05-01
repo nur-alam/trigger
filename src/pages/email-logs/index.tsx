@@ -78,6 +78,23 @@ const EmailLogs = () => {
 	const [searchQuery, setSearchQuery] = useState('')
 	const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(null)
 
+	const getRenderableEmailBody = (message: string) => {
+		if (!message) {
+			return ''
+		}
+
+		const firstTagIndex = message.search(/<(?:!doctype|html|head|body|table|div|p|span|img|a)\b/i)
+		if (firstTagIndex > 0) {
+			const prefix = message.slice(0, firstTagIndex)
+			const looksLikeCssPrefix = prefix.includes('{') && prefix.includes('}') && !prefix.includes('<')
+			if (looksLikeCssPrefix) {
+				return message.slice(firstTagIndex)
+			}
+		}
+
+		return message
+	}
+
 	const handleView = (email: EmailLog) => {
 		setViewEmail(email)
 	}
@@ -482,7 +499,7 @@ const EmailLogs = () => {
 								<CollapsibleSection title="Email Body" defaultOpen>
 									<div
 										className="prose max-w-none"
-										dangerouslySetInnerHTML={{ __html: viewEmail.message }}
+										dangerouslySetInnerHTML={{ __html: getRenderableEmailBody(viewEmail.message) }}
 									/>
 								</CollapsibleSection>
 

@@ -32,12 +32,12 @@ jobs:
       - name: Install Composer and SVN
         run: sudo apt-get update && sudo apt-get install -y composer subversion
       
-      # - name: Install WP CLI
-      #   run: |
-      #     curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-      #     chmod +x wp-cli.phar
-      #     sudo mv wp-cli.phar /usr/local/bin/wp
-      #     wp --info
+      - name: Install WP CLI
+        run: |
+          curl -L https://github.com/wp-cli/wp-cli/releases/latest/download/wp-cli.phar -o wp-cli.phar
+          chmod +x wp-cli.phar
+          sudo mv wp-cli.phar /usr/local/bin/wp
+          wp --info
 
       - name: Run php
         run: php -v
@@ -45,11 +45,11 @@ jobs:
       - name: Run composer
         run: composer install
 
-      # - name: Install WP CLI dist-archive package
-      #   run: wp package install wp-cli/dist-archive-command
+      - name: Install WP CLI dist-archive package
+        run: wp package install wp-cli/dist-archive-command
 
-      # - name: Verify WP CLI installation
-      #   run: wp --info
+      - name: Verify WP CLI installation
+        run: wp --info
 
       - name: Extract version number
         id: get_version
